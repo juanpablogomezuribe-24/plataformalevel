@@ -25,7 +25,17 @@ export default function ViewerInforme({ document }: { document: any }) {
       <aside className="w-80 bg-white border-r border-slate-200 flex flex-col h-full shadow-lg z-10">
         {/* Top Header */}
         <div className="p-8 border-b border-slate-200 bg-slate-900 text-white">
-          <div className="text-[10px] font-black uppercase tracking-widest bg-cyan-500/20 text-cyan-400 px-2 py-1 rounded-md inline-block mb-4 border border-cyan-500/30">
+          {document.content?.brand?.logoUrl && (
+            <img src={document.content.brand.logoUrl} alt="Logo" className="h-10 w-auto mb-6 object-contain" />
+          )}
+          <div 
+            className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md inline-block mb-4 border"
+            style={{ 
+              backgroundColor: document.content?.brand?.primaryColor ? `${document.content.brand.primaryColor}33` : '#06b6d433',
+              color: document.content?.brand?.primaryColor || '#06b6d4',
+              borderColor: document.content?.brand?.primaryColor ? `${document.content.brand.primaryColor}4D` : '#06b6d44D'
+            }}
+          >
             PROPUESTA COMERCIAL
           </div>
           <h1 className="text-2xl font-black leading-tight">
@@ -46,7 +56,10 @@ export default function ViewerInforme({ document }: { document: any }) {
                   : 'hover:bg-slate-50 text-slate-500 border border-transparent'
               }`}
             >
-              <Circle className={`w-4 h-4 flex-shrink-0 ${activeSection === section.id ? 'text-cyan-500 fill-cyan-500' : 'text-slate-300'}`} />
+              <Circle 
+                className={`w-4 h-4 flex-shrink-0 ${activeSection === section.id ? '' : 'text-slate-300'}`}
+                style={activeSection === section.id ? { color: document.content?.brand?.primaryColor || '#06b6d4', fill: document.content?.brand?.primaryColor || '#06b6d4' } : {}}
+              />
               <span className={`text-sm font-bold text-left line-clamp-1 ${activeSection === section.id ? 'text-slate-900' : ''}`}>
                 {section.title}
               </span>

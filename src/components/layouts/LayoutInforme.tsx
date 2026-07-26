@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, Circle, ChevronLeft, Trash2, ArrowUp, ArrowDown } from 'lucide-react'
+import { CheckCircle2, Circle, ChevronLeft, Trash2, ArrowUp, ArrowDown, Palette } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import CoverBlock from '@/components/blocks/CoverBlock'
 import MockupBlock from '@/components/blocks/MockupBlock'
@@ -46,7 +46,19 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
           <button onClick={() => router.push('/')} className="flex items-center text-sm font-bold text-slate-400 hover:text-white mb-6 transition-colors">
             <ChevronLeft className="w-4 h-4 mr-1" /> Volver
           </button>
-          <div className="text-[10px] font-black uppercase tracking-widest bg-cyan-500/20 text-cyan-400 px-2 py-1 rounded-md inline-block mb-4 border border-cyan-500/30">
+          
+          {document.content?.brand?.logoUrl && (
+            <img src={document.content.brand.logoUrl} alt="Logo" className="h-10 w-auto mb-6 object-contain" />
+          )}
+
+          <div 
+            className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md inline-block mb-4 border"
+            style={{ 
+              backgroundColor: document.content?.brand?.primaryColor ? `${document.content.brand.primaryColor}33` : '#06b6d433',
+              color: document.content?.brand?.primaryColor || '#06b6d4',
+              borderColor: document.content?.brand?.primaryColor ? `${document.content.brand.primaryColor}4D` : '#06b6d44D'
+            }}
+          >
             PROPUESTA COMERCIAL
           </div>
           <input 
@@ -59,7 +71,37 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
         </div>
 
         {/* Progress Bar */}
-        <div className="px-6 py-4 border-b border-slate-200 bg-white">
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="mb-8 p-4 bg-slate-800 rounded-2xl border border-slate-700 space-y-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Palette className="w-4 h-4 text-cyan-400" />
+              <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest">Personalizar Marca</h3>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-slate-400 block mb-2">Color Principal</label>
+              <div className="flex items-center gap-3">
+                <input 
+                  type="color" 
+                  value={document.content?.brand?.primaryColor || '#06b6d4'} 
+                  onChange={(e) => updateDocument({ content: { ...document.content, brand: { ...document.content?.brand, primaryColor: e.target.value } } })}
+                  className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent p-0"
+                />
+                <span className="text-xs font-mono text-slate-400 bg-slate-900 px-2 py-1 rounded border border-slate-700">{document.content?.brand?.primaryColor || '#06b6d4'}</span>
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-slate-400 block mb-2">URL del Logo (Opcional)</label>
+              <input 
+                type="text" 
+                placeholder="https://...logo.png"
+                value={document.content?.brand?.logoUrl || ''} 
+                onChange={(e) => updateDocument({ content: { ...document.content, brand: { ...document.content?.brand, logoUrl: e.target.value } } })}
+                className="w-full bg-slate-900 text-sm text-slate-300 border border-slate-700 rounded-lg p-2 outline-none focus:border-cyan-500 transition-colors"
+              />
+            </div>
+          </div>
+
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Progreso</h3>
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Progreso</span>
             <span className="text-xs font-black text-cyan-600">{progress}%</span>
