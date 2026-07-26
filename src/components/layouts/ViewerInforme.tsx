@@ -5,6 +5,9 @@ import { CheckCircle2, Circle } from 'lucide-react'
 import CoverBlock from '@/components/blocks/CoverBlock'
 import MockupBlock from '@/components/blocks/MockupBlock'
 import PricingBlock from '@/components/blocks/PricingBlock'
+import TextBlock from '@/components/blocks/TextBlock'
+import StatsBlock from '@/components/blocks/StatsBlock'
+import ImageBlock from '@/components/blocks/ImageBlock'
 
 export default function ViewerInforme({ document }: { document: any }) {
   // Mock data for sections
@@ -74,6 +77,9 @@ export default function ViewerInforme({ document }: { document: any }) {
               if (block.type === 'cover') return <CoverBlock key={block.id} data={block.data} readOnly={true} />
               if (block.type === 'mockup') return <MockupBlock key={block.id} data={block.data} readOnly={true} />
               if (block.type === 'pricing') return <PricingBlock key={block.id} data={block.data} readOnly={true} />
+              if (block.type === 'text') return <TextBlock key={block.id} data={block.data} readOnly={true} />
+              if (block.type === 'stats') return <StatsBlock key={block.id} data={block.data} readOnly={true} />
+              if (block.type === 'image') return <ImageBlock key={block.id} data={block.data} readOnly={true} />
               return null
             })}
 

@@ -1,11 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, Circle, ChevronLeft, Trash2 } from 'lucide-react'
+import { CheckCircle2, Circle, ChevronLeft, Trash2, ArrowUp, ArrowDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import CoverBlock from '@/components/blocks/CoverBlock'
 import MockupBlock from '@/components/blocks/MockupBlock'
 import PricingBlock from '@/components/blocks/PricingBlock'
+import TextBlock from '@/components/blocks/TextBlock'
+import StatsBlock from '@/components/blocks/StatsBlock'
+import ImageBlock from '@/components/blocks/ImageBlock'
 
 export default function LayoutInforme({ document, updateDocument }: { document: any, updateDocument: (data: any) => void }) {
   const router = useRouter()
@@ -39,19 +42,19 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
       {/* Sidebar (Lotbet Style) */}
       <aside className="w-80 bg-slate-50 border-r border-slate-200 flex flex-col h-full">
         {/* Top Header */}
-        <div className="p-6 border-b border-slate-200">
-          <button onClick={() => router.push('/')} className="flex items-center text-sm font-bold text-slate-500 hover:text-slate-900 mb-6 transition-colors">
+        <div className="p-8 border-b border-slate-200 bg-slate-900 text-white">
+          <button onClick={() => router.push('/')} className="flex items-center text-sm font-bold text-slate-400 hover:text-white mb-6 transition-colors">
             <ChevronLeft className="w-4 h-4 mr-1" /> Volver
           </button>
-          <div className="text-[10px] font-black uppercase tracking-widest bg-cyan-100 text-cyan-700 px-2 py-1 rounded-md inline-block mb-3">
-            INFORME LEVEL
+          <div className="text-[10px] font-black uppercase tracking-widest bg-cyan-500/20 text-cyan-400 px-2 py-1 rounded-md inline-block mb-4 border border-cyan-500/30">
+            PROPUESTA COMERCIAL
           </div>
           <input 
             type="text" 
-            value={document.title}
+            value={document.title || ''}
             onChange={(e) => updateDocument({ title: e.target.value })}
-            className="w-full text-2xl font-black text-slate-900 bg-transparent outline-none focus:border-b-2 focus:border-cyan-500 transition-colors"
-            placeholder="Título del Informe"
+            className="w-full text-2xl font-black leading-tight bg-transparent outline-none border-b border-transparent focus:border-cyan-500 transition-colors py-1"
+            placeholder="Título del Documento"
           />
         </div>
 
@@ -138,43 +141,74 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
                 updateDocument({ content: { ...document.content, blocks: newBlocks } })
               }
 
+              const moveBlockUp = () => {
+                if (index === 0) return
+                const newBlocks = [...document.content.blocks]
+                const temp = newBlocks[index - 1]
+                newBlocks[index - 1] = newBlocks[index]
+                newBlocks[index] = temp
+                updateDocument({ content: { ...document.content, blocks: newBlocks } })
+              }
+
+              const moveBlockDown = () => {
+                if (index === document.content.blocks.length - 1) return
+                const newBlocks = [...document.content.blocks]
+                const temp = newBlocks[index + 1]
+                newBlocks[index + 1] = newBlocks[index]
+                newBlocks[index] = temp
+                updateDocument({ content: { ...document.content, blocks: newBlocks } })
+              }
+
               return (
                 <div key={block.id} className="relative group/blockwrapper">
-                  <div className="absolute -right-6 top-6 opacity-0 group-hover/blockwrapper:opacity-100 z-10 transition-opacity">
+                  <div className="absolute -right-6 top-6 opacity-0 group-hover/blockwrapper:opacity-100 z-10 transition-opacity flex flex-col gap-2">
+                    {index > 0 && (
+                      <button onClick={moveBlockUp} title="Mover Arriba" className="bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 p-2 rounded-xl shadow-md">
+                        <ArrowUp className="w-4 h-4" />
+                      </button>
+                    )}
+                    {index < document.content.blocks.length - 1 && (
+                      <button onClick={moveBlockDown} title="Mover Abajo" className="bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 p-2 rounded-xl shadow-md">
+                        <ArrowDown className="w-4 h-4" />
+                      </button>
+                    )}
                     <button 
                       onClick={deleteBlock}
                       title="Eliminar Bloque"
-                      className="bg-white text-red-500 border border-red-100 hover:bg-red-50 p-2.5 rounded-xl shadow-lg shadow-red-500/10"
+                      className="bg-white text-red-500 border border-red-100 hover:bg-red-50 p-2 rounded-xl shadow-lg shadow-red-500/10 mt-2"
                     >
-                      <Trash2 className="w-5 h-5" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                   {block.type === 'cover' && <CoverBlock data={block.data} onChange={updateBlockData} />}
                   {block.type === 'mockup' && <MockupBlock data={block.data} onChange={updateBlockData} />}
                   {block.type === 'pricing' && <PricingBlock data={block.data} onChange={updateBlockData} />}
+                  {block.type === 'text' && <TextBlock data={block.data} onChange={updateBlockData} />}
+                  {block.type === 'stats' && <StatsBlock data={block.data} onChange={updateBlockData} />}
+                  {block.type === 'image' && <ImageBlock data={block.data} onChange={updateBlockData} />}
                 </div>
               )
             })}
 
             {/* Menú Flotante para Añadir Bloques */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex items-center justify-center gap-4 mt-8">
+            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-wrap items-center justify-center gap-4 mt-8 sticky bottom-8">
               <span className="text-sm font-bold text-slate-400">Insertar:</span>
-              <button 
-                onClick={() => handleAddBlock('cover')}
-                className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors"
-              >
+              <button onClick={() => handleAddBlock('cover')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
                 Portada
               </button>
-              <button 
-                onClick={() => handleAddBlock('mockup')}
-                className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors"
-              >
+              <button onClick={() => handleAddBlock('text')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                Texto
+              </button>
+              <button onClick={() => handleAddBlock('image')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                Imagen
+              </button>
+              <button onClick={() => handleAddBlock('stats')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                Métricas
+              </button>
+              <button onClick={() => handleAddBlock('mockup')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
                 Mockups
               </button>
-              <button 
-                onClick={() => handleAddBlock('pricing')}
-                className="bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors"
-              >
+              <button onClick={() => handleAddBlock('pricing')} className="bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
                 Tabla de Cotización
               </button>
             </div>

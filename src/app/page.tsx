@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
-import { FileText, LogOut, Plus } from 'lucide-react'
+import { FileText, LogOut, Plus, Trash2 } from 'lucide-react'
 
 export default function Dashboard() {
   const [session, setSession] = useState<any>(null)
@@ -66,6 +66,18 @@ export default function Dashboard() {
     }
   }
 
+  async function handleDelete(e: React.MouseEvent, id: string) {
+    e.stopPropagation() // Evitar que el click abra el editor
+    if (!confirm('¿Estás seguro de eliminar este documento de forma permanente?')) return
+    
+    const { error } = await supabase.from('documents').delete().eq('id', id)
+    if (error) {
+      alert("Error al eliminar: " + error.message + " (Asegúrate de tener la política RLS de DELETE habilitada en Supabase)")
+    } else {
+      fetchDocuments()
+    }
+  }
+
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><p className="text-slate-500 font-bold">Cargando...</p></div>
   if (!session) return null // Prevents flashing before redirect
 
@@ -117,8 +129,17 @@ export default function Dashboard() {
                   }`}>
                     {doc.type}
                   </div>
-                  <div className="text-[10px] font-bold text-slate-400">
-                    {new Date(doc.created_at).toLocaleDateString()}
+                  <div className="flex items-center gap-3">
+                    <div className="text-[10px] font-bold text-slate-400">
+                      {new Date(doc.created_at).toLocaleDateString()}
+                    </div>
+                    <button 
+                      onClick={(e) => handleDelete(e, doc.id)} 
+                      className="text-slate-300 hover:text-red-500 transition-colors"
+                      title="Eliminar documento"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
                 <h3 className="font-bold text-lg text-slate-800 mb-1 line-clamp-1">{doc.title}</h3>
