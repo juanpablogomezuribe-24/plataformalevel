@@ -3,10 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
-import LayoutInforme from '@/components/layouts/LayoutInforme'
-import LayoutPresentacion from '@/components/layouts/LayoutPresentacion'
-import LayoutCotizacion from '@/components/layouts/LayoutCotizacion'
-import TemplateEditorWrapper from '@/components/TemplateEditorWrapper'
+import PageEditorWrapper from '@/components/PageEditorWrapper'
+import { Loader2 } from 'lucide-react'
 
 export default function DocumentEditorPage() {
   const params = useParams()
@@ -27,7 +25,7 @@ export default function DocumentEditorPage() {
   async function fetchDocument(id: string) {
     const { data, error } = await supabase
       .from('documents')
-      .select('*')
+      .select('*, clients(name, brand_color)')
       .eq('id', id)
       .single()
     
@@ -52,29 +50,32 @@ export default function DocumentEditorPage() {
       // Create automatic snapshot
       await supabase.from('document_versions').insert({
         document_id: document.id,
-        version_name: `Estado: ${updates.status.toUpperCase()} (antes ${oldStatus || 'nuevo'})`,
+        version_name: \`Estado: \${updates.status.toUpperCase()} (antes \${oldStatus || 'nuevo'})\`,
         title: document.title,
         content: document.content
       })
     }
   }
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50 font-bold text-slate-500">Cargando Editor...</div>
+  if (loading) return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-slate-500">
+      <Loader2 className="w-8 h-8 animate-spin mb-4 text-indigo-600" />
+      <p className="font-bold">Cargando Editor...</p>
+    </div>
+  )
+  
   if (!document) return <div className="min-h-screen flex items-center justify-center bg-slate-50 font-bold text-red-500">Documento no encontrado</div>
 
-  // Si tiene un template especializado, usar el nuevo Wrapper
-  if (document.content?.template) {
-    return <TemplateEditorWrapper document={document} updateDocument={updateDocument} session={session} />
+  // Usar el nuevo Editor Basado en Páginas si el documento tiene la estructura correcta
+  if (document.content?.pages) {
+    return <PageEditorWrapper document={document} updateDocument={updateDocument} session={session} />
   }
 
-  // Fallback a layouts legacy (Bloques genericos)
-  if (document.type === 'presentacion') return <LayoutPresentacion document={document} updateDocument={updateDocument} session={session} />
-  if (document.type === 'informe') return <LayoutInforme document={document} updateDocument={updateDocument} session={session} />
-  if (document.type === 'cotizacion') return <LayoutCotizacion document={document} updateDocument={updateDocument} session={session} />
-
+  // Fallback para documentos viejos (si existen)
   return (
-    <div className="p-8">
-      <h1>Editor genérico (Falta Layout para {document.type})</h1>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-slate-600">
+      <h1 className="text-xl font-bold mb-2">Formato de Documento Legacy</h1>
+      <p>Este documento no tiene la estructura de páginas (Slide Builder). Crea un nuevo documento.</p>
     </div>
   )
 }

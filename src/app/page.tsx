@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
-import { FileText, Plus, Trash2, Copy, MoreVertical, Bell } from 'lucide-react'
+import { FileText, Plus, Trash2, Copy, MoreVertical, Bell, Search, Filter } from 'lucide-react'
 import CreateDocumentModal from '@/components/CreateDocumentModal'
 import SidebarLayout from '@/components/SidebarLayout'
 
@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [documents, setDocuments] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const [activeTab, setActiveTab] = useState('pendientes')
   const router = useRouter()
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export default function Dashboard() {
   async function fetchDocuments() {
     const { data, error } = await supabase
       .from('documents')
-      .select('*')
+      .select('*, clients(name)')
       .order('created_at', { ascending: false })
     
     if (data) setDocuments(data)
@@ -59,7 +60,9 @@ export default function Dashboard() {
         user_id: session.user.id,
         title: doc.title + ' (Copia)', 
         type: doc.type, 
-        status: 'borrador', 
+        status: 'borrador',
+        client_id: doc.client_id,
+        campaign_id: doc.campaign_id,
         content: doc.content 
       }
     ]).select()
@@ -74,157 +77,153 @@ export default function Dashboard() {
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><p className="text-slate-500 font-bold">Cargando...</p></div>
   if (!session) return null 
 
-  const userName = session?.user?.email?.split('@')[0] || 'Usuario'
-  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+  // Filtrado de documentos basado en status (Mapeo a las pestañas de Figma)
+  const filteredDocs = documents.filter(doc => {
+    if (activeTab === 'pendientes') return doc.status === 'borrador' || doc.status === 'en_revision'
+    if (activeTab === 'publicadas') return doc.status === 'publicado'
+    if (activeTab === 'compartidas') return doc.status === 'compartido' || doc.status === 'publicado'
+    if (activeTab === 'cambios') return doc.status === 'cambios_solicitados'
+    return true
+  })
 
   return (
     <SidebarLayout session={session}>
-      {/* Top Header */}
-      <header className="h-20 px-10 flex justify-between items-center bg-white/50 backdrop-blur-md sticky top-0 z-10 border-b border-slate-100">
-        <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Panel principal</h1>
-          <p className="text-slate-500 text-sm">Hola, {capitalize(userName)}. Este es el resumen de tu actividad.</p>
-        </div>
-        <div className="flex items-center gap-4">
+      <div className="p-8 max-w-7xl mx-auto h-screen flex flex-col">
+        
+        {/* Header Publicaciones */}
+        <div className="flex justify-between items-center mb-8 shrink-0">
+          <div>
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight">Publicaciones</h1>
+            <p className="text-slate-500 mt-1">Gestiona todos los documentos publicados y compartidos.</p>
+          </div>
           <button 
             onClick={() => setShowModal(true)}
-            className="bg-indigo-600 text-white font-bold py-2 px-5 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/20 flex items-center gap-2 text-sm"
+            className="bg-indigo-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/20 flex items-center gap-2"
           >
-            <Plus className="w-4 h-4" /> Crear nuevo
-          </button>
-          <button className="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors">
-            <Bell className="w-5 h-5" />
+            <Plus className="w-5 h-5" /> Nuevo documento
           </button>
         </div>
-      </header>
 
-      <div className="p-10 max-w-7xl mx-auto">
-        
-        {/* KPIs (Sparkline Cards) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {/* KPI 1: Cotizaciones */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2 text-slate-500 font-bold text-sm mb-3">
-                <div className="w-2 h-2 rounded-full bg-indigo-500" /> Cotizaciones
-              </div>
-              <div className="text-4xl font-black text-slate-900 mb-1">
-                {documents.filter(d => d.type === 'cotizacion').length}
-              </div>
-              <p className="text-xs text-slate-400">
-                {documents.filter(d => d.type === 'cotizacion' && d.status === 'borrador').length} abiertas
-              </p>
-            </div>
-            {/* Fake Sparkline */}
-            <div className="w-24 h-12 flex items-end justify-between gap-1">
-              {[40, 70, 45, 90, 65, 100].map((h, i) => (
-                <div key={i} className="w-2 bg-indigo-100 rounded-t-sm" style={{ height: `${h}%` }}>
-                  {h === 100 && <div className="w-full h-full bg-indigo-500 rounded-t-sm shadow-[0_0_8px_rgba(99,102,241,0.5)]" />}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* KPI 2: Presentaciones */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2 text-slate-500 font-bold text-sm mb-3">
-                <div className="w-2 h-2 rounded-full bg-pink-500" /> Presentaciones
-              </div>
-              <div className="text-4xl font-black text-slate-900 mb-1">
-                {documents.filter(d => d.type === 'presentacion').length}
-              </div>
-              <p className="text-xs text-slate-400">
-                {documents.filter(d => d.type === 'presentacion' && d.status === 'en_revision').length} en revisión
-              </p>
-            </div>
-            {/* Fake Sparkline Line */}
-            <div className="w-24 h-12 relative flex items-center">
-               <svg viewBox="0 0 100 50" className="w-full h-full overflow-visible">
-                 <path d="M0,40 C20,40 30,10 50,20 C70,30 80,5 100,0" fill="none" stroke="#ec4899" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-               </svg>
-            </div>
-          </div>
-
-          {/* KPI 3: Informes */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2 text-slate-500 font-bold text-sm mb-3">
-                <div className="w-2 h-2 rounded-full bg-emerald-500" /> Informes
-              </div>
-              <div className="text-4xl font-black text-slate-900 mb-1">
-                {documents.filter(d => d.type === 'informe').length}
-              </div>
-              <p className="text-xs text-slate-400">
-                {documents.filter(d => d.type === 'informe' && d.status === 'publicado').length} finalizados
-              </p>
-            </div>
-            <div className="w-24 h-12 relative flex items-center">
-               <svg viewBox="0 0 100 50" className="w-full h-full overflow-visible">
-                 <path d="M0,50 C30,40 40,30 60,35 C80,40 90,10 100,5" fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-               </svg>
-            </div>
-          </div>
+        {/* Tabs */}
+        <div className="flex items-center gap-8 border-b border-slate-200 mb-6 shrink-0">
+          {[
+            { id: 'pendientes', label: 'Pendientes' },
+            { id: 'publicadas', label: 'Publicadas' },
+            { id: 'compartidas', label: 'Compartidas' },
+            { id: 'cambios', label: 'Con cambios solicitados' }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={\`pb-4 text-sm font-bold border-b-2 transition-colors \${
+                activeTab === tab.id 
+                  ? 'border-indigo-600 text-indigo-600' 
+                  : 'border-transparent text-slate-500 hover:text-slate-700'
+              }\`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
-        {/* Lista de Recientes */}
-        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
-            <h2 className="text-lg font-bold text-slate-900 tracking-tight">Recientes</h2>
-            <button className="text-indigo-600 text-sm font-bold hover:text-indigo-700">Ver todo</button>
+        {/* Filters Bar */}
+        <div className="flex items-center gap-4 mb-6 shrink-0">
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            <input 
+              type="text" 
+              placeholder="Buscar documentos..." 
+              className="w-full bg-white border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+          <select className="bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-600 focus:outline-none focus:border-indigo-500">
+            <option>Todos los tipos</option>
+            <option>Cotización</option>
+            <option>Presentación</option>
+            <option>Informe</option>
+          </select>
+          <select className="bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-600 focus:outline-none focus:border-indigo-500">
+            <option>Todos los clientes</option>
+          </select>
+          <button className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">
+            <Filter className="w-4 h-4" /> Más filtros
+          </button>
+        </div>
+
+        {/* Table/List */}
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm flex-1 overflow-hidden flex flex-col">
+          {/* Header Row */}
+          <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-slate-100 bg-slate-50/50 text-xs font-bold text-slate-400 uppercase tracking-wider shrink-0">
+            <div className="col-span-4">Documento</div>
+            <div className="col-span-3">Cliente</div>
+            <div className="col-span-1">Versión</div>
+            <div className="col-span-2">Estado</div>
+            <div className="col-span-2">Actualizado</div>
           </div>
           
-          <div className="divide-y divide-slate-50">
-            {documents.slice(0, 5).map(doc => (
-              <div 
-                key={doc.id} 
-                onClick={() => router.push(`/document/${doc.id}`)}
-                className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer group"
-              >
-                <div className="flex items-center gap-4 flex-1">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                    doc.type === 'cotizacion' ? 'bg-indigo-50 text-indigo-600' :
-                    doc.type === 'presentacion' ? 'bg-pink-50 text-pink-600' :
-                    'bg-emerald-50 text-emerald-600'
-                  }`}>
-                    <FileText className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900 text-sm mb-0.5">{doc.title}</h3>
-                    <p className="text-xs text-slate-500">Cliente: {doc.client_name}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-8">
-                  <div className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${
-                     doc.type === 'cotizacion' ? 'bg-indigo-50 text-indigo-600' :
-                     doc.type === 'presentacion' ? 'bg-pink-50 text-pink-600' :
-                     'bg-emerald-50 text-emerald-600'
-                  }`}>
-                    {doc.type}
-                  </div>
-                  
-                  <div className="text-xs font-bold text-slate-400 w-24 text-right">
-                    {new Date(doc.created_at).toLocaleDateString()}
-                  </div>
-
-                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={(e) => handleDuplicate(e, doc)} className="text-slate-400 hover:text-indigo-600"><Copy className="w-4 h-4" /></button>
-                    <button onClick={(e) => handleDelete(e, doc.id)} className="text-slate-400 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
-                  </div>
-                </div>
+          {/* List Body */}
+          <div className="overflow-y-auto flex-1">
+            {filteredDocs.length === 0 ? (
+              <div className="p-12 text-center text-slate-500 flex flex-col items-center justify-center h-full">
+                <FileText className="w-12 h-12 text-slate-200 mb-4" />
+                <p>No hay documentos en esta sección.</p>
               </div>
-            ))}
-
-            {documents.length === 0 && (
-              <div className="p-12 text-center">
-                <div className="w-16 h-16 bg-slate-50 rounded-full mx-auto flex items-center justify-center text-slate-300 mb-4">
-                  <FileText className="w-8 h-8" />
-                </div>
-                <h3 className="text-sm font-bold text-slate-900 mb-1">Aún no hay documentos</h3>
-                <p className="text-xs text-slate-500">Haz clic en Crear nuevo para comenzar.</p>
+            ) : (
+              <div className="divide-y divide-slate-100">
+                {filteredDocs.map(doc => (
+                  <div 
+                    key={doc.id}
+                    onClick={() => router.push(\`/document/\${doc.id}\`)}
+                    className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-slate-50 cursor-pointer group transition-colors"
+                  >
+                    <div className="col-span-4 flex items-center gap-3">
+                      <div className={\`w-8 h-8 rounded-lg flex items-center justify-center \${
+                        doc.type === 'cotizacion' ? 'bg-indigo-50 text-indigo-600' :
+                        doc.type === 'presentacion' ? 'bg-pink-50 text-pink-600' :
+                        'bg-emerald-50 text-emerald-600'
+                      }\`}>
+                        <FileText className="w-4 h-4" />
+                      </div>
+                      <span className="font-bold text-sm text-slate-900 truncate">{doc.title}</span>
+                    </div>
+                    <div className="col-span-3 text-sm text-slate-600 truncate">
+                      {doc.clients?.name || doc.client_name || 'Sin cliente'}
+                    </div>
+                    <div className="col-span-1 text-sm text-slate-500">
+                      v1
+                    </div>
+                    <div className="col-span-2">
+                      <span className={\`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold \${
+                        doc.status === 'borrador' ? 'bg-amber-50 text-amber-600' :
+                        doc.status === 'publicado' ? 'bg-emerald-50 text-emerald-600' :
+                        doc.status === 'en_revision' ? 'bg-blue-50 text-blue-600' :
+                        'bg-slate-100 text-slate-600'
+                      }\`}>
+                        {doc.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </span>
+                    </div>
+                    <div className="col-span-2 flex items-center justify-between text-sm text-slate-500">
+                      <span>{new Date(doc.created_at).toLocaleDateString()}</span>
+                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
+                        <button onClick={(e) => handleDuplicate(e, doc)} className="p-1 hover:text-indigo-600"><Copy className="w-4 h-4" /></button>
+                        <button onClick={(e) => handleDelete(e, doc.id)} className="p-1 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
+          </div>
+          
+          {/* Pagination Footer */}
+          <div className="border-t border-slate-100 px-6 py-4 flex items-center justify-between text-sm text-slate-500 shrink-0 bg-white">
+            <span>Mostrando {filteredDocs.length} documentos</span>
+            <div className="flex items-center gap-1">
+              <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-50">&lt;</button>
+              <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 font-bold">1</button>
+              <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-50">2</button>
+              <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-50">&gt;</button>
+            </div>
           </div>
         </div>
 
@@ -237,7 +236,7 @@ export default function Dashboard() {
           onSuccess={(id) => {
             setShowModal(false)
             fetchDocuments()
-            router.push(`/document/${id}`)
+            router.push(\`/document/\${id}\`)
           }}
         />
       )}
