@@ -12,6 +12,8 @@ export default function Dashboard() {
   const [showModal, setShowModal] = useState(false)
   const [filter, setFilter] = useState('todos')
   const [clientName, setClientName] = useState('')
+  const [aiPrompt, setAiPrompt] = useState('')
+  const [isGenerating, setIsGenerating] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -85,6 +87,74 @@ export default function Dashboard() {
     }
   }
 
+  async function generateWithAI() {
+    if (!aiPrompt.trim()) {
+      alert("Por favor ingresa un contexto o brief para la IA.")
+      return
+    }
+    if (!session?.user?.id) return;
+    
+    setIsGenerating(true)
+
+    try {
+      // Fetch profile to inject brand
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single()
+
+      const brand = profile ? {
+        primaryColor: profile.primary_color || '#06b6d4',
+        logoUrl: profile.logo_url || ''
+      } : {
+        primaryColor: '#06b6d4',
+        logoUrl: ''
+      }
+
+      // Call AI endpoint
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: aiPrompt, clientName })
+      })
+
+      if (!response.ok) {
+        throw new Error("Error en la respuesta de la IA")
+      }
+
+      const generatedData = await response.json()
+
+      // Save to Supabase
+      const { data, error } = await supabase.from('documents').insert([
+        { 
+          user_id: session.user.id,
+          title: generatedData.title || ('Propuesta para ' + (clientName || 'Cliente')), 
+          type: generatedData.type || 'informe', 
+          status: 'borrador', 
+          client_name: clientName || 'Sin Cliente',
+          content: { 
+            brand: brand,
+            blocks: generatedData.blocks || [] 
+          } 
+        }
+      ]).select()
+
+      if (error) throw error
+
+      if (data && data[0]) {
+        setShowModal(false)
+        fetchDocuments()
+        router.push(`/document/${data[0].id}`)
+      }
+    } catch (error: any) {
+      console.error(error)
+      alert("Hubo un error al generar con IA: " + error.message)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
   async function handleDelete(e: React.MouseEvent, id: string) {
     e.stopPropagation() // Evitar que el click abra el editor
     if (!confirm('¿Estás seguro de eliminar este documento de forma permanente?')) return
@@ -146,8 +216,8 @@ export default function Dashboard() {
       <main className="max-w-5xl mx-auto px-6 py-10">
         <div className="flex justify-between items-end mb-8">
           <div>
-            <h2 className="text-3xl font-black tracking-tight text-slate-900 mb-1">Mis Documentos</h2>
-            <p className="text-slate-500 text-sm">Gestiona tus cotizaciones, propuestas e informes.</p>
+            <h2 className="text-3xl font-black tracking-tight text-slate-900 mb-1">Visión General</h2>
+            <p className="text-slate-500 text-sm">Dashboard analítico y gestión de propuestas.</p>
           </div>
           <button 
             onClick={() => setShowModal(true)}
@@ -156,6 +226,48 @@ export default function Dashboard() {
             <Plus className="w-5 h-5" /> Nuevo Documento
           </button>
         </div>
+
+        {/* --- DASHBOARD ANALÍTICO --- */}
+        {documents.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
+            {/* KPI: Total */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Creados</p>
+              <div className="text-3xl font-black text-slate-800">{documents.length}</div>
+            </div>
+            
+            {/* KPI: Tasa de Éxito */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Tasa de Éxito</p>
+              <div className="flex items-end gap-2">
+                <div className="text-3xl font-black text-emerald-600">
+                  {Math.round((documents.filter(d => ['publicado', 'aprobado', 'enviado'].includes(d.status)).length / documents.length) * 100) || 0}%
+                </div>
+                <div className="text-xs font-bold text-slate-400 mb-1.5">aprobados</div>
+              </div>
+            </div>
+
+            {/* KPI: Desglose por Tipo */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm col-span-1 md:col-span-2 flex flex-col justify-center">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Distribución por Formato</p>
+              <div className="flex items-center gap-4">
+                <div className="flex-1 flex flex-col items-center p-2 bg-cyan-50 rounded-xl">
+                  <span className="text-xl font-black text-cyan-600">{documents.filter(d => d.type === 'informe').length}</span>
+                  <span className="text-[10px] font-bold text-cyan-700 uppercase">Informes</span>
+                </div>
+                <div className="flex-1 flex flex-col items-center p-2 bg-indigo-50 rounded-xl">
+                  <span className="text-xl font-black text-indigo-600">{documents.filter(d => d.type === 'presentacion').length}</span>
+                  <span className="text-[10px] font-bold text-indigo-700 uppercase">Presentaciones</span>
+                </div>
+                <div className="flex-1 flex flex-col items-center p-2 bg-emerald-50 rounded-xl">
+                  <span className="text-xl font-black text-emerald-600">{documents.filter(d => d.type === 'cotizacion').length}</span>
+                  <span className="text-[10px] font-bold text-emerald-700 uppercase">Cotizaciones</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* --- FIN DASHBOARD --- */}
 
         {/* Pestañas de Filtro */}
         <div className="flex flex-wrap gap-2 mb-8 border-b border-slate-200 pb-4">
@@ -264,6 +376,48 @@ export default function Dashboard() {
                 placeholder="Ej. Coca-Cola, Apple..."
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:border-cyan-500 transition-colors"
               />
+            </div>
+            
+            <div className="mb-6">
+              <label className="text-sm font-bold text-slate-700 block mb-2">Contexto / Brief (Opcional pero recomendado para IA)</label>
+              <textarea 
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                placeholder="Ej. Necesito una cotización para rediseñar la marca de Coca-Cola. Incluye una fase de auditoría ($500), diseño ($2000) y manual de marca ($1000). El objetivo es modernizar..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:border-indigo-500 transition-colors min-h-[100px] resize-y"
+              />
+            </div>
+            
+            <div className="mb-6">
+              <button 
+                onClick={generateWithAI}
+                disabled={isGenerating || !aiPrompt.trim()}
+                className={`w-full font-bold py-3 px-5 rounded-xl transition-colors shadow-lg flex items-center justify-center gap-2 ${
+                  isGenerating 
+                    ? 'bg-slate-200 text-slate-500 cursor-not-allowed' 
+                    : aiPrompt.trim() 
+                      ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-600/20' 
+                      : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                }`}
+              >
+                {isGenerating ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Generando Propuesta con Inteligencia Artificial...
+                  </>
+                ) : (
+                  <>✨ Generar Propuesta Automáticamente con IA</>
+                )}
+              </button>
+            </div>
+
+            <div className="relative flex py-5 items-center">
+              <div className="flex-grow border-t border-slate-200"></div>
+              <span className="flex-shrink-0 mx-4 text-slate-400 text-sm font-bold uppercase tracking-widest">O CREAR MANUALMENTE</span>
+              <div className="flex-grow border-t border-slate-200"></div>
             </div>
             
             <div className="grid md:grid-cols-3 gap-6">
