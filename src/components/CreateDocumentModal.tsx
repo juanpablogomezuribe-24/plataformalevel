@@ -73,6 +73,9 @@ export default function CreateDocumentModal({
         if (response.ok) {
           const generatedData = await response.json()
           blocks = generatedData.blocks || []
+        } else {
+          const errorData = await response.json()
+          throw new Error("Error de IA: " + (errorData.error || "Fallo desconocido al conectar con OpenAI"))
         }
       }
 
