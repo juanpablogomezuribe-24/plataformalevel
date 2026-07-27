@@ -69,7 +69,7 @@ Instrucciones:
 function generateMockResponse(prompt: string, clientName: string) {
   const isQuote = prompt.toLowerCase().includes('precio') || prompt.toLowerCase().includes('cotiza') || prompt.toLowerCase().includes('$');
   
-  const mockData = {
+  const mockData: any = {
     title: `Propuesta Inteligente para ${clientName || 'Cliente'}`,
     type: isQuote ? 'cotizacion' : 'presentacion',
     blocks: [
