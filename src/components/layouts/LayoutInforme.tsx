@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, Circle, ChevronLeft, Trash2, ArrowUp, ArrowDown, Palette } from 'lucide-react'
+import { CheckCircle2, Circle, ChevronLeft, Trash2, ArrowUp, ArrowDown, Palette, Menu, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import CoverBlock from '@/components/blocks/CoverBlock'
 import MockupBlock from '@/components/blocks/MockupBlock'
@@ -29,6 +29,7 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
     { id: 4, title: 'Conclusiones', completed: false },
   ])
   const [activeSection, setActiveSection] = useState(3)
+  const [showSidebar, setShowSidebar] = useState(false)
 
   // Calculate progress
   const progress = Math.round((sections.filter(s => s.completed).length / sections.length) * 100)
@@ -47,9 +48,23 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
 
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex flex-col md:flex-row h-screen bg-white overflow-hidden">
+      
+      {/* Botón menú móvil */}
+      <div className="md:hidden p-4 bg-slate-900 flex justify-between items-center text-white shrink-0">
+        <div className="flex items-center gap-3">
+          {document.content?.brand?.logoUrl && (
+            <img src={document.content.brand.logoUrl} alt="Logo" className="h-6 w-auto object-contain" />
+          )}
+          <span className="font-bold text-sm truncate">{document.title || 'Sin Título'}</span>
+        </div>
+        <button onClick={() => setShowSidebar(!showSidebar)}>
+          {showSidebar ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
+
       {/* Sidebar (Lotbet Style) */}
-      <aside className="w-80 bg-slate-50 border-r border-slate-200 flex flex-col h-full">
+      <aside className={`${showSidebar ? 'block' : 'hidden'} md:flex w-full md:w-80 bg-slate-50 border-r border-slate-200 flex-col absolute md:relative z-40 h-[calc(100vh-60px)] md:h-full overflow-y-auto`}>
         {/* Top Header */}
         <div className="p-8 border-b border-slate-200 bg-slate-900 text-white">
           <button onClick={() => router.push('/')} className="flex items-center text-sm font-bold text-slate-400 hover:text-white mb-6 transition-colors">
@@ -57,7 +72,7 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
           </button>
           
           {document.content?.brand?.logoUrl && (
-            <img src={document.content.brand.logoUrl} alt="Logo" className="h-10 w-auto mb-6 object-contain" />
+            <img src={document.content.brand.logoUrl} alt="Logo" className="h-10 w-auto mb-6 object-contain hidden md:block" />
           )}
 
           <div 
@@ -237,8 +252,8 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
       </aside>
 
       {/* Main Content Area (Editor) */}
-      <main className="flex-1 overflow-y-auto bg-slate-100 relative">
-        <div className="max-w-4xl mx-auto py-12 px-8">
+      <main className="flex-1 overflow-y-auto bg-slate-100 relative w-full">
+        <div className="w-full max-w-4xl mx-auto py-6 md:py-12 px-4 md:px-8">
           <div className="min-h-[800px] flex flex-col gap-8">
             
             {/* Header Mínimo si está vacío */}

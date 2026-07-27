@@ -3,13 +3,15 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
-import { FileText, LogOut, Plus, Trash2, Copy } from 'lucide-react'
+import { FileText, LogOut, Plus, Trash2, Copy, Settings } from 'lucide-react'
 
 export default function Dashboard() {
   const [session, setSession] = useState<any>(null)
   const [documents, setDocuments] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const [filter, setFilter] = useState('todos')
+  const [clientName, setClientName] = useState('')
   const router = useRouter()
 
   useEffect(() => {
@@ -44,13 +46,29 @@ export default function Dashboard() {
   async function createDocument(type: 'informe' | 'presentacion' | 'cotizacion') {
     if (!session?.user?.id) return;
     
+    // Fetch profile to inject brand
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single()
+
+    const brand = profile ? {
+      primaryColor: profile.primary_color || '#06b6d4',
+      logoUrl: profile.logo_url || ''
+    } : {
+      primaryColor: '#06b6d4',
+      logoUrl: ''
+    }
+
     const { data, error } = await supabase.from('documents').insert([
       { 
         user_id: session.user.id,
         title: 'Nueva ' + (type === 'informe' ? 'Propuesta' : type === 'presentacion' ? 'Presentación' : 'Cotización'), 
         type: type, 
         status: 'borrador', 
-        content: {} 
+        client_name: clientName || 'Sin Cliente',
+        content: { brand: brand } 
       }
     ]).select()
 
@@ -115,7 +133,10 @@ export default function Dashboard() {
           <h1 className="font-black text-xl tracking-tight">LEVEL</h1>
         </div>
         <div className="flex items-center gap-4 text-sm font-medium">
-          <span className="text-slate-500 hidden md:block">{session.user.email}</span>
+          <button onClick={() => router.push('/settings')} className="text-slate-500 hover:text-slate-900 flex items-center gap-2 transition-colors">
+            <Settings className="w-4 h-4" /> Ajustes
+          </button>
+          <div className="w-px h-4 bg-slate-200"></div>
           <button onClick={handleLogout} className="text-red-500 hover:text-red-600 flex items-center gap-2">
             <LogOut className="w-4 h-4" /> Salir
           </button>
@@ -136,7 +157,16 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {documents.length === 0 ? (
+        {/* Pestañas de Filtro */}
+        <div className="flex flex-wrap gap-2 mb-8 border-b border-slate-200 pb-4">
+          <button onClick={() => setFilter('todos')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${filter === 'todos' ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'}`}>Todos</button>
+          <button onClick={() => setFilter('borrador')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${filter === 'borrador' ? 'bg-slate-200 text-slate-800' : 'text-slate-500 hover:bg-slate-100'}`}>Borradores</button>
+          <button onClick={() => setFilter('en_revision')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${filter === 'en_revision' ? 'bg-amber-100 text-amber-700' : 'text-slate-500 hover:bg-slate-100'}`}>En Revisión</button>
+          <button onClick={() => setFilter('publicado')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${filter === 'publicado' ? 'bg-emerald-100 text-emerald-700' : 'text-slate-500 hover:bg-slate-100'}`}>Publicados</button>
+          <button onClick={() => setFilter('rechazado')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${filter === 'rechazado' ? 'bg-red-100 text-red-700' : 'text-slate-500 hover:bg-slate-100'}`}>Rechazados</button>
+        </div>
+
+        {documents.filter(doc => filter === 'todos' || doc.status === filter).length === 0 ? (
           <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm">
             <div className="w-16 h-16 bg-slate-50 rounded-2xl mx-auto flex items-center justify-center text-slate-300 mb-4">
               <FileText className="w-8 h-8" />
@@ -147,7 +177,7 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {documents.map(doc => (
+            {documents.filter(doc => filter === 'todos' || doc.status === filter).map(doc => (
               <div key={doc.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow group cursor-pointer" onClick={() => router.push(`/document/${doc.id}`)}>
                 <div className="flex justify-between items-start mb-4">
                   <div className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${
@@ -179,6 +209,13 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </div>
+                
+                {doc.client_name && doc.client_name !== 'Sin Cliente' && (
+                  <div className="text-xs font-bold text-slate-500 mb-1 flex items-center gap-1">
+                    Para: <span className="text-slate-700">{doc.client_name}</span>
+                  </div>
+                )}
+                
                 <h3 className="font-bold text-lg text-slate-800 mb-2 line-clamp-1">{doc.title}</h3>
                 
                 <div className={`inline-block mb-4 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-md ${
@@ -216,7 +253,18 @@ export default function Dashboard() {
               ✕
             </button>
             <h2 className="text-3xl font-black tracking-tight text-slate-900 mb-2">¿Qué vamos a crear hoy?</h2>
-            <p className="text-slate-500 mb-8">Elige el formato estructural (Layout) ideal para tu propuesta.</p>
+            <p className="text-slate-500 mb-6">Elige el formato estructural (Layout) ideal para tu propuesta.</p>
+            
+            <div className="mb-6">
+              <label className="text-sm font-bold text-slate-700 block mb-2">Cliente (Opcional)</label>
+              <input 
+                type="text" 
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                placeholder="Ej. Coca-Cola, Apple..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:border-cyan-500 transition-colors"
+              />
+            </div>
             
             <div className="grid md:grid-cols-3 gap-6">
               {/* Opción Informe */}

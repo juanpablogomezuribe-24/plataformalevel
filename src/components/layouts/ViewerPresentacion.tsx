@@ -21,31 +21,32 @@ export default function ViewerPresentacion({ document }: { document: any }) {
       
       {/* Client Header (Print Hidden) */}
       <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm print:hidden">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
           {document.content?.brand?.logoUrl ? (
-            <img src={document.content.brand.logoUrl} alt="Logo" className="h-8 w-auto object-contain" />
+            <img src={document.content.brand.logoUrl} alt="Logo" className="h-6 md:h-8 w-auto object-contain shrink-0" />
           ) : (
-            <div className="font-black text-xl text-slate-900">LEVEL</div>
+            <div className="font-black text-lg md:text-xl text-slate-900 shrink-0">LEVEL</div>
           )}
-          <div className="h-4 w-px bg-slate-300"></div>
-          <h1 className="text-sm font-bold text-slate-600">
+          <div className="h-4 w-px bg-slate-300 shrink-0"></div>
+          <h1 className="text-xs md:text-sm font-bold text-slate-600 truncate">
             {document.title}
           </h1>
         </div>
 
         <button 
           onClick={() => window.print()}
-          className="bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold py-2 px-4 rounded-xl shadow-md transition-all flex items-center gap-2"
+          className="bg-slate-900 hover:bg-slate-800 text-white text-xs md:text-sm font-bold py-2 px-3 md:px-4 rounded-xl shadow-md transition-all flex items-center gap-1 md:gap-2 shrink-0 ml-4"
         >
           <Printer className="w-4 h-4" />
-          Descargar PDF
+          <span className="hidden md:inline">Descargar PDF</span>
+          <span className="md:hidden">PDF</span>
         </button>
       </div>
 
       {/* Main Content Area (Viewer) */}
-      <main className="flex-1 overflow-y-auto relative print:overflow-visible flex flex-col items-center">
-        <div className="w-full max-w-6xl mx-auto py-12 px-6 md:px-12 print:p-0 print:max-w-none">
-          <div className="min-h-[800px] flex flex-col gap-12 print:gap-4 print:min-h-0">
+      <main className="flex-1 overflow-y-auto relative print:overflow-visible flex flex-col items-center w-full">
+        <div className="w-full max-w-6xl mx-auto py-6 md:py-12 px-4 md:px-12 print:p-0 print:max-w-none">
+          <div className="min-h-[800px] flex flex-col gap-8 md:gap-12 print:gap-4 print:min-h-0 w-full">
             
             {(!document.content?.blocks || document.content.blocks.length === 0) && (
               <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-20 text-center">

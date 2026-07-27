@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, Circle, Printer } from 'lucide-react'
+import { CheckCircle2, Circle, Printer, Menu, X } from 'lucide-react'
 import CoverBlock from '@/components/blocks/CoverBlock'
 import MockupBlock from '@/components/blocks/MockupBlock'
 import PricingBlock from '@/components/blocks/PricingBlock'
@@ -25,11 +25,26 @@ export default function ViewerInforme({ document }: { document: any }) {
     { id: 4, title: 'Conclusiones', completed: true },
   ])
   const [activeSection, setActiveSection] = useState(1)
+  const [showSidebar, setShowSidebar] = useState(false)
 
   return (
-    <div className="flex min-h-screen bg-slate-100 print:bg-white">
+    <div className="flex flex-col md:flex-row min-h-screen bg-slate-100 print:bg-white overflow-hidden">
+      
+      {/* Botón menú móvil y barra superior cliente */}
+      <div className="md:hidden p-4 bg-white border-b border-slate-200 flex justify-between items-center shrink-0 print:hidden z-50 shadow-sm relative">
+        <div className="flex items-center gap-3">
+          {document.content?.brand?.logoUrl && (
+            <img src={document.content.brand.logoUrl} alt="Logo" className="h-6 w-auto object-contain" />
+          )}
+          <span className="font-bold text-sm text-slate-900 truncate">{document.title || 'Propuesta'}</span>
+        </div>
+        <button onClick={() => setShowSidebar(!showSidebar)} className="text-slate-900 p-1">
+          {showSidebar ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
+
       {/* Sidebar (Lotbet Style) - Clean for Client */}
-      <aside className="w-80 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0 shadow-lg z-10 print:hidden">
+      <aside className={`${showSidebar ? 'block' : 'hidden'} md:flex w-full md:w-80 bg-white border-r border-slate-200 flex-col absolute md:relative z-40 h-[calc(100vh-60px)] md:h-screen sticky top-0 shadow-lg print:hidden`}>
         {/* Top Header */}
         <div className="p-8 border-b border-slate-200 bg-slate-900 text-white">
           {document.content?.brand?.logoUrl && (
@@ -88,8 +103,8 @@ export default function ViewerInforme({ document }: { document: any }) {
       </aside>
 
       {/* Main Content Area (Viewer) */}
-      <main className="flex-1 overflow-y-auto relative print:overflow-visible">
-        <div className="max-w-4xl mx-auto py-12 px-8 print:p-0 print:max-w-none w-full">
+      <main className="flex-1 overflow-y-auto relative print:overflow-visible w-full">
+        <div className="w-full max-w-4xl mx-auto py-6 md:py-12 px-4 md:px-8 print:p-0 print:max-w-none">
           <div className="min-h-[800px] flex flex-col gap-8 print:gap-4 print:min-h-0">
             
             {(!document.content?.blocks || document.content.blocks.length === 0) && (

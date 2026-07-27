@@ -259,11 +259,11 @@ export default function LayoutCotizacion({ document, updateDocument }: { documen
       )}
 
       {/* Main Content Area (Editor a Dos Columnas) */}
-      <main className="flex-1 overflow-y-auto bg-slate-100 flex justify-center">
-        <div className="w-full max-w-[1400px] py-12 px-8 flex items-start gap-8">
+      <main className="flex-1 overflow-y-auto bg-slate-100 flex justify-center w-full">
+        <div className="w-full max-w-[1400px] py-6 md:py-12 px-4 md:px-8 flex flex-col xl:flex-row items-start gap-8">
           
           {/* Columna Izquierda: Contenido Principal */}
-          <div className="flex-1 flex flex-col gap-12 min-h-[800px]">
+          <div className="flex-1 flex flex-col gap-8 md:gap-12 min-h-0 xl:min-h-[800px] w-full">
             
             {(!allBlocks || allBlocks.length === 0) && (
               <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-20 text-center">
@@ -292,7 +292,7 @@ export default function LayoutCotizacion({ document, updateDocument }: { documen
           </div>
 
           {/* Columna Derecha: Panel Financiero Sticky */}
-          <div className="w-[450px] sticky top-24 flex flex-col gap-6 shrink-0">
+          <div className="w-full xl:w-[450px] sticky bottom-0 xl:top-24 flex flex-col gap-6 shrink-0 bg-slate-100/90 backdrop-blur-md p-4 xl:p-0 rounded-t-2xl xl:rounded-none shadow-[0_-10px_30px_rgba(0,0,0,0.05)] xl:shadow-none border-t border-slate-200 xl:border-none z-30">
             {financeBlocks.length > 0 ? (
               financeBlocks.map((b: any) => renderBlockWrapper(b.block, b.index))
             ) : (
