@@ -18,85 +18,47 @@ export async function POST(req: Request) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    let systemPrompt = '';
-    
-    if (template === 'balones') {
-      systemPrompt = `
-Eres un asistente comercial experto en ventas de balones y material deportivo.
-Tu tarea es leer el brief del usuario y devolver UNICAMENTE un JSON válido que llene la estructura del template "Cotización Balones".
-Inventa datos coherentes si faltan (ej. precios coherentes, logística, medidas de caja maestra) para que la cotización quede profesional.
+    // Nuevo System Prompt enfocado en el Editor de Diapositivas con Variaciones
+    const systemPrompt = `
+Eres la IA central de "Level", una plataforma de presentaciones y propuestas corporativas premium.
+Tu tarea es leer el brief del usuario y generar la estructura completa de un documento basado en páginas (diapositivas).
+El usuario ha seleccionado el template base: "${template}". Utiliza la esencia visual y narrativa de ese template para inspirar el contenido.
 
-ESTRUCTURA REQUERIDA (JSON EXACTO):
+ESTRUCTURA ESTRICTA REQUERIDA (JSON):
 {
   "data": {
-    "client": { "name": "Nombre Cliente", "nit": "NIT o RUT inventado/real" },
-    "product": { "name": "Nombre del balón/producto", "image": "", "description": "Descripción persuasiva" },
-    "options": [
-      { "id": "3", "tag": "Infantil", "title": "Número #3", "price": 40500, "specs": "Medidas/Peso" },
-      { "id": "4", "tag": "Juvenil", "title": "Número #4", "price": 44500, "specs": "Medidas/Peso" },
-      { "id": "5", "tag": "Profesional", "title": "Número #5", "price": 46000, "specs": "Medidas/Peso" }
-    ],
-    "logistics": { "delivery": "Destino", "freight": "Condición flete", "time": "Días de entrega" },
-    "masterBox": { "dimensions": "Ej: 74 x 30 x 50 cm", "weight": "Ej: 15 Kg" },
-    "units": 500
-  }
-}
-      `;
-    } else if (template === 'evolution') {
-      systemPrompt = `
-Eres un consultor de alta dirección y estrategia (estilo McKinsey).
-Tu tarea es leer el brief y devolver UNICAMENTE un JSON válido para el template "Propuesta Evolution".
-El estilo debe ser vanguardista, directo y altamente persuasivo. Invéntate precios y secciones si faltan.
-
-ESTRUCTURA REQUERIDA (JSON EXACTO):
-{
-  "data": {
-    "cover": { "title": "Título Impactante", "subtitle": "Evolution", "description": "Resumen ejecutivo en 1 párrafo" },
-    "sections": [
+    "pages": [
       {
-        "title": "Categoría (ej. Fase 1 / Estrategia)",
-        "blocks": [
-          { "icon": "🚀", "title": "Nombre del bloque", "content": "Detalle estratégico", "price": 5000000 }
+        "id": "GeneraUnUUIDCorto",
+        "name": "Nombre de la sección (ej. Portada, Resumen, etc.)",
+        "activeVariationIndex": 0,
+        "variations": [
+          {
+            "layoutType": "cover" | "content" | "two-column" | "metrics" | "chart" | "pricing" | "gallery",
+            "data": { 
+               // Los campos exactos dependen del layoutType.
+               // Para cover: title, subtitle, description
+               // Para content: title, content (texto largo), image_url
+               // Para two-column: title, left_content, right_content
+               // Para metrics: title, items: [{label, value}]
+               // Para chart: title, chartType (pie|bar|line), items: [{name, value}]
+               // Para pricing: title, items: [{name, price, features}]
+            }
+          }
         ]
       }
-    ],
-    "totalPrice": 15000000
+    ]
   }
 }
-      `;
-    } else if (template === 'lotbet' || template === 'mundial') {
-      systemPrompt = `
-Eres un analista de datos avanzado experto en dashboards.
-Tu tarea es leer el brief y devolver UNICAMENTE un JSON válido para el template de "Informe".
-Extrae KPIs, métricas, y datos para gráficos. Invéntate datos de impacto si el texto es muy pobre, para demostrar el poder visual del informe.
 
-ESTRUCTURA REQUERIDA (JSON EXACTO):
-{
-  "data": {
-    "cover": { "title": "Título del Informe", "subtitle": "Dashboard", "date": "Mes Año" },
-    "kpis": [
-      { "label": "Métrica clave", "value": "100%" } // Mínimo 4 KPIs
-    ],
-    "metrics": [
-      {
-        "title": "Sección Principal",
-        "description": "Análisis narrativo",
-        "items": [ { "label": "Detalle", "value": "Número" } ]
-      }
-    ],
-    "chart": {
-      "title": "Distribución / Alcance",
-      "items": [ { "name": "Categoría 1", "value": 40 }, { "name": "Categoría 2", "value": 60 } ]
-    }
-  }
-}
-      `;
-    } else {
-       // Fallback for missing template (Should not happen but just in case)
-       systemPrompt = `
-Eres un asistente. El usuario no eligió template. Devuelve un JSON vacío: {"data": {}}.
-       `;
-    }
+REGLAS CRÍTICAS:
+1. MÁGIA EN LAS VARIACIONES: Para CADA página, debes proponer al menos 2 variaciones (objetos dentro del array 'variations') con diferentes 'layoutType' o enfoques de redacción. Por ejemplo, para el resumen, ofrece una variación 'content' y otra 'two-column'.
+2. ADAPTACIÓN AL TEMPLATE:
+   - Si el template es 'lotbet' o 'mundial' (Informes): Prioriza páginas con layouts 'metrics' y 'chart'. Extrae datos numéricos.
+   - Si el template es 'cotizacion-generica': Asegúrate de incluir una página con layout 'pricing' y otra con 'gallery' o 'two-column' para mostrar productos/servicios.
+   - Si el template es 'evolution': Estilo vanguardista, textos directos, layouts 'cover' potentes y 'two-column' para beneficios.
+3. DATOS Y TEXTOS: No dejes campos vacíos. Inventa datos persuasivos, nombres de features, y números lógicos si no vienen en el brief, para que el diseño se vea lleno y profesional.
+    `;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -111,9 +73,9 @@ Eres un asistente. El usuario no eligió template. Devuelve un JSON vacío: {"da
     const aiResponse = response.choices[0].message.content;
     const parsedData = JSON.parse(aiResponse || "{}");
 
-    // Envolvemos en data si la IA no lo hizo
-    if (!parsedData.data) {
-        return NextResponse.json({ data: parsedData });
+    if (!parsedData.data || !parsedData.data.pages) {
+        // Envolver por seguridad si la IA falla
+        return NextResponse.json({ data: { pages: parsedData.pages || [] } });
     }
 
     return NextResponse.json(parsedData);
@@ -124,34 +86,59 @@ Eres un asistente. El usuario no eligió template. Devuelve un JSON vacío: {"da
 }
 
 function generateMockResponse(prompt: string, clientName: string, template: string) {
-  // Simulación de respuesta rápida cuando no hay API KEY
-  let data = {};
-  
-  if (template === 'balones') {
-    data = {
-      client: { name: clientName || "Mock Cliente", nit: "000-000-000" },
-      product: { name: "Balón Mock", description: "Descripción simulada de balón basado en: " + prompt.substring(0, 50) },
-      options: [
-        { id: "5", tag: "Profesional", title: "Número #5", price: 46000, specs: "Medidas estándar" }
-      ],
-      logistics: { delivery: "Bogotá", freight: "Incluido", time: "15 Días" },
-      masterBox: { dimensions: "70x30x50", weight: "15kg" },
-      units: 100
-    };
-  } else if (template === 'evolution') {
-    data = {
-      cover: { title: "Propuesta Mock", subtitle: "Evolution", description: prompt.substring(0, 50) },
-      sections: [{ title: "Fase Única", blocks: [{ icon: "⚙️", title: "Desarrollo", content: "Contenido mock", price: 1000000 }] }],
-      totalPrice: 1000000
-    };
-  } else {
-    data = {
-      cover: { title: "Informe Mock", subtitle: "Lotbet", date: "2026" },
-      kpis: [{ label: "Usuarios", value: "10K" }, { label: "Conversión", value: "5%" }],
-      metrics: [{ title: "Rendimiento", description: "Texto simulado", items: [{ label: "Clics", value: "5000" }] }],
-      chart: { items: [{ name: "A", value: 50 }, { name: "B", value: 50 }] }
-    };
+  // Simulación mock de la nueva estructura basada en páginas
+  const mockPages = [
+    {
+      id: 'page-1',
+      name: 'Portada',
+      activeVariationIndex: 0,
+      variations: [
+        {
+          layoutType: 'cover',
+          data: { title: `Propuesta para ${clientName}`, subtitle: 'Estrategia Digital', description: prompt.substring(0, 100) }
+        },
+        {
+          layoutType: 'two-column',
+          data: { title: `Proyecto ${clientName}`, left_content: 'Un enfoque disruptivo para el mercado.', right_content: prompt.substring(0, 50) }
+        }
+      ]
+    },
+    {
+      id: 'page-2',
+      name: 'Análisis y Métricas',
+      activeVariationIndex: 0,
+      variations: [
+        {
+          layoutType: 'metrics',
+          data: { title: 'KPIs Proyectados', items: [{ label: 'Conversión', value: '15%' }, { label: 'Alcance', value: '2.5M' }] }
+        },
+        {
+          layoutType: 'chart',
+          data: { title: 'Distribución de Inversión', chartType: 'pie', items: [{ name: 'Social', value: 60 }, { name: 'Search', value: 40 }] }
+        }
+      ]
+    }
+  ];
+
+  if (template === 'cotizacion-generica' || template === 'balones') {
+    mockPages.push({
+      id: 'page-3',
+      name: 'Inversión',
+      activeVariationIndex: 0,
+      variations: [
+        {
+          layoutType: 'pricing',
+          data: { 
+            title: 'Cotización', 
+            items: [
+              { name: 'Licencia Core', price: 5000, features: 'Acceso total, soporte 24/7' },
+              { name: 'Módulo Analítico', price: 2000, features: 'Dashboards en tiempo real' }
+            ]
+          }
+        }
+      ]
+    });
   }
 
-  return NextResponse.json({ data });
+  return NextResponse.json({ data: { pages: mockPages } });
 }
