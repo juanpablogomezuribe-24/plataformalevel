@@ -9,6 +9,9 @@ import PricingBlock from '@/components/blocks/PricingBlock'
 import TextBlock from '@/components/blocks/TextBlock'
 import StatsBlock from '@/components/blocks/StatsBlock'
 import ImageBlock from '@/components/blocks/ImageBlock'
+import VideoBlock from '@/components/blocks/VideoBlock'
+import DividerBlock from '@/components/blocks/DividerBlock'
+import TestimonialBlock from '@/components/blocks/TestimonialBlock'
 
 export default function LayoutInforme({ document, updateDocument }: { document: any, updateDocument: (data: any) => void }) {
   const router = useRouter()
@@ -228,6 +231,9 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
                   {block.type === 'text' && <TextBlock data={block.data} onChange={updateBlockData} />}
                   {block.type === 'stats' && <StatsBlock data={block.data} onChange={updateBlockData} />}
                   {block.type === 'image' && <ImageBlock data={block.data} onChange={updateBlockData} />}
+                  {block.type === 'video' && <VideoBlock data={block.data} onChange={updateBlockData} />}
+                  {block.type === 'divider' && <DividerBlock data={block.data} onChange={updateBlockData} />}
+                  {block.type === 'testimonial' && <TestimonialBlock data={block.data} onChange={updateBlockData} />}
                 </div>
               )
             })}
@@ -244,8 +250,17 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
               <button onClick={() => handleAddBlock('image')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
                 Imagen
               </button>
+              <button onClick={() => handleAddBlock('video')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                Video
+              </button>
+              <button onClick={() => handleAddBlock('testimonial')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                Testimonio
+              </button>
               <button onClick={() => handleAddBlock('stats')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
                 Métricas
+              </button>
+              <button onClick={() => handleAddBlock('divider')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                Divisor
               </button>
               <button onClick={() => handleAddBlock('mockup')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
                 Mockups

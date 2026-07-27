@@ -78,8 +78,28 @@ export default function Dashboard() {
     }
   }
 
+  async function updateStatus(e: React.ChangeEvent<HTMLSelectElement>, id: string) {
+    e.stopPropagation()
+    const newStatus = e.target.value
+    const { error } = await supabase.from('documents').update({ status: newStatus }).eq('id', id)
+    if (error) {
+      alert("Error al actualizar estado: " + error.message)
+    } else {
+      fetchDocuments()
+    }
+  }
+
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><p className="text-slate-500 font-bold">Cargando...</p></div>
   if (!session) return null // Prevents flashing before redirect
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'enviado': return 'text-blue-600 bg-blue-50'
+      case 'aprobado': return 'text-emerald-600 bg-emerald-50'
+      case 'rechazado': return 'text-red-600 bg-red-50'
+      default: return 'text-slate-600 bg-slate-100'
+    }
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
@@ -122,7 +142,7 @@ export default function Dashboard() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {documents.map(doc => (
-              <div key={doc.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow group cursor-pointer">
+              <div key={doc.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow group cursor-pointer" onClick={() => router.push(`/document/${doc.id}`)}>
                 <div className="flex justify-between items-start mb-4">
                   <div className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${
                     doc.type === 'informe' ? 'bg-cyan-50 text-cyan-600' : 'bg-indigo-50 text-indigo-600'
@@ -142,10 +162,23 @@ export default function Dashboard() {
                     </button>
                   </div>
                 </div>
-                <h3 className="font-bold text-lg text-slate-800 mb-1 line-clamp-1">{doc.title}</h3>
-                <p className="text-xs text-slate-500 mb-4">Estado: <span className="font-semibold capitalize text-slate-700">{doc.status}</span></p>
+                <h3 className="font-bold text-lg text-slate-800 mb-2 line-clamp-1">{doc.title}</h3>
+                
+                <div className="mb-4" onClick={e => e.stopPropagation()}>
+                  <select 
+                    value={doc.status}
+                    onChange={(e) => updateStatus(e, doc.id)}
+                    className={`text-xs font-bold rounded-lg px-2 py-1 outline-none border border-transparent hover:border-slate-200 cursor-pointer transition-colors ${getStatusColor(doc.status)}`}
+                  >
+                    <option value="borrador">📝 Borrador</option>
+                    <option value="enviado">✉️ Enviado</option>
+                    <option value="aprobado">✅ Aprobado</option>
+                    <option value="rechazado">❌ Rechazado</option>
+                  </select>
+                </div>
+
                 <button 
-                  onClick={() => router.push(`/document/${doc.id}`)}
+                  onClick={(e) => { e.stopPropagation(); router.push(`/document/${doc.id}`) }}
                   className="w-full py-2 bg-slate-50 text-slate-700 text-xs font-bold rounded-xl group-hover:bg-slate-900 group-hover:text-white transition-colors"
                 >
                   Abrir Editor

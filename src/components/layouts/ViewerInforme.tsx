@@ -1,13 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, Circle } from 'lucide-react'
+import { CheckCircle2, Circle, Printer } from 'lucide-react'
 import CoverBlock from '@/components/blocks/CoverBlock'
 import MockupBlock from '@/components/blocks/MockupBlock'
 import PricingBlock from '@/components/blocks/PricingBlock'
 import TextBlock from '@/components/blocks/TextBlock'
 import StatsBlock from '@/components/blocks/StatsBlock'
 import ImageBlock from '@/components/blocks/ImageBlock'
+import VideoBlock from '@/components/blocks/VideoBlock'
+import DividerBlock from '@/components/blocks/DividerBlock'
+import TestimonialBlock from '@/components/blocks/TestimonialBlock'
 
 export default function ViewerInforme({ document }: { document: any }) {
   // Mock data for sections
@@ -20,9 +23,9 @@ export default function ViewerInforme({ document }: { document: any }) {
   const [activeSection, setActiveSection] = useState(1)
 
   return (
-    <div className="flex h-screen bg-slate-100">
+    <div className="flex min-h-screen bg-slate-100 print:bg-white">
       {/* Sidebar (Lotbet Style) - Clean for Client */}
-      <aside className="w-80 bg-white border-r border-slate-200 flex flex-col h-full shadow-lg z-10">
+      <aside className="w-80 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0 shadow-lg z-10 print:hidden">
         {/* Top Header */}
         <div className="p-8 border-b border-slate-200 bg-slate-900 text-white">
           {document.content?.brand?.logoUrl && (
@@ -68,15 +71,22 @@ export default function ViewerInforme({ document }: { document: any }) {
         </div>
         
         {/* Footer actions */}
-        <div className="p-6 border-t border-slate-200 bg-slate-50 text-center">
-          <p className="text-xs font-bold text-slate-400">Powered by <span className="text-cyan-600">LEVEL</span></p>
+        <div className="p-6 border-t border-slate-200 bg-slate-50 flex flex-col gap-4">
+          <button 
+            onClick={() => window.print()}
+            className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white font-bold py-3 px-4 rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20"
+          >
+            <Printer className="w-4 h-4" />
+            Descargar PDF
+          </button>
+          <p className="text-xs font-bold text-slate-400 text-center">Powered by <span className="text-cyan-600">LEVEL</span></p>
         </div>
       </aside>
 
       {/* Main Content Area (Viewer) */}
-      <main className="flex-1 overflow-y-auto relative">
-        <div className="max-w-4xl mx-auto py-12 px-8">
-          <div className="min-h-[800px] flex flex-col gap-8">
+      <main className="flex-1 overflow-y-auto relative print:overflow-visible">
+        <div className="max-w-4xl mx-auto py-12 px-8 print:p-0 print:max-w-none w-full">
+          <div className="min-h-[800px] flex flex-col gap-8 print:gap-4 print:min-h-0">
             
             {(!document.content?.blocks || document.content.blocks.length === 0) && (
               <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-12 text-center">
@@ -93,6 +103,9 @@ export default function ViewerInforme({ document }: { document: any }) {
               if (block.type === 'text') return <TextBlock key={block.id} data={block.data} readOnly={true} />
               if (block.type === 'stats') return <StatsBlock key={block.id} data={block.data} readOnly={true} />
               if (block.type === 'image') return <ImageBlock key={block.id} data={block.data} readOnly={true} />
+              if (block.type === 'video') return <VideoBlock key={block.id} data={block.data} readOnly={true} />
+              if (block.type === 'divider') return <DividerBlock key={block.id} data={block.data} readOnly={true} />
+              if (block.type === 'testimonial') return <TestimonialBlock key={block.id} data={block.data} readOnly={true} />
               return null
             })}
 
