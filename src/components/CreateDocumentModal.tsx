@@ -104,7 +104,7 @@ export default function CreateDocumentModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 lg:p-10 font-sans">
+    <div className="fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center p-4 lg:p-10 font-sans">
       <div className="bg-white rounded-3xl w-full max-w-5xl h-full max-h-[85vh] shadow-2xl relative flex flex-col overflow-hidden">
         
         {/* Header del Modal */}
