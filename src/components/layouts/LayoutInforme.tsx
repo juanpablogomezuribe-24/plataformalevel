@@ -94,7 +94,7 @@ export default function LayoutInforme({ document, updateDocument, session }: { d
               type="text" 
               value={document.title || ''}
               onChange={(e) => updateDocument({ title: e.target.value })}
-              className="w-full text-2xl font-black leading-tight bg-transparent outline-none border-b border-transparent focus:border-cyan-500 transition-colors py-1"
+              className="w-full text-2xl font-black leading-tight bg-transparent outline-none border-b border-transparent focus:border-indigo-500 transition-colors py-1"
               placeholder="Título del Documento"
             />
           )}
@@ -105,7 +105,7 @@ export default function LayoutInforme({ document, updateDocument, session }: { d
           {!isReadOnly && (
             <div className="mb-8 p-4 bg-slate-800 rounded-2xl border border-slate-700 space-y-4">
               <div className="flex items-center gap-2 mb-2">
-                <Palette className="w-4 h-4 text-cyan-400" />
+                <Palette className="w-4 h-4 text-indigo-400" />
                 <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest">Personalizar Marca</h3>
               </div>
               <div>
@@ -127,7 +127,7 @@ export default function LayoutInforme({ document, updateDocument, session }: { d
                   placeholder="https://...logo.png"
                   value={document.content?.brand?.logoUrl || ''} 
                   onChange={(e) => updateDocument({ content: { ...document.content, brand: { ...document.content?.brand, logoUrl: e.target.value } } })}
-                  className="w-full bg-slate-900 text-sm text-slate-300 border border-slate-700 rounded-lg p-2 outline-none focus:border-cyan-500 transition-colors"
+                  className="w-full bg-slate-900 text-sm text-slate-300 border border-slate-700 rounded-lg p-2 outline-none focus:border-indigo-500 transition-colors"
                 />
               </div>
             </div>
@@ -136,11 +136,11 @@ export default function LayoutInforme({ document, updateDocument, session }: { d
           <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Progreso</h3>
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Progreso</span>
-            <span className="text-xs font-black text-cyan-600">{progress}%</span>
+            <span className="text-xs font-black text-indigo-600">{progress}%</span>
           </div>
           <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
             <div 
-              className="bg-cyan-500 h-full transition-all duration-500 ease-out"
+              className="bg-indigo-500 h-full transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -159,7 +159,7 @@ export default function LayoutInforme({ document, updateDocument, session }: { d
               }`}
             >
               {section.completed ? (
-                <CheckCircle2 className="w-5 h-5 text-cyan-500 flex-shrink-0" />
+                <CheckCircle2 className="w-5 h-5 text-indigo-500 flex-shrink-0" />
               ) : (
                 <Circle className="w-5 h-5 text-slate-300 flex-shrink-0" />
               )}
@@ -197,7 +197,7 @@ export default function LayoutInforme({ document, updateDocument, session }: { d
               </div>
               <button 
                 onClick={() => updateDocument({ status: 'publicado' })}
-                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all text-sm"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all text-sm"
               >
                 Aprobar y Publicar
               </button>
@@ -379,7 +379,7 @@ export default function LayoutInforme({ document, updateDocument, session }: { d
                 <button onClick={() => handleAddBlock('mockup')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
                   Mockups
                 </button>
-                <button onClick={() => handleAddBlock('pricing')} className="bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                <button onClick={() => handleAddBlock('pricing')} className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
                   Tabla de Cotización
                 </button>
               </div>

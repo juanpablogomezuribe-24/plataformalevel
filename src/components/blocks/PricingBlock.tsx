@@ -61,7 +61,7 @@ export default function PricingBlock({ data, onChange, readOnly = false }: { dat
                     value={item.name} 
                     onChange={(e) => updateItem(index, { name: e.target.value })}
                     placeholder="Descripción del servicio..."
-                    className={`w-full bg-transparent outline-none text-slate-700 font-medium p-1 ${readOnly ? '' : 'focus:border-b border-cyan-500'}`}
+                    className={`w-full bg-transparent outline-none text-slate-700 font-medium p-1 ${readOnly ? '' : 'focus:border-b border-indigo-500'}`}
                   />
                 </td>
                 <td className="py-3">
@@ -71,7 +71,7 @@ export default function PricingBlock({ data, onChange, readOnly = false }: { dat
                     min="1"
                     value={item.quantity || ''} 
                     onChange={(e) => updateItem(index, { quantity: parseInt(e.target.value) || 0 })}
-                    className={`w-full bg-transparent outline-none text-slate-700 text-center font-medium p-1 ${readOnly ? '' : 'focus:border-b border-cyan-500'}`}
+                    className={`w-full bg-transparent outline-none text-slate-700 text-center font-medium p-1 ${readOnly ? '' : 'focus:border-b border-indigo-500'}`}
                   />
                 </td>
                 <td className="py-3">
@@ -82,7 +82,7 @@ export default function PricingBlock({ data, onChange, readOnly = false }: { dat
                       readOnly={readOnly}
                       value={item.unitPrice || ''} 
                       onChange={(e) => updateItem(index, { unitPrice: parseFloat(e.target.value) || 0 })}
-                      className={`w-full max-w-[100px] bg-transparent outline-none text-slate-700 text-right font-medium p-1 ${readOnly ? '' : 'focus:border-b border-cyan-500'}`}
+                      className={`w-full max-w-[100px] bg-transparent outline-none text-slate-700 text-right font-medium p-1 ${readOnly ? '' : 'focus:border-b border-indigo-500'}`}
                     />
                   </div>
                 </td>
@@ -103,7 +103,7 @@ export default function PricingBlock({ data, onChange, readOnly = false }: { dat
       </div>
 
       {!readOnly && (
-        <button onClick={addItem} className="mt-4 flex items-center text-sm font-bold text-cyan-600 hover:text-cyan-700">
+        <button onClick={addItem} className="mt-4 flex items-center text-sm font-bold text-indigo-600 hover:text-indigo-700">
           <Plus className="w-4 h-4 mr-1" /> Añadir Concepto
         </button>
       )}
@@ -116,7 +116,7 @@ export default function PricingBlock({ data, onChange, readOnly = false }: { dat
           </div>
           <div className="flex justify-between items-center text-xl font-black pt-4 border-t border-slate-700">
             <span>Total</span>
-            <span className="text-cyan-400">${total.toLocaleString()}</span>
+            <span className="text-indigo-400">${total.toLocaleString()}</span>
           </div>
         </div>
       </div>

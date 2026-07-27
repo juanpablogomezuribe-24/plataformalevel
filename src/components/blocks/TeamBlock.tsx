@@ -88,7 +88,7 @@ export default function TeamBlock({ data, onChange, readOnly = false }: { data: 
 
       {!readOnly && profiles.length < 12 && (
         <div className="flex justify-center mt-10">
-          <button onClick={addProfile} className="flex items-center text-sm font-bold text-slate-500 hover:text-cyan-600 transition-colors bg-slate-50 hover:bg-cyan-50 px-4 py-2 rounded-xl">
+          <button onClick={addProfile} className="flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors bg-slate-50 hover:bg-indigo-50 px-4 py-2 rounded-xl">
             <Plus className="w-4 h-4 mr-1" /> Añadir Perfil
           </button>
         </div>

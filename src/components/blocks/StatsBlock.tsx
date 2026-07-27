@@ -58,7 +58,7 @@ export default function StatsBlock({ data, onChange, readOnly = false }: { data:
               value={stat.label}
               onChange={(e) => updateStat(index, { label: e.target.value })}
               placeholder="Descripción de la métrica"
-              className={`w-full text-sm font-bold text-cyan-400 uppercase tracking-widest bg-transparent outline-none text-center transition-all rounded-xl ${readOnly ? '' : 'focus:bg-slate-700 p-1'}`}
+              className={`w-full text-sm font-bold text-indigo-400 uppercase tracking-widest bg-transparent outline-none text-center transition-all rounded-xl ${readOnly ? '' : 'focus:bg-slate-700 p-1'}`}
             />
           </div>
         ))}

@@ -98,7 +98,7 @@ export default function ViewerInforme({ document }: { document: any }) {
             <Printer className="w-4 h-4" />
             Descargar PDF
           </button>
-          <p className="text-xs font-bold text-slate-400 text-center">Powered by <span className="text-cyan-600">LEVEL</span></p>
+          <p className="text-xs font-bold text-slate-400 text-center">Powered by <span className="text-indigo-600">LEVEL</span></p>
         </div>
       </aside>
 

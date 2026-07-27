@@ -43,7 +43,7 @@ export default function CoverBlock({ data, onChange, readOnly = false }: { data:
             onChange={(e) => setLocalSubtitle(e.target.value)}
             onBlur={() => onChange && onChange({ ...data, subtitle: localSubtitle })}
             placeholder="Escribe el subtítulo o descripción corta aquí..."
-            className={`w-full text-xl text-cyan-400 bg-transparent outline-none placeholder:text-cyan-400/50 resize-none h-24 transition-all font-medium rounded-xl ${readOnly ? '' : 'focus:bg-white/10 p-2'}`}
+            className={`w-full text-xl text-indigo-400 bg-transparent outline-none placeholder:text-indigo-400/50 resize-none h-24 transition-all font-medium rounded-xl ${readOnly ? '' : 'focus:bg-white/10 p-2'}`}
           />
         </div>
       </div>

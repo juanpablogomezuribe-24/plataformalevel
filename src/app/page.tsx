@@ -3,15 +3,15 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
-import { FileText, LogOut, Plus, Trash2, Copy, Settings } from 'lucide-react'
+import { FileText, Plus, Trash2, Copy, MoreVertical, Bell } from 'lucide-react'
 import CreateDocumentModal from '@/components/CreateDocumentModal'
+import SidebarLayout from '@/components/SidebarLayout'
 
 export default function Dashboard() {
   const [session, setSession] = useState<any>(null)
   const [documents, setDocuments] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
-  const [filter, setFilter] = useState('todos')
   const router = useRouter()
 
   useEffect(() => {
@@ -38,24 +38,17 @@ export default function Dashboard() {
     setLoading(false)
   }
 
-  async function handleLogout() {
-    await supabase.auth.signOut()
-    router.push('/login')
-  }
-
   async function handleDelete(e: React.MouseEvent, id: string) {
-    e.stopPropagation() // Evitar que el click abra el editor
-    if (!confirm('¿Estás seguro de eliminar este documento de forma permanente?')) return
+    e.stopPropagation() 
+    if (!confirm('¿Estás seguro de eliminar este documento?')) return
     
     const { error } = await supabase.from('documents').delete().eq('id', id)
     if (error) {
-      alert("Error al eliminar: " + error.message + " (Asegúrate de tener la política RLS de DELETE habilitada en Supabase)")
+      alert("Error al eliminar: " + error.message)
     } else {
       fetchDocuments()
     }
   }
-
-
 
   async function handleDuplicate(e: React.MouseEvent, doc: any) {
     e.stopPropagation()
@@ -79,170 +72,164 @@ export default function Dashboard() {
   }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><p className="text-slate-500 font-bold">Cargando...</p></div>
-  if (!session) return null // Prevents flashing before redirect
+  if (!session) return null 
 
-
+  const userName = session?.user?.email?.split('@')[0] || 'Usuario'
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-      <header className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-cyan-500 rounded-lg text-white font-black flex items-center justify-center">L</div>
-          <h1 className="font-black text-xl tracking-tight">LEVEL</h1>
+    <SidebarLayout session={session}>
+      {/* Top Header */}
+      <header className="h-20 px-10 flex justify-between items-center bg-white/50 backdrop-blur-md sticky top-0 z-10 border-b border-slate-100">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Panel principal</h1>
+          <p className="text-slate-500 text-sm">Hola, {capitalize(userName)}. Este es el resumen de tu actividad.</p>
         </div>
-        <div className="flex items-center gap-4 text-sm font-medium">
-          <button onClick={() => router.push('/settings')} className="text-slate-500 hover:text-slate-900 flex items-center gap-2 transition-colors">
-            <Settings className="w-4 h-4" /> Ajustes
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => setShowModal(true)}
+            className="bg-indigo-600 text-white font-bold py-2 px-5 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/20 flex items-center gap-2 text-sm"
+          >
+            <Plus className="w-4 h-4" /> Crear nuevo
           </button>
-          <div className="w-px h-4 bg-slate-200"></div>
-          <button onClick={handleLogout} className="text-red-500 hover:text-red-600 flex items-center gap-2">
-            <LogOut className="w-4 h-4" /> Salir
+          <button className="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors">
+            <Bell className="w-5 h-5" />
           </button>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-10">
-        <div className="flex justify-between items-end mb-8">
-          <div>
-            <h2 className="text-3xl font-black tracking-tight text-slate-900 mb-1">Visión General</h2>
-            <p className="text-slate-500 text-sm">Dashboard analítico y gestión de propuestas.</p>
+      <div className="p-10 max-w-7xl mx-auto">
+        
+        {/* KPIs (Sparkline Cards) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {/* KPI 1: Cotizaciones */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 text-slate-500 font-bold text-sm mb-3">
+                <div className="w-2 h-2 rounded-full bg-indigo-500" /> Cotizaciones
+              </div>
+              <div className="text-4xl font-black text-slate-900 mb-1">
+                {documents.filter(d => d.type === 'cotizacion').length}
+              </div>
+              <p className="text-xs text-slate-400">
+                {documents.filter(d => d.type === 'cotizacion' && d.status === 'borrador').length} abiertas
+              </p>
+            </div>
+            {/* Fake Sparkline */}
+            <div className="w-24 h-12 flex items-end justify-between gap-1">
+              {[40, 70, 45, 90, 65, 100].map((h, i) => (
+                <div key={i} className="w-2 bg-indigo-100 rounded-t-sm" style={{ height: `${h}%` }}>
+                  {h === 100 && <div className="w-full h-full bg-indigo-500 rounded-t-sm shadow-[0_0_8px_rgba(99,102,241,0.5)]" />}
+                </div>
+              ))}
+            </div>
           </div>
-          <button 
-            onClick={() => setShowModal(true)}
-            className="bg-slate-900 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20 flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" /> Nuevo Documento
-          </button>
+
+          {/* KPI 2: Presentaciones */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 text-slate-500 font-bold text-sm mb-3">
+                <div className="w-2 h-2 rounded-full bg-pink-500" /> Presentaciones
+              </div>
+              <div className="text-4xl font-black text-slate-900 mb-1">
+                {documents.filter(d => d.type === 'presentacion').length}
+              </div>
+              <p className="text-xs text-slate-400">
+                {documents.filter(d => d.type === 'presentacion' && d.status === 'en_revision').length} en revisión
+              </p>
+            </div>
+            {/* Fake Sparkline Line */}
+            <div className="w-24 h-12 relative flex items-center">
+               <svg viewBox="0 0 100 50" className="w-full h-full overflow-visible">
+                 <path d="M0,40 C20,40 30,10 50,20 C70,30 80,5 100,0" fill="none" stroke="#ec4899" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+               </svg>
+            </div>
+          </div>
+
+          {/* KPI 3: Informes */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 text-slate-500 font-bold text-sm mb-3">
+                <div className="w-2 h-2 rounded-full bg-emerald-500" /> Informes
+              </div>
+              <div className="text-4xl font-black text-slate-900 mb-1">
+                {documents.filter(d => d.type === 'informe').length}
+              </div>
+              <p className="text-xs text-slate-400">
+                {documents.filter(d => d.type === 'informe' && d.status === 'publicado').length} finalizados
+              </p>
+            </div>
+            <div className="w-24 h-12 relative flex items-center">
+               <svg viewBox="0 0 100 50" className="w-full h-full overflow-visible">
+                 <path d="M0,50 C30,40 40,30 60,35 C80,40 90,10 100,5" fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+               </svg>
+            </div>
+          </div>
         </div>
 
-        {/* --- DASHBOARD ANALÍTICO --- */}
-        {documents.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
-            {/* KPI: Total */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Creados</p>
-              <div className="text-3xl font-black text-slate-800">{documents.length}</div>
-            </div>
-            
-            {/* KPI: Tasa de Éxito */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Tasa de Éxito</p>
-              <div className="flex items-end gap-2">
-                <div className="text-3xl font-black text-emerald-600">
-                  {Math.round((documents.filter(d => ['publicado', 'aprobado', 'enviado'].includes(d.status)).length / documents.length) * 100) || 0}%
-                </div>
-                <div className="text-xs font-bold text-slate-400 mb-1.5">aprobados</div>
-              </div>
-            </div>
-
-            {/* KPI: Desglose por Tipo */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm col-span-1 md:col-span-2 flex flex-col justify-center">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Distribución por Formato</p>
-              <div className="flex items-center gap-4">
-                <div className="flex-1 flex flex-col items-center p-2 bg-cyan-50 rounded-xl">
-                  <span className="text-xl font-black text-cyan-600">{documents.filter(d => d.type === 'informe').length}</span>
-                  <span className="text-[10px] font-bold text-cyan-700 uppercase">Informes</span>
-                </div>
-                <div className="flex-1 flex flex-col items-center p-2 bg-indigo-50 rounded-xl">
-                  <span className="text-xl font-black text-indigo-600">{documents.filter(d => d.type === 'presentacion').length}</span>
-                  <span className="text-[10px] font-bold text-indigo-700 uppercase">Presentaciones</span>
-                </div>
-                <div className="flex-1 flex flex-col items-center p-2 bg-emerald-50 rounded-xl">
-                  <span className="text-xl font-black text-emerald-600">{documents.filter(d => d.type === 'cotizacion').length}</span>
-                  <span className="text-[10px] font-bold text-emerald-700 uppercase">Cotizaciones</span>
-                </div>
-              </div>
-            </div>
+        {/* Lista de Recientes */}
+        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+            <h2 className="text-lg font-bold text-slate-900 tracking-tight">Recientes</h2>
+            <button className="text-indigo-600 text-sm font-bold hover:text-indigo-700">Ver todo</button>
           </div>
-        )}
-        {/* --- FIN DASHBOARD --- */}
-
-        {/* Pestañas de Filtro */}
-        <div className="flex flex-wrap gap-2 mb-8 border-b border-slate-200 pb-4">
-          <button onClick={() => setFilter('todos')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${filter === 'todos' ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'}`}>Todos</button>
-          <button onClick={() => setFilter('borrador')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${filter === 'borrador' ? 'bg-slate-200 text-slate-800' : 'text-slate-500 hover:bg-slate-100'}`}>Borradores</button>
-          <button onClick={() => setFilter('en_revision')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${filter === 'en_revision' ? 'bg-amber-100 text-amber-700' : 'text-slate-500 hover:bg-slate-100'}`}>En Revisión</button>
-          <button onClick={() => setFilter('publicado')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${filter === 'publicado' ? 'bg-emerald-100 text-emerald-700' : 'text-slate-500 hover:bg-slate-100'}`}>Publicados</button>
-          <button onClick={() => setFilter('rechazado')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${filter === 'rechazado' ? 'bg-red-100 text-red-700' : 'text-slate-500 hover:bg-slate-100'}`}>Rechazados</button>
-        </div>
-
-        {documents.filter(doc => filter === 'todos' || doc.status === filter).length === 0 ? (
-          <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-sm">
-            <div className="w-16 h-16 bg-slate-50 rounded-2xl mx-auto flex items-center justify-center text-slate-300 mb-4">
-              <FileText className="w-8 h-8" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-800 mb-2">No tienes documentos</h3>
-            <p className="text-slate-500 text-sm mb-6 max-w-sm mx-auto">Comienza creando tu primer informe o cotización basada en la arquitectura Level.</p>
-            <button onClick={() => setShowModal(true)} className="text-cyan-600 font-bold hover:text-cyan-700">Crear ahora →</button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {documents.filter(doc => filter === 'todos' || doc.status === filter).map(doc => (
-              <div key={doc.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow group cursor-pointer" onClick={() => router.push(`/document/${doc.id}`)}>
-                <div className="flex justify-between items-start mb-4">
-                  <div className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${
-                    doc.type === 'informe' ? 'bg-cyan-50 text-cyan-600' : 
-                    doc.type === 'presentacion' ? 'bg-indigo-50 text-indigo-600' : 
+          
+          <div className="divide-y divide-slate-50">
+            {documents.slice(0, 5).map(doc => (
+              <div 
+                key={doc.id} 
+                onClick={() => router.push(`/document/${doc.id}`)}
+                className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer group"
+              >
+                <div className="flex items-center gap-4 flex-1">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                    doc.type === 'cotizacion' ? 'bg-indigo-50 text-indigo-600' :
+                    doc.type === 'presentacion' ? 'bg-pink-50 text-pink-600' :
                     'bg-emerald-50 text-emerald-600'
+                  }`}>
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-900 text-sm mb-0.5">{doc.title}</h3>
+                    <p className="text-xs text-slate-500">Cliente: {doc.client_name}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-8">
+                  <div className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${
+                     doc.type === 'cotizacion' ? 'bg-indigo-50 text-indigo-600' :
+                     doc.type === 'presentacion' ? 'bg-pink-50 text-pink-600' :
+                     'bg-emerald-50 text-emerald-600'
                   }`}>
                     {doc.type}
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-[10px] font-bold text-slate-400">
-                      {new Date(doc.created_at).toLocaleDateString()}
-                    </div>
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={(e) => handleDuplicate(e, doc)} 
-                        className="text-slate-300 hover:text-cyan-500 transition-colors"
-                        title="Duplicar documento"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
-                      <button 
-                        onClick={(e) => handleDelete(e, doc.id)} 
-                        className="text-slate-300 hover:text-red-500 transition-colors"
-                        title="Eliminar documento"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                  
+                  <div className="text-xs font-bold text-slate-400 w-24 text-right">
+                    {new Date(doc.created_at).toLocaleDateString()}
                   </div>
-                </div>
-                
-                {doc.client_name && doc.client_name !== 'Sin Cliente' && (
-                  <div className="text-xs font-bold text-slate-500 mb-1 flex items-center gap-1">
-                    Para: <span className="text-slate-700">{doc.client_name}</span>
-                  </div>
-                )}
-                
-                <h3 className="font-bold text-lg text-slate-800 mb-2 line-clamp-1">{doc.title}</h3>
-                
-                <div className={`inline-block mb-4 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-md ${
-                  doc.status === 'en_revision' ? 'bg-amber-100 text-amber-600' :
-                  doc.status === 'publicado' ? 'bg-emerald-100 text-emerald-600' :
-                  doc.status === 'rechazado' ? 'bg-red-100 text-red-600' :
-                  'bg-slate-100 text-slate-600'
-                }`}>
-                  {doc.status === 'en_revision' ? 'En Revisión' : 
-                   doc.status === 'publicado' ? 'Publicado' : 
-                   doc.status === 'rechazado' ? 'Rechazado' : 
-                   'Borrador'}
-                </div>
 
-                <button 
-                  onClick={(e) => { e.stopPropagation(); router.push(`/document/${doc.id}`) }}
-                  className="w-full py-2 bg-slate-50 text-slate-700 text-xs font-bold rounded-xl group-hover:bg-slate-900 group-hover:text-white transition-colors"
-                >
-                  Abrir Editor
-                </button>
+                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={(e) => handleDuplicate(e, doc)} className="text-slate-400 hover:text-indigo-600"><Copy className="w-4 h-4" /></button>
+                    <button onClick={(e) => handleDelete(e, doc.id)} className="text-slate-400 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
+                  </div>
+                </div>
               </div>
             ))}
-          </div>
-        )}
-      </main>
 
-      {/* Modal de Creación */}
+            {documents.length === 0 && (
+              <div className="p-12 text-center">
+                <div className="w-16 h-16 bg-slate-50 rounded-full mx-auto flex items-center justify-center text-slate-300 mb-4">
+                  <FileText className="w-8 h-8" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 mb-1">Aún no hay documentos</h3>
+                <p className="text-xs text-slate-500">Haz clic en Crear nuevo para comenzar.</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+      </div>
+
       {showModal && (
         <CreateDocumentModal 
           session={session} 
@@ -254,6 +241,6 @@ export default function Dashboard() {
           }}
         />
       )}
-    </div>
+    </SidebarLayout>
   )
 }

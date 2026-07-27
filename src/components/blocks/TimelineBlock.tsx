@@ -41,7 +41,7 @@ export default function TimelineBlock({ data, onChange, readOnly = false }: { da
         {items.map((item: any, index: number) => (
           <div key={item.id} className="relative pl-8 group/item">
             {/* Dot */}
-            <div className="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-cyan-500 ring-4 ring-white"></div>
+            <div className="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-indigo-500 ring-4 ring-white"></div>
             
             {!readOnly && items.length > 1 && (
               <button onClick={() => removeItem(index)} className="absolute right-0 top-0 text-slate-400 hover:text-red-500 opacity-0 group-hover/item:opacity-100 transition-opacity">
@@ -56,7 +56,7 @@ export default function TimelineBlock({ data, onChange, readOnly = false }: { da
                 value={item.date}
                 onChange={(e) => updateItem(index, { date: e.target.value })}
                 placeholder="Tiempo (ej. Semana 1)"
-                className={`text-xs font-bold text-cyan-600 uppercase tracking-widest bg-transparent outline-none w-fit transition-all rounded ${readOnly ? '' : 'focus:bg-slate-50 p-1 -ml-1'}`}
+                className={`text-xs font-bold text-indigo-600 uppercase tracking-widest bg-transparent outline-none w-fit transition-all rounded ${readOnly ? '' : 'focus:bg-slate-50 p-1 -ml-1'}`}
               />
               <input
                 type="text"
@@ -79,7 +79,7 @@ export default function TimelineBlock({ data, onChange, readOnly = false }: { da
       </div>
 
       {!readOnly && (
-        <button onClick={addItem} className="mt-8 ml-6 flex items-center text-sm font-bold text-slate-500 hover:text-cyan-600 transition-colors bg-slate-50 hover:bg-cyan-50 px-4 py-2 rounded-xl">
+        <button onClick={addItem} className="mt-8 ml-6 flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors bg-slate-50 hover:bg-indigo-50 px-4 py-2 rounded-xl">
           <Plus className="w-4 h-4 mr-1" /> Añadir Hito
         </button>
       )}

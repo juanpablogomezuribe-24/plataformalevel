@@ -86,7 +86,7 @@ export default function ListBlock({ data, onChange, readOnly = false }: { data: 
       </div>
 
       {!readOnly && (
-        <button onClick={addItem} className="mt-6 flex items-center text-sm font-bold text-slate-500 hover:text-cyan-600 transition-colors bg-slate-50 hover:bg-cyan-50 px-4 py-2 rounded-xl">
+        <button onClick={addItem} className="mt-6 flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors bg-slate-50 hover:bg-indigo-50 px-4 py-2 rounded-xl">
           <Plus className="w-4 h-4 mr-1" /> Añadir Ítem
         </button>
       )}

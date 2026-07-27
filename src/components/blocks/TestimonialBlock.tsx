@@ -4,8 +4,8 @@ import { Quote } from 'lucide-react'
 
 export default function TestimonialBlock({ data, onChange, readOnly = false }: { data: any, onChange?: (data: any) => void, readOnly?: boolean }) {
   return (
-    <div className="w-full bg-gradient-to-br from-cyan-50 to-blue-50 rounded-3xl overflow-hidden border border-cyan-100 p-12 my-8 relative">
-      <Quote className="absolute top-8 left-8 w-24 h-24 text-cyan-500 opacity-10" />
+    <div className="w-full bg-gradient-to-br from-indigo-50 to-blue-50 rounded-3xl overflow-hidden border border-indigo-100 p-12 my-8 relative">
+      <Quote className="absolute top-8 left-8 w-24 h-24 text-indigo-500 opacity-10" />
       
       <div className="relative z-10 max-w-3xl mx-auto text-center">
         <textarea
