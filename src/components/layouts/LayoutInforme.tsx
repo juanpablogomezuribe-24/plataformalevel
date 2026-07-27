@@ -17,8 +17,9 @@ import TeamBlock from '@/components/blocks/TeamBlock'
 import ListBlock from '@/components/blocks/ListBlock'
 import AlertBlock from '@/components/blocks/AlertBlock'
 import VersionHistory from '@/components/VersionHistory'
+import CommentSidebar from '@/components/CommentSidebar'
 
-export default function LayoutInforme({ document, updateDocument }: { document: any, updateDocument: (data: any) => void }) {
+export default function LayoutInforme({ document, updateDocument, session }: { document: any, updateDocument: (data: any) => void, session?: any }) {
   const router = useRouter()
   const isReadOnly = document.status === 'en_revision' || document.status === 'publicado' || document.status === 'aprobado' || document.status === 'enviado';
   // Mock data for sections until we have actual blocks
@@ -172,7 +173,8 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
         {/* Footer actions / Estado */}
         <div className="p-6 border-t border-slate-200 bg-slate-50 flex flex-col gap-3">
           
-          <div className="flex justify-center mb-2">
+          <div className="flex justify-center mb-2 gap-2">
+            <CommentSidebar document={document} session={session} />
             <VersionHistory 
               document={document} 
               onRestore={(title, content) => updateDocument({ title, content })} 

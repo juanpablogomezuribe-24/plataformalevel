@@ -14,6 +14,7 @@ export default function Dashboard() {
   const [clientName, setClientName] = useState('')
   const [aiPrompt, setAiPrompt] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isReadingFile, setIsReadingFile] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -152,6 +153,23 @@ export default function Dashboard() {
       alert("Hubo un error al generar con IA: " + error.message)
     } finally {
       setIsGenerating(false)
+    }
+  }
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsReadingFile(true);
+    try {
+      const text = await file.text();
+      setAiPrompt((prev) => prev ? prev + '\n\n' + text : text);
+    } catch (error) {
+      alert("Error al leer el archivo. Asegúrate de que sea un archivo de texto válido (.txt, .md, .csv)");
+    } finally {
+      setIsReadingFile(false);
+      // Reset input
+      if (e.target) e.target.value = '';
     }
   }
 
@@ -379,7 +397,13 @@ export default function Dashboard() {
             </div>
             
             <div className="mb-6">
-              <label className="text-sm font-bold text-slate-700 block mb-2">Contexto / Brief (Opcional pero recomendado para IA)</label>
+              <label className="text-sm font-bold text-slate-700 block mb-2 flex justify-between items-center">
+                <span>Contexto / Brief (Opcional pero recomendado para IA)</span>
+                <label className="text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-lg cursor-pointer transition-colors flex items-center gap-1">
+                  {isReadingFile ? 'Leyendo...' : '📄 Subir Archivo (.txt, .md)'}
+                  <input type="file" accept=".txt,.md,.csv" className="hidden" onChange={handleFileUpload} disabled={isReadingFile} />
+                </label>
+              </label>
               <textarea 
                 value={aiPrompt}
                 onChange={(e) => setAiPrompt(e.target.value)}

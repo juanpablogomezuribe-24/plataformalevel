@@ -12,8 +12,12 @@ export default function DocumentEditorPage() {
   const router = useRouter()
   const [document, setDocument] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [session, setSession] = useState<any>(null)
 
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
     if (params?.id) {
       fetchDocument(params.id as string)
     }
@@ -59,15 +63,15 @@ export default function DocumentEditorPage() {
 
   // Seleccionar Layout según el tipo
   if (document.type === 'presentacion') {
-    return <LayoutPresentacion document={document} updateDocument={updateDocument} />
+    return <LayoutPresentacion document={document} updateDocument={updateDocument} session={session} />
   }
 
   if (document.type === 'informe') {
-    return <LayoutInforme document={document} updateDocument={updateDocument} />
+    return <LayoutInforme document={document} updateDocument={updateDocument} session={session} />
   }
 
   if (document.type === 'cotizacion') {
-    return <LayoutCotizacion document={document} updateDocument={updateDocument} />
+    return <LayoutCotizacion document={document} updateDocument={updateDocument} session={session} />
   }
 
   return (

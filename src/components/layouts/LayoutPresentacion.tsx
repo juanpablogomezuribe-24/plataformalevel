@@ -17,8 +17,9 @@ import TeamBlock from '@/components/blocks/TeamBlock'
 import ListBlock from '@/components/blocks/ListBlock'
 import AlertBlock from '@/components/blocks/AlertBlock'
 import VersionHistory from '@/components/VersionHistory'
+import CommentSidebar from '@/components/CommentSidebar'
 
-export default function LayoutPresentacion({ document, updateDocument }: { document: any, updateDocument: (data: any) => void }) {
+export default function LayoutPresentacion({ document, updateDocument, session }: { document: any, updateDocument: (data: any) => void, session?: any }) {
   const router = useRouter()
   const [showSettings, setShowSettings] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -60,6 +61,7 @@ export default function LayoutPresentacion({ document, updateDocument }: { docum
         </div>
 
         <div className="flex items-center gap-4">
+          <CommentSidebar document={document} session={session} />
           <VersionHistory 
             document={document} 
             onRestore={(title, content) => updateDocument({ title, content })} 
