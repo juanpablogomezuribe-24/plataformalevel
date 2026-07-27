@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import LayoutInforme from '@/components/layouts/LayoutInforme'
 import LayoutPresentacion from '@/components/layouts/LayoutPresentacion'
+import LayoutCotizacion from '@/components/layouts/LayoutCotizacion'
 
 export default function DocumentEditorPage() {
   const params = useParams()
@@ -50,6 +51,10 @@ export default function DocumentEditorPage() {
 
   if (document.type === 'informe') {
     return <LayoutInforme document={document} updateDocument={updateDocument} />
+  }
+
+  if (document.type === 'cotizacion') {
+    return <LayoutCotizacion document={document} updateDocument={updateDocument} />
   }
 
   return (

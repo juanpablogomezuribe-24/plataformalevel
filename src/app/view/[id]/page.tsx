@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabaseClient'
 import ViewerInforme from '@/components/layouts/ViewerInforme'
 import ViewerPresentacion from '@/components/layouts/ViewerPresentacion'
+import ViewerCotizacion from '@/components/layouts/ViewerCotizacion'
 import type { Metadata } from 'next'
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
@@ -40,6 +41,10 @@ export default async function ViewDocument({ params }: { params: { id: string } 
 
   if (document.type === 'presentacion') {
     return <ViewerPresentacion document={document} />
+  }
+
+  if (document.type === 'cotizacion') {
+    return <ViewerCotizacion document={document} />
   }
 
   return <ViewerInforme document={document} />

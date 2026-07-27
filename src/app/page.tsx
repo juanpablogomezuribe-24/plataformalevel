@@ -41,13 +41,13 @@ export default function Dashboard() {
     router.push('/login')
   }
 
-  async function createDocument(type: 'informe' | 'presentacion') {
+  async function createDocument(type: 'informe' | 'presentacion' | 'cotizacion') {
     if (!session?.user?.id) return;
     
     const { data, error } = await supabase.from('documents').insert([
       { 
         user_id: session.user.id,
-        title: 'Nueva ' + (type === 'informe' ? 'Cotización' : 'Presentación'), 
+        title: 'Nueva ' + (type === 'informe' ? 'Propuesta' : type === 'presentacion' ? 'Presentación' : 'Cotización'), 
         type: type, 
         status: 'borrador', 
         content: {} 
@@ -167,7 +167,9 @@ export default function Dashboard() {
               <div key={doc.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow group cursor-pointer" onClick={() => router.push(`/document/${doc.id}`)}>
                 <div className="flex justify-between items-start mb-4">
                   <div className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${
-                    doc.type === 'informe' ? 'bg-cyan-50 text-cyan-600' : 'bg-indigo-50 text-indigo-600'
+                    doc.type === 'informe' ? 'bg-cyan-50 text-cyan-600' : 
+                    doc.type === 'presentacion' ? 'bg-indigo-50 text-indigo-600' : 
+                    'bg-emerald-50 text-emerald-600'
                   }`}>
                     {doc.type}
                   </div>
@@ -233,7 +235,7 @@ export default function Dashboard() {
             <h2 className="text-3xl font-black tracking-tight text-slate-900 mb-2">¿Qué vamos a crear hoy?</h2>
             <p className="text-slate-500 mb-8">Elige el formato estructural (Layout) ideal para tu propuesta.</p>
             
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-3 gap-6">
               {/* Opción Informe */}
               <button 
                 onClick={() => createDocument('informe')}
@@ -242,8 +244,8 @@ export default function Dashboard() {
                 <div className="w-12 h-12 bg-cyan-100 text-cyan-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <FileText className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">Informe / Cotización</h3>
-                <p className="text-sm text-slate-500 mb-4">Incluye barra de navegación lateral. Ideal para reportes largos, metodologías paso a paso y presupuestos detallados.</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Propuesta Guiada</h3>
+                <p className="text-sm text-slate-500 mb-4">Incluye barra de navegación lateral. Ideal para reportes, justificaciones y procesos detallados.</p>
                 <span className="text-cyan-600 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity">Usar este formato →</span>
               </button>
 
@@ -258,8 +260,21 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Presentación Creativa</h3>
-                <p className="text-sm text-slate-500 mb-4">Formato inmersivo a pantalla completa sin barra lateral. Ideal para mostrar portafolios, diseño de marca o campañas de alto impacto.</p>
+                <p className="text-sm text-slate-500 mb-4">Formato inmersivo a pantalla completa sin barra lateral. Ideal para diseño de marca o reuniones.</p>
                 <span className="text-indigo-600 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity">Usar este formato →</span>
+              </button>
+
+              {/* Opción Cotización */}
+              <button 
+                onClick={() => createDocument('cotizacion')}
+                className="text-left group border-2 border-slate-100 hover:border-emerald-500 rounded-2xl p-6 transition-all hover:shadow-xl hover:shadow-emerald-500/10"
+              >
+                <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <span className="font-bold text-xl">$</span>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Cotización Comercial</h3>
+                <p className="text-sm text-slate-500 mb-4">Panel derecho anclado (sticky) con el total siempre visible para asegurar el cierre de ventas.</p>
+                <span className="text-emerald-600 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity">Usar este formato →</span>
               </button>
             </div>
           </div>
