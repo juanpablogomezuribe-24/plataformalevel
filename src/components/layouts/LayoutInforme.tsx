@@ -12,6 +12,10 @@ import ImageBlock from '@/components/blocks/ImageBlock'
 import VideoBlock from '@/components/blocks/VideoBlock'
 import DividerBlock from '@/components/blocks/DividerBlock'
 import TestimonialBlock from '@/components/blocks/TestimonialBlock'
+import TimelineBlock from '@/components/blocks/TimelineBlock'
+import TeamBlock from '@/components/blocks/TeamBlock'
+import ListBlock from '@/components/blocks/ListBlock'
+import AlertBlock from '@/components/blocks/AlertBlock'
 
 export default function LayoutInforme({ document, updateDocument }: { document: any, updateDocument: (data: any) => void }) {
   const router = useRouter()
@@ -234,6 +238,10 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
                   {block.type === 'video' && <VideoBlock data={block.data} onChange={updateBlockData} />}
                   {block.type === 'divider' && <DividerBlock data={block.data} onChange={updateBlockData} />}
                   {block.type === 'testimonial' && <TestimonialBlock data={block.data} onChange={updateBlockData} />}
+                  {block.type === 'timeline' && <TimelineBlock data={block.data} onChange={updateBlockData} />}
+                  {block.type === 'team' && <TeamBlock data={block.data} onChange={updateBlockData} />}
+                  {block.type === 'list' && <ListBlock data={block.data} onChange={updateBlockData} />}
+                  {block.type === 'alert' && <AlertBlock data={block.data} onChange={updateBlockData} />}
                 </div>
               )
             })}
@@ -255,6 +263,18 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
               </button>
               <button onClick={() => handleAddBlock('testimonial')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
                 Testimonio
+              </button>
+              <button onClick={() => handleAddBlock('timeline')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                Cronograma
+              </button>
+              <button onClick={() => handleAddBlock('team')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                Equipo
+              </button>
+              <button onClick={() => handleAddBlock('list')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                Lista
+              </button>
+              <button onClick={() => handleAddBlock('alert')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                Alerta
               </button>
               <button onClick={() => handleAddBlock('stats')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
                 Métricas

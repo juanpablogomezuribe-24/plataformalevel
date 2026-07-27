@@ -11,6 +11,10 @@ import ImageBlock from '@/components/blocks/ImageBlock'
 import VideoBlock from '@/components/blocks/VideoBlock'
 import DividerBlock from '@/components/blocks/DividerBlock'
 import TestimonialBlock from '@/components/blocks/TestimonialBlock'
+import TimelineBlock from '@/components/blocks/TimelineBlock'
+import TeamBlock from '@/components/blocks/TeamBlock'
+import ListBlock from '@/components/blocks/ListBlock'
+import AlertBlock from '@/components/blocks/AlertBlock'
 
 export default function ViewerInforme({ document }: { document: any }) {
   // Mock data for sections
@@ -106,6 +110,10 @@ export default function ViewerInforme({ document }: { document: any }) {
               if (block.type === 'video') return <VideoBlock key={block.id} data={block.data} readOnly={true} />
               if (block.type === 'divider') return <DividerBlock key={block.id} data={block.data} readOnly={true} />
               if (block.type === 'testimonial') return <TestimonialBlock key={block.id} data={block.data} readOnly={true} />
+              if (block.type === 'timeline') return <TimelineBlock key={block.id} data={block.data} readOnly={true} />
+              if (block.type === 'team') return <TeamBlock key={block.id} data={block.data} readOnly={true} />
+              if (block.type === 'list') return <ListBlock key={block.id} data={block.data} readOnly={true} />
+              if (block.type === 'alert') return <AlertBlock key={block.id} data={block.data} readOnly={true} />
               return null
             })}
 
