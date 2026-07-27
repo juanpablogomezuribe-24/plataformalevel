@@ -3,51 +3,100 @@ import OpenAI from 'openai';
 
 export async function POST(req: Request) {
   try {
-    const { prompt, clientName } = await req.json();
+    const { prompt, clientName, template } = await req.json();
 
     if (!prompt) {
       return NextResponse.json({ error: "No prompt provided" }, { status: 400 });
     }
 
-    // Check if we have an API key. If not, use fallback logic.
     if (!process.env.OPENAI_API_KEY) {
       console.warn("No OPENAI_API_KEY found, using mock fallback AI generation");
-      return generateMockResponse(prompt, clientName);
+      return generateMockResponse(prompt, clientName, template);
     }
 
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    const systemPrompt = `
-Eres una IA experta en ventas y presentaciones ejecutivas de alto nivel (estilo McKinsey / BCG).
-Tu tarea es convertir el brief del usuario en un documento estructurado JSON que se renderizará como una presentación/informe rico en componentes gráficos y dinámicos.
-El documento debe tener el siguiente formato (responde SOLO con el JSON válido):
+    let systemPrompt = '';
+    
+    if (template === 'balones') {
+      systemPrompt = `
+Eres un asistente comercial experto en ventas de balones y material deportivo.
+Tu tarea es leer el brief del usuario y devolver UNICAMENTE un JSON válido que llene la estructura del template "Cotización Balones".
+Inventa datos coherentes si faltan (ej. precios coherentes, logística, medidas de caja maestra) para que la cotización quede profesional.
+
+ESTRUCTURA REQUERIDA (JSON EXACTO):
 {
-  "title": "Nombre comercial de la propuesta",
-  "type": "cotizacion" | "informe" | "presentacion",
-  "blocks": [
-    // Array de bloques lógicos
-  ]
+  "data": {
+    "client": { "name": "Nombre Cliente", "nit": "NIT o RUT inventado/real" },
+    "product": { "name": "Nombre del balón/producto", "image": "", "description": "Descripción persuasiva" },
+    "options": [
+      { "id": "3", "tag": "Infantil", "title": "Número #3", "price": 40500, "specs": "Medidas/Peso" },
+      { "id": "4", "tag": "Juvenil", "title": "Número #4", "price": 44500, "specs": "Medidas/Peso" },
+      { "id": "5", "tag": "Profesional", "title": "Número #5", "price": 46000, "specs": "Medidas/Peso" }
+    ],
+    "logistics": { "delivery": "Destino", "freight": "Condición flete", "time": "Días de entrega" },
+    "masterBox": { "dimensions": "Ej: 74 x 30 x 50 cm", "weight": "Ej: 15 Kg" },
+    "units": 500
+  }
 }
+      `;
+    } else if (template === 'evolution') {
+      systemPrompt = `
+Eres un consultor de alta dirección y estrategia (estilo McKinsey).
+Tu tarea es leer el brief y devolver UNICAMENTE un JSON válido para el template "Propuesta Evolution".
+El estilo debe ser vanguardista, directo y altamente persuasivo. Invéntate precios y secciones si faltan.
 
-Tipos de bloques disponibles y sus estructuras requeridas:
-1. { "id": "uuid", "type": "cover", "data": { "title": "Título", "subtitle": "Subtítulo", "date": "fecha actual" } }
-2. { "id": "uuid", "type": "text", "data": { "title": "Título sección", "content": "Texto descriptivo (usa <b>, <ul>, <li> y <p>)" } }
-3. { "id": "uuid", "type": "pricing", "data": { "currency": "USD", "items": [{ "name": "Servicio", "price": 1000, "description": "Detalle" }] } }
-4. { "id": "uuid", "type": "timeline", "data": { "items": [{ "title": "Fase 1", "description": "Detalle", "date": "Semana 1" }] } }
-5. { "id": "uuid", "type": "stats", "data": { "items": [{ "label": "Métrica Clave", "value": "100%" }] } }
-6. { "id": "uuid", "type": "alert", "data": { "type": "info", "title": "Atención", "description": "Texto de alerta o insight" } }
-7. { "id": "uuid", "type": "chart", "data": { "title": "Título del gráfico", "description": "Contexto breve", "chartType": "pie" | "bar" | "line", "items": [{ "name": "Etiqueta 1", "value": 40 }, { "name": "Etiqueta 2", "value": 60 }] } }
+ESTRUCTURA REQUERIDA (JSON EXACTO):
+{
+  "data": {
+    "cover": { "title": "Título Impactante", "subtitle": "Evolution", "description": "Resumen ejecutivo en 1 párrafo" },
+    "sections": [
+      {
+        "title": "Categoría (ej. Fase 1 / Estrategia)",
+        "blocks": [
+          { "icon": "🚀", "title": "Nombre del bloque", "content": "Detalle estratégico", "price": 5000000 }
+        ]
+      }
+    ],
+    "totalPrice": 15000000
+  }
+}
+      `;
+    } else if (template === 'lotbet' || template === 'mundial') {
+      systemPrompt = `
+Eres un analista de datos avanzado experto en dashboards.
+Tu tarea es leer el brief y devolver UNICAMENTE un JSON válido para el template de "Informe".
+Extrae KPIs, métricas, y datos para gráficos. Invéntate datos de impacto si el texto es muy pobre, para demostrar el poder visual del informe.
 
-REGLAS ESTRICTAS DE DISEÑO E INTELIGENCIA VISUAL (MANDATORIO):
-1. **NO SEAS PLANO NI ABURRIDO.** Está ESTRICTAMENTE PROHIBIDO usar más de 2 bloques "text" seguidos. Debes intercalar la información con otros bloques visuales.
-2. **DATOS = GRÁFICOS:** Si el brief menciona porcentajes, distribuciones, comparaciones numéricas, demografía o presupuestos, DEBES usar el bloque "chart". Usa "pie" para porcentajes que sumen 100, "bar" para comparar elementos y "line" para evolución en el tiempo. Invéntate los datos si es necesario para hacer el informe atractivo basándote en el contexto.
-3. **RESÚMENES = STATS:** Extrae los 3 o 4 KPIs o números más impactantes del texto y ponlos en un bloque "stats" justo después del cover.
-4. **PROCESOS = TIMELINE:** Si hay pasos, meses, semanas o un plan de ejecución, DEBES usar un bloque "timeline". NUNCA uses viñetas en un bloque de texto para explicar un proceso.
-5. Siempre empieza con un bloque "cover". Invéntate UUIDs simples (ej. "b-1", "b-2").
-6. Expande y redacta persuasivamente. Transforma un texto simple en un análisis profundo y profesional.
-`;
+ESTRUCTURA REQUERIDA (JSON EXACTO):
+{
+  "data": {
+    "cover": { "title": "Título del Informe", "subtitle": "Dashboard", "date": "Mes Año" },
+    "kpis": [
+      { "label": "Métrica clave", "value": "100%" } // Mínimo 4 KPIs
+    ],
+    "metrics": [
+      {
+        "title": "Sección Principal",
+        "description": "Análisis narrativo",
+        "items": [ { "label": "Detalle", "value": "Número" } ]
+      }
+    ],
+    "chart": {
+      "title": "Distribución / Alcance",
+      "items": [ { "name": "Categoría 1", "value": 40 }, { "name": "Categoría 2", "value": 60 } ]
+    }
+  }
+}
+      `;
+    } else {
+       // Fallback for missing template (Should not happen but just in case)
+       systemPrompt = `
+Eres un asistente. El usuario no eligió template. Devuelve un JSON vacío: {"data": {}}.
+       `;
+    }
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -62,6 +111,11 @@ REGLAS ESTRICTAS DE DISEÑO E INTELIGENCIA VISUAL (MANDATORIO):
     const aiResponse = response.choices[0].message.content;
     const parsedData = JSON.parse(aiResponse || "{}");
 
+    // Envolvemos en data si la IA no lo hizo
+    if (!parsedData.data) {
+        return NextResponse.json({ data: parsedData });
+    }
+
     return NextResponse.json(parsedData);
   } catch (error: any) {
     console.error("AI Generation Error:", error);
@@ -69,83 +123,35 @@ REGLAS ESTRICTAS DE DISEÑO E INTELIGENCIA VISUAL (MANDATORIO):
   }
 }
 
-function generateMockResponse(prompt: string, clientName: string) {
-  const isQuote = prompt.toLowerCase().includes('precio') || prompt.toLowerCase().includes('cotiza') || prompt.toLowerCase().includes('$');
+function generateMockResponse(prompt: string, clientName: string, template: string) {
+  // Simulación de respuesta rápida cuando no hay API KEY
+  let data = {};
   
-  const mockData: any = {
-    title: `Propuesta Inteligente para ${clientName || 'Cliente'}`,
-    type: isQuote ? 'cotizacion' : 'presentacion',
-    blocks: [
-      {
-        id: 'block-1',
-        type: 'cover',
-        data: {
-          title: `Proyecto: ${clientName || 'Estratégico'}`,
-          subtitle: "Generado vía Modo Simulación IA",
-          date: new Date().toLocaleDateString()
-        }
-      },
-      {
-        id: 'block-2',
-        type: 'text',
-        data: {
-          title: "Análisis de Requerimientos",
-          content: `<p>Hemos procesado tu brief: <em>"${prompt.substring(0, 100)}..."</em>.</p><p>Dado que no se ha configurado la clave de OpenAI (OPENAI_API_KEY) en las variables de entorno, este es un <strong>documento simulado</strong> para demostrar cómo el sistema convierte texto en bloques. Cuando agregues la llave, GPT redactará todo esto perfectamente.</p>`
-        }
-      },
-      {
-        id: 'block-3',
-        type: 'stats',
-        data: {
-          items: [
-            { label: "Tiempo de Respuesta IA", value: "1.2s" },
-            { label: "Eficiencia", value: "+80%" },
-            { label: "Nivel de Personalización", value: "Alto" }
-          ]
-        }
-      },
-      {
-        id: 'block-4',
-        type: 'timeline',
-        data: {
-          items: [
-            { title: "Fase 1: Auditoría", description: "Revisión inicial del estado actual", date: "Semana 1" },
-            { title: "Fase 2: Estrategia", description: "Diseño del nuevo enfoque", date: "Semana 2-3" },
-            { title: "Fase 3: Ejecución", description: "Implementación técnica y visual", date: "Semana 4-6" }
-          ]
-        }
-      },
-      {
-        id: 'block-chart-1',
-        type: 'chart',
-        data: {
-          title: "Distribución de Usuarios (Simulación)",
-          description: "Representación gráfica de cómo se dividen los usuarios activos en la plataforma actual.",
-          chartType: "pie",
-          items: [
-            { name: "Móvil", value: 65 },
-            { name: "Escritorio", value: 25 },
-            { name: "Tablet", value: 10 }
-          ]
-        }
-      }
-    ]
-  };
-
-  if (isQuote) {
-    mockData.blocks.push({
-      id: 'block-5',
-      type: 'pricing',
-      data: {
-        currency: "USD",
-        items: [
-          { name: "Licencia Base", description: "Acceso a la plataforma central", price: 1000 },
-          { name: "Módulo Personalizado", description: "Desarrollo a la medida según brief", price: 2500 },
-          { name: "Soporte Anual", description: "Mantenimiento y actualizaciones", price: 800 }
-        ]
-      }
-    });
+  if (template === 'balones') {
+    data = {
+      client: { name: clientName || "Mock Cliente", nit: "000-000-000" },
+      product: { name: "Balón Mock", description: "Descripción simulada de balón basado en: " + prompt.substring(0, 50) },
+      options: [
+        { id: "5", tag: "Profesional", title: "Número #5", price: 46000, specs: "Medidas estándar" }
+      ],
+      logistics: { delivery: "Bogotá", freight: "Incluido", time: "15 Días" },
+      masterBox: { dimensions: "70x30x50", weight: "15kg" },
+      units: 100
+    };
+  } else if (template === 'evolution') {
+    data = {
+      cover: { title: "Propuesta Mock", subtitle: "Evolution", description: prompt.substring(0, 50) },
+      sections: [{ title: "Fase Única", blocks: [{ icon: "⚙️", title: "Desarrollo", content: "Contenido mock", price: 1000000 }] }],
+      totalPrice: 1000000
+    };
+  } else {
+    data = {
+      cover: { title: "Informe Mock", subtitle: "Lotbet", date: "2026" },
+      kpis: [{ label: "Usuarios", value: "10K" }, { label: "Conversión", value: "5%" }],
+      metrics: [{ title: "Rendimiento", description: "Texto simulado", items: [{ label: "Clics", value: "5000" }] }],
+      chart: { items: [{ name: "A", value: 50 }, { name: "B", value: 50 }] }
+    };
   }
 
-  return NextResponse.json(mockData);
+  return NextResponse.json({ data });
 }

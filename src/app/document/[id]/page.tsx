@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabaseClient'
 import LayoutInforme from '@/components/layouts/LayoutInforme'
 import LayoutPresentacion from '@/components/layouts/LayoutPresentacion'
 import LayoutCotizacion from '@/components/layouts/LayoutCotizacion'
+import TemplateEditorWrapper from '@/components/TemplateEditorWrapper'
 
 export default function DocumentEditorPage() {
   const params = useParams()
@@ -52,7 +53,7 @@ export default function DocumentEditorPage() {
       await supabase.from('document_versions').insert({
         document_id: document.id,
         version_name: `Estado: ${updates.status.toUpperCase()} (antes ${oldStatus || 'nuevo'})`,
-        title: document.title, // Use current title (which hasn't changed in this update theoretically)
+        title: document.title,
         content: document.content
       })
     }
@@ -61,18 +62,15 @@ export default function DocumentEditorPage() {
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50 font-bold text-slate-500">Cargando Editor...</div>
   if (!document) return <div className="min-h-screen flex items-center justify-center bg-slate-50 font-bold text-red-500">Documento no encontrado</div>
 
-  // Seleccionar Layout según el tipo
-  if (document.type === 'presentacion') {
-    return <LayoutPresentacion document={document} updateDocument={updateDocument} session={session} />
+  // Si tiene un template especializado, usar el nuevo Wrapper
+  if (document.content?.template) {
+    return <TemplateEditorWrapper document={document} updateDocument={updateDocument} session={session} />
   }
 
-  if (document.type === 'informe') {
-    return <LayoutInforme document={document} updateDocument={updateDocument} session={session} />
-  }
-
-  if (document.type === 'cotizacion') {
-    return <LayoutCotizacion document={document} updateDocument={updateDocument} session={session} />
-  }
+  // Fallback a layouts legacy (Bloques genericos)
+  if (document.type === 'presentacion') return <LayoutPresentacion document={document} updateDocument={updateDocument} session={session} />
+  if (document.type === 'informe') return <LayoutInforme document={document} updateDocument={updateDocument} session={session} />
+  if (document.type === 'cotizacion') return <LayoutCotizacion document={document} updateDocument={updateDocument} session={session} />
 
   return (
     <div className="p-8">

@@ -13,7 +13,7 @@ export default function CreateDocumentModal({
 }) {
   const [step, setStep] = useState(1)
   const [docType, setDocType] = useState<'cotizacion' | 'presentacion' | 'informe' | null>(null)
-  const [template, setTemplate] = useState<'comercial' | 'ejecutiva' | 'creativa' | null>(null)
+  const [template, setTemplate] = useState<string | null>(null)
   
   const [clientName, setClientName] = useState('')
   const [projectName, setProjectName] = useState('')
@@ -28,7 +28,7 @@ export default function CreateDocumentModal({
     setStep(2)
   }
 
-  const handleNextStep2 = (tmpl: 'comercial' | 'ejecutiva' | 'creativa') => {
+  const handleNextStep2 = (tmpl: string) => {
     setTemplate(tmpl)
     setStep(3)
   }
@@ -67,12 +67,12 @@ export default function CreateDocumentModal({
         const response = await fetch('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: aiPrompt, clientName })
+          body: JSON.stringify({ prompt: aiPrompt, clientName, template })
         })
 
         if (response.ok) {
           const generatedData = await response.json()
-          blocks = generatedData.blocks || []
+          blocks = generatedData.data || [] // Ahora la IA devuelve la data estructurada del template en 'data' en vez de 'blocks'
         } else {
           const errorData = await response.json()
           throw new Error("Error de IA: " + (errorData.error || "Fallo desconocido al conectar con OpenAI"))
@@ -86,7 +86,7 @@ export default function CreateDocumentModal({
           type: docType, 
           status: 'borrador', 
           client_name: clientName || 'Sin Cliente',
-          content: { brand, blocks } 
+          content: { brand, template, data: blocks } 
         }
       ]).select()
 
@@ -178,58 +178,98 @@ export default function CreateDocumentModal({
           {/* PASO 2 */}
           {step === 2 && (
             <div className="max-w-4xl mx-auto pt-6">
-              <p className="text-slate-500 mb-8">Selecciona el estilo que mejor se adapte a tu propuesta.</p>
+              <p className="text-slate-500 mb-8 text-center">Selecciona el template base para tu {docType}.</p>
               
-              <div className="flex gap-4 mb-8">
-                <button className="px-5 py-2 bg-indigo-600 text-white font-bold text-sm rounded-full">Comercial</button>
-                <button className="px-5 py-2 bg-white border border-slate-200 text-slate-600 font-bold text-sm rounded-full hover:bg-slate-50">Ejecutiva</button>
-                <button className="px-5 py-2 bg-white border border-slate-200 text-slate-600 font-bold text-sm rounded-full hover:bg-slate-50">Creativa</button>
-              </div>
-
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Estructura 1 */}
-                <div className="bg-white border-2 border-indigo-500 rounded-2xl p-4 shadow-lg shadow-indigo-500/10 relative overflow-hidden">
-                  <div className="absolute top-4 left-4 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Recomendado</div>
-                  <div className="h-64 bg-slate-900 rounded-xl mb-4 p-6 flex flex-col justify-end text-white overflow-hidden relative">
-                     <div className="absolute inset-0 bg-indigo-500/20" />
-                     <div className="relative z-10">
-                        <div className="w-8 h-1 bg-indigo-500 mb-2" />
-                        <h4 className="text-xl font-bold">Propuesta Comercial</h4>
-                     </div>
-                  </div>
-                  <h3 className="font-bold text-slate-900 mb-1">Clásica</h3>
-                  <p className="text-xs text-slate-500 mb-4 line-clamp-2">Estructura tradicional y clara, ideal para la mayoría de propuestas.</p>
-                  <button onClick={() => handleNextStep2('comercial')} className="w-full py-2.5 border-2 border-indigo-100 text-indigo-600 font-bold text-sm rounded-xl hover:bg-indigo-50 transition-colors">
-                    Seleccionar
-                  </button>
-                </div>
-
-                {/* Estructura 2 */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-4 hover:border-slate-300 transition-colors">
-                  <div className="h-64 bg-slate-100 rounded-xl mb-4 p-6 flex flex-col justify-center items-center text-slate-800">
-                     <h4 className="text-xl font-black text-center">Propuesta<br/>Ejecutiva</h4>
-                  </div>
-                  <h3 className="font-bold text-slate-900 mb-1">Ejecutiva</h3>
-                  <p className="text-xs text-slate-500 mb-4 line-clamp-2">Diseño profesional y directo, enfocado en resultados rápidos.</p>
-                  <button onClick={() => handleNextStep2('ejecutiva')} className="w-full py-2.5 border border-slate-200 text-slate-600 font-bold text-sm rounded-xl hover:bg-slate-50 transition-colors">
-                    Seleccionar
-                  </button>
-                </div>
-
-                {/* Estructura 3 */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-4 hover:border-slate-300 transition-colors">
-                  <div className="h-64 bg-slate-900 rounded-xl mb-4 overflow-hidden relative">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-indigo-500 opacity-20" />
-                    <div className="absolute bottom-6 left-6 text-white">
-                      <h4 className="text-xl font-black leading-tight">Propuesta<br/>Creativa</h4>
+                
+                {docType === 'cotizacion' && (
+                  <>
+                    {/* Estructura Balones */}
+                    <div className="bg-white border-2 border-indigo-500 rounded-2xl p-4 shadow-lg shadow-indigo-500/10 relative overflow-hidden">
+                      <div className="absolute top-4 left-4 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Activo</div>
+                      <div className="h-48 bg-slate-100 rounded-xl mb-4 p-4 flex flex-col justify-center items-center text-center">
+                         <span className="text-3xl mb-2">⚽️</span>
+                         <h4 className="text-lg font-bold text-slate-800">Cotización<br/>Balones</h4>
+                      </div>
+                      <p className="text-xs text-slate-500 mb-4 line-clamp-2">Template interactivo para selección de tallas y logística.</p>
+                      <button onClick={() => handleNextStep2('balones')} className="w-full py-2.5 bg-indigo-50 text-indigo-600 font-bold text-sm rounded-xl hover:bg-indigo-100 transition-colors">
+                        Seleccionar
+                      </button>
                     </div>
-                  </div>
-                  <h3 className="font-bold text-slate-900 mb-1">Moderna</h3>
-                  <p className="text-xs text-slate-500 mb-4 line-clamp-2">Diseño visual y dinámico para propuestas creativas y modernas.</p>
-                  <button onClick={() => handleNextStep2('creativa')} className="w-full py-2.5 border border-slate-200 text-slate-600 font-bold text-sm rounded-xl hover:bg-slate-50 transition-colors">
-                    Seleccionar
-                  </button>
-                </div>
+
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 opacity-60">
+                      <div className="h-48 bg-slate-200 rounded-xl mb-4 flex items-center justify-center text-slate-400">
+                         Próximamente
+                      </div>
+                      <h3 className="font-bold text-slate-600 mb-1">Template 2</h3>
+                      <button disabled className="w-full py-2.5 border border-slate-200 text-slate-400 font-bold text-sm rounded-xl">
+                        Pendiente
+                      </button>
+                    </div>
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 opacity-60">
+                      <div className="h-48 bg-slate-200 rounded-xl mb-4 flex items-center justify-center text-slate-400">
+                         Próximamente
+                      </div>
+                      <h3 className="font-bold text-slate-600 mb-1">Template 3</h3>
+                      <button disabled className="w-full py-2.5 border border-slate-200 text-slate-400 font-bold text-sm rounded-xl">
+                        Pendiente
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {docType === 'presentacion' && (
+                  <>
+                    <div className="bg-white border-2 border-indigo-500 rounded-2xl p-4 shadow-lg shadow-indigo-500/10 relative overflow-hidden">
+                      <div className="absolute top-4 left-4 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Activo</div>
+                      <div className="h-48 bg-slate-900 rounded-xl mb-4 p-4 flex items-center justify-center">
+                         <h4 className="text-xl font-bold text-white">Lotbet</h4>
+                      </div>
+                      <p className="text-xs text-slate-500 mb-4">Diseño oscuro premium con menú interactivo lateral.</p>
+                      <button onClick={() => handleNextStep2('lotbet')} className="w-full py-2.5 bg-indigo-50 text-indigo-600 font-bold text-sm rounded-xl hover:bg-indigo-100 transition-colors">
+                        Seleccionar
+                      </button>
+                    </div>
+
+                    <div className="bg-white border-2 border-pink-500 rounded-2xl p-4 shadow-lg shadow-pink-500/10 relative overflow-hidden">
+                      <div className="absolute top-4 left-4 bg-pink-600 text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Activo</div>
+                      <div className="h-48 bg-gradient-to-br from-pink-50 to-white rounded-xl mb-4 flex items-center justify-center border border-pink-100">
+                         <h4 className="text-xl font-black text-slate-900">Evolution</h4>
+                      </div>
+                      <p className="text-xs text-slate-500 mb-4">Arquitectura avanzada, scroll dinámico y animaciones.</p>
+                      <button onClick={() => handleNextStep2('evolution')} className="w-full py-2.5 bg-pink-50 text-pink-600 font-bold text-sm rounded-xl hover:bg-pink-100 transition-colors">
+                        Seleccionar
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {docType === 'informe' && (
+                  <>
+                    <div className="bg-white border-2 border-indigo-500 rounded-2xl p-4 shadow-lg shadow-indigo-500/10 relative overflow-hidden">
+                      <div className="absolute top-4 left-4 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Activo</div>
+                      <div className="h-48 bg-slate-900 rounded-xl mb-4 p-4 flex items-center justify-center">
+                         <h4 className="text-xl font-bold text-white">Lotbet Informe</h4>
+                      </div>
+                      <p className="text-xs text-slate-500 mb-4">Dashboard interactivo con KPIs y timelines.</p>
+                      <button onClick={() => handleNextStep2('lotbet')} className="w-full py-2.5 bg-indigo-50 text-indigo-600 font-bold text-sm rounded-xl hover:bg-indigo-100 transition-colors">
+                        Seleccionar
+                      </button>
+                    </div>
+
+                    <div className="bg-white border-2 border-emerald-500 rounded-2xl p-4 shadow-lg shadow-emerald-500/10 relative overflow-hidden">
+                      <div className="absolute top-4 left-4 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Activo</div>
+                      <div className="h-48 bg-emerald-900 rounded-xl mb-4 flex items-center justify-center">
+                         <h4 className="text-xl font-black text-emerald-50">Mundial / WPlay</h4>
+                      </div>
+                      <p className="text-xs text-slate-500 mb-4">Plantilla robusta para reportes de gran escala.</p>
+                      <button onClick={() => handleNextStep2('mundial')} className="w-full py-2.5 bg-emerald-50 text-emerald-600 font-bold text-sm rounded-xl hover:bg-emerald-100 transition-colors">
+                        Seleccionar
+                      </button>
+                    </div>
+                  </>
+                )}
+
               </div>
             </div>
           )}

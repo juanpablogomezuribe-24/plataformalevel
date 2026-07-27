@@ -4,6 +4,12 @@ import ViewerPresentacion from '@/components/layouts/ViewerPresentacion'
 import ViewerCotizacion from '@/components/layouts/ViewerCotizacion'
 import type { Metadata } from 'next'
 
+// Nuevos templates especializados
+import CotizacionBalones from '@/components/templates/CotizacionBalones'
+import PropuestaEvolution from '@/components/templates/PropuestaEvolution'
+import InformeLotbet from '@/components/templates/InformeLotbet'
+import InformeMundial from '@/components/templates/InformeMundial'
+
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const { data: document } = await supabase
     .from('documents')
@@ -50,13 +56,19 @@ export default async function ViewDocument({ params }: { params: { id: string } 
     )
   }
 
-  if (document.type === 'presentacion') {
-    return <ViewerPresentacion document={document} />
-  }
+  const template = document.content?.template;
+  const data = document.content?.data || {};
+  const brand = document.content?.brand || {};
 
-  if (document.type === 'cotizacion') {
-    return <ViewerCotizacion document={document} />
-  }
+  // Renderizar templates especializados si existen
+  if (template === 'balones') return <CotizacionBalones data={data} brand={brand} />
+  if (template === 'evolution') return <PropuestaEvolution data={data} brand={brand} />
+  if (template === 'lotbet') return <InformeLotbet data={data} brand={brand} />
+  if (template === 'mundial') return <InformeMundial data={data} brand={brand} />
 
+  // Fallback a los renders legacy genéricos
+  if (document.type === 'presentacion') return <ViewerPresentacion document={document} />
+  if (document.type === 'cotizacion') return <ViewerCotizacion document={document} />
+  
   return <ViewerInforme document={document} />
 }
