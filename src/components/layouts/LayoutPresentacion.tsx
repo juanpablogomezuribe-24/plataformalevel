@@ -21,6 +21,7 @@ import VersionHistory from '@/components/VersionHistory'
 export default function LayoutPresentacion({ document, updateDocument }: { document: any, updateDocument: (data: any) => void }) {
   const router = useRouter()
   const [showSettings, setShowSettings] = useState(false)
+  const [copied, setCopied] = useState(false)
   const isReadOnly = document.status === 'en_revision' || document.status === 'publicado' || document.status === 'aprobado' || document.status === 'enviado';
 
   const handleAddBlock = (type: string) => {
@@ -127,11 +128,12 @@ export default function LayoutPresentacion({ document, updateDocument }: { docum
                 onClick={() => {
                   const url = `${window.location.origin}/view/${document.id}`
                   navigator.clipboard.writeText(url)
-                  alert("¡Enlace copiado al portapapeles! Ya puedes enviarlo a tu cliente.")
+                  setCopied(true)
+                  setTimeout(() => setCopied(false), 2000)
                 }}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-1.5 px-4 rounded-lg shadow-md shadow-indigo-500/20 transition-all flex items-center gap-2"
+                className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-1.5 px-4 rounded-lg shadow-md shadow-blue-500/20 transition-all flex items-center gap-2"
               >
-                <CheckCircle2 className="w-4 h-4" /> Copiar Link
+                <CheckCircle2 className="w-4 h-4" /> {copied ? "¡Enlace Copiado!" : "Copiar Link"}
               </button>
               <button 
                 onClick={() => updateDocument({ status: 'borrador' })}

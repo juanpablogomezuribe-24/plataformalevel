@@ -6,6 +6,8 @@ export default function VersionHistory({ document, onRestore }: { document: any,
   const [isOpen, setIsOpen] = useState(false)
   const [versions, setVersions] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  const [showPrompt, setShowPrompt] = useState(false)
+  const [versionName, setVersionName] = useState('Respaldo manual')
 
   const fetchVersions = async () => {
     setLoading(true)
@@ -33,12 +35,11 @@ export default function VersionHistory({ document, onRestore }: { document: any,
   }
 
   const saveManualSnapshot = async () => {
-    setLoading(true)
-    const versionName = prompt('Nombre para esta versión:', 'Respaldo manual')
-    if (!versionName) {
-      setLoading(false)
+    if (!versionName.trim()) {
+      setShowPrompt(false)
       return
     }
+    setLoading(true)
 
     const { error } = await supabase.from('document_versions').insert({
       document_id: document.id,
@@ -53,6 +54,8 @@ export default function VersionHistory({ document, onRestore }: { document: any,
       fetchVersions()
     }
     setLoading(false)
+    setShowPrompt(false)
+    setVersionName('Respaldo manual')
   }
 
   return (
@@ -78,13 +81,40 @@ export default function VersionHistory({ document, onRestore }: { document: any,
           </div>
 
           <div className="p-4 border-b border-slate-800 bg-slate-900/50">
-            <button 
-              onClick={saveManualSnapshot}
-              disabled={loading}
-              className="w-full bg-slate-800 hover:bg-slate-700 text-white text-sm font-bold py-3 px-4 rounded-xl border border-slate-700 transition-colors flex items-center justify-center gap-2"
-            >
-              Guardar Versión Actual
-            </button>
+            {showPrompt ? (
+              <div className="flex flex-col gap-2">
+                <input 
+                  type="text" 
+                  value={versionName}
+                  onChange={(e) => setVersionName(e.target.value)}
+                  className="w-full bg-slate-950 text-white text-sm px-3 py-2 rounded-lg border border-slate-700 outline-none focus:border-indigo-500"
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => setShowPrompt(false)}
+                    className="flex-1 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-2 rounded-lg transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    onClick={saveManualSnapshot}
+                    disabled={loading}
+                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded-lg transition-colors"
+                  >
+                    {loading ? 'Guardando...' : 'Guardar'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button 
+                onClick={() => setShowPrompt(true)}
+                disabled={loading}
+                className="w-full bg-slate-800 hover:bg-slate-700 text-white text-sm font-bold py-3 px-4 rounded-xl border border-slate-700 transition-colors flex items-center justify-center gap-2"
+              >
+                Guardar Versión Actual
+              </button>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4">

@@ -30,6 +30,7 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
   ])
   const [activeSection, setActiveSection] = useState(3)
   const [showSidebar, setShowSidebar] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   // Calculate progress
   const progress = Math.round((sections.filter(s => s.completed).length / sections.length) * 100)
@@ -230,11 +231,12 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
                 onClick={() => {
                   const url = `${window.location.origin}/view/${document.id}`
                   navigator.clipboard.writeText(url)
-                  alert("¡Enlace copiado al portapapeles! Ya puedes enviarlo a tu cliente.")
+                  setCopied(true)
+                  setTimeout(() => setCopied(false), 2000)
                 }}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm"
               >
-                <CheckCircle2 className="w-5 h-5" /> Copiar Enlace Cliente
+                <CheckCircle2 className="w-4 h-4" /> {copied ? "¡Enlace Copiado!" : "Copiar Link de Cliente"}
               </button>
               <button 
                 onClick={() => updateDocument({ status: 'borrador' })}
