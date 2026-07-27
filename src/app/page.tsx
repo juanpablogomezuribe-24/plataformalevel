@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
-import { FileText, LogOut, Plus, Trash2 } from 'lucide-react'
+import { FileText, LogOut, Plus, Trash2, Copy } from 'lucide-react'
 
 export default function Dashboard() {
   const [session, setSession] = useState<any>(null)
@@ -89,6 +89,27 @@ export default function Dashboard() {
     }
   }
 
+  async function handleDuplicate(e: React.MouseEvent, doc: any) {
+    e.stopPropagation()
+    if (!session?.user?.id) return;
+    
+    const { data, error } = await supabase.from('documents').insert([
+      { 
+        user_id: session.user.id,
+        title: doc.title + ' (Copia)', 
+        type: doc.type, 
+        status: 'borrador', 
+        content: doc.content 
+      }
+    ]).select()
+
+    if (error) {
+      alert("Error al duplicar el documento: " + error.message)
+    } else {
+      fetchDocuments()
+    }
+  }
+
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><p className="text-slate-500 font-bold">Cargando...</p></div>
   if (!session) return null // Prevents flashing before redirect
 
@@ -153,13 +174,22 @@ export default function Dashboard() {
                     <div className="text-[10px] font-bold text-slate-400">
                       {new Date(doc.created_at).toLocaleDateString()}
                     </div>
-                    <button 
-                      onClick={(e) => handleDelete(e, doc.id)} 
-                      className="text-slate-300 hover:text-red-500 transition-colors"
-                      title="Eliminar documento"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={(e) => handleDuplicate(e, doc)} 
+                        className="text-slate-300 hover:text-cyan-500 transition-colors"
+                        title="Duplicar documento"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={(e) => handleDelete(e, doc.id)} 
+                        className="text-slate-300 hover:text-red-500 transition-colors"
+                        title="Eliminar documento"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <h3 className="font-bold text-lg text-slate-800 mb-2 line-clamp-1">{doc.title}</h3>

@@ -40,7 +40,15 @@ export default function CoverBlock({ data, onChange, readOnly = false }: { data:
 
       {/* Botón Flotante para cambiar imagen */}
       {!readOnly && (
-        <button className="absolute top-6 right-6 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2 rounded-full flex items-center gap-2 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+        <button 
+          onClick={() => {
+            const url = prompt('Ingresa la URL de la imagen de fondo (ej. Unsplash, Google Drive):', data.backgroundImage || '')
+            if (url !== null) {
+              onChange && onChange({ ...data, backgroundImage: url })
+            }
+          }}
+          className="absolute top-6 right-6 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2 rounded-full flex items-center gap-2 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity"
+        >
           <ImageIcon className="w-4 h-4" /> Cambiar Fondo
         </button>
       )}
