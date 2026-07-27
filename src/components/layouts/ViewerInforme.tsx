@@ -15,6 +15,7 @@ import TimelineBlock from '@/components/blocks/TimelineBlock'
 import TeamBlock from '@/components/blocks/TeamBlock'
 import ListBlock from '@/components/blocks/ListBlock'
 import AlertBlock from '@/components/blocks/AlertBlock'
+import ChartBlock from '@/components/blocks/ChartBlock'
 
 export default function ViewerInforme({ document }: { document: any }) {
   // Mock data for sections

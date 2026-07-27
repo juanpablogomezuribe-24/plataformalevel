@@ -20,30 +20,33 @@ export async function POST(req: Request) {
     });
 
     const systemPrompt = `
-Eres una IA experta en ventas y presentaciones ejecutivas.
-Tu tarea es convertir el brief del usuario en un documento estructurado JSON listo para nuestra plataforma.
+Eres una IA experta en ventas y presentaciones ejecutivas de alto nivel (estilo McKinsey / BCG).
+Tu tarea es convertir el brief del usuario en un documento estructurado JSON que se renderizará como una presentación/informe rico en componentes gráficos y dinámicos.
 El documento debe tener el siguiente formato (responde SOLO con el JSON válido):
 {
   "title": "Nombre comercial de la propuesta",
   "type": "cotizacion" | "informe" | "presentacion",
   "blocks": [
-    // Array de bloques
+    // Array de bloques lógicos
   ]
 }
 
 Tipos de bloques disponibles y sus estructuras requeridas:
 1. { "id": "uuid", "type": "cover", "data": { "title": "Título", "subtitle": "Subtítulo", "date": "fecha actual" } }
-2. { "id": "uuid", "type": "text", "data": { "title": "Título sección", "content": "Texto descriptivo (puedes usar <b> y <p>)" } }
+2. { "id": "uuid", "type": "text", "data": { "title": "Título sección", "content": "Texto descriptivo (usa <b>, <ul>, <li> y <p>)" } }
 3. { "id": "uuid", "type": "pricing", "data": { "currency": "USD", "items": [{ "name": "Servicio", "price": 1000, "description": "Detalle" }] } }
 4. { "id": "uuid", "type": "timeline", "data": { "items": [{ "title": "Fase 1", "description": "Detalle", "date": "Semana 1" }] } }
-5. { "id": "uuid", "type": "stats", "data": { "items": [{ "label": "Métrica", "value": "100%" }] } }
-6. { "id": "uuid", "type": "alert", "data": { "type": "info", "title": "Título", "description": "Texto" } }
+5. { "id": "uuid", "type": "stats", "data": { "items": [{ "label": "Métrica Clave", "value": "100%" }] } }
+6. { "id": "uuid", "type": "alert", "data": { "type": "info", "title": "Atención", "description": "Texto de alerta o insight" } }
+7. { "id": "uuid", "type": "chart", "data": { "title": "Título del gráfico", "description": "Contexto breve", "chartType": "pie" | "bar" | "line", "items": [{ "name": "Etiqueta 1", "value": 40 }, { "name": "Etiqueta 2", "value": 60 }] } }
 
-Instrucciones:
-1. Si el usuario menciona precios o presupuestos, usa type "cotizacion" e incluye un bloque "pricing".
-2. Siempre empieza con un bloque "cover".
-3. Inventa UUIDs simples (ej. "b-1", "b-2") para los ids.
-4. Si el brief es muy corto, expande la información para que la propuesta se vea profesional y completa, inventando las fases lógicas ("timeline") y textos persuasivos.
+REGLAS ESTRICTAS DE DISEÑO E INTELIGENCIA VISUAL (MANDATORIO):
+1. **NO SEAS PLANO NI ABURRIDO.** Está ESTRICTAMENTE PROHIBIDO usar más de 2 bloques "text" seguidos. Debes intercalar la información con otros bloques visuales.
+2. **DATOS = GRÁFICOS:** Si el brief menciona porcentajes, distribuciones, comparaciones numéricas, demografía o presupuestos, DEBES usar el bloque "chart". Usa "pie" para porcentajes que sumen 100, "bar" para comparar elementos y "line" para evolución en el tiempo. Invéntate los datos si es necesario para hacer el informe atractivo basándote en el contexto.
+3. **RESÚMENES = STATS:** Extrae los 3 o 4 KPIs o números más impactantes del texto y ponlos en un bloque "stats" justo después del cover.
+4. **PROCESOS = TIMELINE:** Si hay pasos, meses, semanas o un plan de ejecución, DEBES usar un bloque "timeline". NUNCA uses viñetas en un bloque de texto para explicar un proceso.
+5. Siempre empieza con un bloque "cover". Invéntate UUIDs simples (ej. "b-1", "b-2").
+6. Expande y redacta persuasivamente. Transforma un texto simple en un análisis profundo y profesional.
 `;
 
     const response = await openai.chat.completions.create({
@@ -109,6 +112,20 @@ function generateMockResponse(prompt: string, clientName: string) {
             { title: "Fase 1: Auditoría", description: "Revisión inicial del estado actual", date: "Semana 1" },
             { title: "Fase 2: Estrategia", description: "Diseño del nuevo enfoque", date: "Semana 2-3" },
             { title: "Fase 3: Ejecución", description: "Implementación técnica y visual", date: "Semana 4-6" }
+          ]
+        }
+      },
+      {
+        id: 'block-chart-1',
+        type: 'chart',
+        data: {
+          title: "Distribución de Usuarios (Simulación)",
+          description: "Representación gráfica de cómo se dividen los usuarios activos en la plataforma actual.",
+          chartType: "pie",
+          items: [
+            { name: "Móvil", value: 65 },
+            { name: "Escritorio", value: 25 },
+            { name: "Tablet", value: 10 }
           ]
         }
       }
