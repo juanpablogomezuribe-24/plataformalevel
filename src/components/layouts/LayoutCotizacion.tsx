@@ -20,6 +20,7 @@ import AlertBlock from '@/components/blocks/AlertBlock'
 export default function LayoutCotizacion({ document, updateDocument }: { document: any, updateDocument: (data: any) => void }) {
   const router = useRouter()
   const [showSettings, setShowSettings] = useState(false)
+  const isReadOnly = document.status === 'en_revision' || document.status === 'publicado' || document.status === 'aprobado' || document.status === 'enviado';
 
   const handleAddBlock = (type: string) => {
     const newBlock = {
@@ -65,40 +66,42 @@ export default function LayoutCotizacion({ document, updateDocument }: { documen
 
     return (
       <div key={block.id} className="relative group/blockwrapper">
-        <div className="absolute -right-16 top-6 opacity-0 group-hover/blockwrapper:opacity-100 z-10 transition-opacity flex flex-col gap-2">
-          {index > 0 && (
-            <button onClick={moveBlockUp} title="Mover Arriba" className="bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 p-2 rounded-xl shadow-md">
-              <ArrowUp className="w-4 h-4" />
+        {!isReadOnly && (
+          <div className="absolute -right-16 top-6 opacity-0 group-hover/blockwrapper:opacity-100 z-10 transition-opacity flex flex-col gap-2">
+            {index > 0 && (
+              <button onClick={moveBlockUp} title="Mover Arriba" className="bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 p-2 rounded-xl shadow-md">
+                <ArrowUp className="w-4 h-4" />
+              </button>
+            )}
+            {index < document.content.blocks.length - 1 && (
+              <button onClick={moveBlockDown} title="Mover Abajo" className="bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 p-2 rounded-xl shadow-md">
+                <ArrowDown className="w-4 h-4" />
+              </button>
+            )}
+            <button 
+              onClick={deleteBlock}
+              title="Eliminar Bloque"
+              className="bg-white text-red-500 border border-red-100 hover:bg-red-50 p-2 rounded-xl shadow-lg shadow-red-500/10 mt-2"
+            >
+              <Trash2 className="w-4 h-4" />
             </button>
-          )}
-          {index < document.content.blocks.length - 1 && (
-            <button onClick={moveBlockDown} title="Mover Abajo" className="bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 p-2 rounded-xl shadow-md">
-              <ArrowDown className="w-4 h-4" />
-            </button>
-          )}
-          <button 
-            onClick={deleteBlock}
-            title="Eliminar Bloque"
-            className="bg-white text-red-500 border border-red-100 hover:bg-red-50 p-2 rounded-xl shadow-lg shadow-red-500/10 mt-2"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
+          </div>
+        )}
         
         <div className="w-full">
-          {block.type === 'cover' && <CoverBlock data={block.data} onChange={updateBlockData} />}
-          {block.type === 'mockup' && <MockupBlock data={block.data} onChange={updateBlockData} />}
-          {block.type === 'pricing' && <PricingBlock data={block.data} onChange={updateBlockData} />}
-          {block.type === 'text' && <TextBlock data={block.data} onChange={updateBlockData} />}
-          {block.type === 'stats' && <StatsBlock data={block.data} onChange={updateBlockData} />}
-          {block.type === 'image' && <ImageBlock data={block.data} onChange={updateBlockData} />}
-          {block.type === 'video' && <VideoBlock data={block.data} onChange={updateBlockData} />}
-          {block.type === 'divider' && <DividerBlock data={block.data} onChange={updateBlockData} />}
-          {block.type === 'testimonial' && <TestimonialBlock data={block.data} onChange={updateBlockData} />}
-          {block.type === 'timeline' && <TimelineBlock data={block.data} onChange={updateBlockData} />}
-          {block.type === 'team' && <TeamBlock data={block.data} onChange={updateBlockData} />}
-          {block.type === 'list' && <ListBlock data={block.data} onChange={updateBlockData} />}
-          {block.type === 'alert' && <AlertBlock data={block.data} onChange={updateBlockData} />}
+          {block.type === 'cover' && <CoverBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+          {block.type === 'mockup' && <MockupBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+          {block.type === 'pricing' && <PricingBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+          {block.type === 'text' && <TextBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+          {block.type === 'stats' && <StatsBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+          {block.type === 'image' && <ImageBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+          {block.type === 'video' && <VideoBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+          {block.type === 'divider' && <DividerBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+          {block.type === 'testimonial' && <TestimonialBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+          {block.type === 'timeline' && <TimelineBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+          {block.type === 'team' && <TeamBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+          {block.type === 'list' && <ListBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+          {block.type === 'alert' && <AlertBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
         </div>
       </div>
     )
@@ -124,33 +127,98 @@ export default function LayoutCotizacion({ document, updateDocument }: { documen
           )}
 
           <div className="h-4 w-px bg-slate-300 ml-4"></div>
-          <input 
-            type="text" 
-            value={document.title || ''}
-            onChange={(e) => updateDocument({ title: e.target.value })}
-            className="w-64 text-sm font-bold bg-transparent outline-none border-b border-transparent focus:border-emerald-500 text-slate-800 transition-colors"
-            placeholder="Título de la Cotización"
-          />
+          {isReadOnly ? (
+            <span className="w-64 text-sm font-bold text-slate-800 ml-2">{document.title || 'Sin Título'}</span>
+          ) : (
+            <input 
+              type="text" 
+              value={document.title || ''}
+              onChange={(e) => updateDocument({ title: e.target.value })}
+              className="w-64 text-sm font-bold bg-transparent outline-none border-b border-transparent focus:border-emerald-500 text-slate-800 transition-colors ml-2"
+              placeholder="Título de la Cotización"
+            />
+          )}
         </div>
 
         <div className="flex items-center gap-4">
-          <button 
-            onClick={() => setShowSettings(!showSettings)}
-            className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200"
-          >
-            <Palette className="w-4 h-4" /> Marca
-          </button>
+          {!isReadOnly && (
+            <button 
+              onClick={() => setShowSettings(!showSettings)}
+              className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200"
+            >
+              <Palette className="w-4 h-4" /> Marca
+            </button>
+          )}
           
-          <button 
-            onClick={() => {
-              const url = `${window.location.origin}/view/${document.id}`
-              navigator.clipboard.writeText(url)
-              alert("¡Enlace copiado al portapapeles! Ya puedes enviarlo a tu cliente.")
-            }}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-1.5 px-4 rounded-lg shadow-md shadow-emerald-500/20 transition-all flex items-center gap-2"
-          >
-            <CheckCircle2 className="w-4 h-4" /> Compartir
-          </button>
+          <div className="h-4 w-px bg-slate-300"></div>
+
+          {/* Botones de Estado */}
+          {(!document.status || document.status === 'borrador') && (
+            <button 
+              onClick={() => updateDocument({ status: 'en_revision' })}
+              className="bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold py-1.5 px-4 rounded-lg shadow-md transition-all"
+            >
+              Solicitar Revisión
+            </button>
+          )}
+
+          {document.status === 'en_revision' && (
+            <>
+              <div className="bg-amber-100 text-amber-700 text-sm font-bold py-1.5 px-3 rounded-lg border border-amber-200">
+                En Revisión (Bloqueado)
+              </div>
+              <button 
+                onClick={() => updateDocument({ status: 'publicado' })}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-1.5 px-4 rounded-lg shadow-md transition-all"
+              >
+                Aprobar y Publicar
+              </button>
+              <button 
+                onClick={() => updateDocument({ status: 'rechazado' })}
+                className="bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-1.5 px-4 rounded-lg shadow-md transition-all"
+              >
+                Rechazar
+              </button>
+            </>
+          )}
+
+          {document.status === 'rechazado' && (
+            <>
+              <div className="bg-red-100 text-red-700 text-sm font-bold py-1.5 px-3 rounded-lg border border-red-200">
+                Rechazado
+              </div>
+              <button 
+                onClick={() => updateDocument({ status: 'borrador' })}
+                className="bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-bold py-1.5 px-4 rounded-lg shadow-md transition-all"
+              >
+                Volver a Borrador
+              </button>
+            </>
+          )}
+
+          {(document.status === 'publicado' || document.status === 'aprobado' || document.status === 'enviado') && (
+            <>
+              <div className="bg-blue-100 text-blue-700 text-sm font-bold py-1.5 px-3 rounded-lg border border-blue-200">
+                {document.status.toUpperCase()}
+              </div>
+              <button 
+                onClick={() => {
+                  const url = `${window.location.origin}/view/${document.id}`
+                  navigator.clipboard.writeText(url)
+                  alert("¡Enlace copiado al portapapeles! Ya puedes enviarlo a tu cliente.")
+                }}
+                className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-1.5 px-4 rounded-lg shadow-md shadow-blue-500/20 transition-all flex items-center gap-2"
+              >
+                <CheckCircle2 className="w-4 h-4" /> Copiar Link
+              </button>
+              <button 
+                onClick={() => updateDocument({ status: 'borrador' })}
+                className="bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-bold py-1.5 px-4 rounded-lg shadow-md transition-all"
+              >
+                Editar (Borrador)
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -203,17 +271,19 @@ export default function LayoutCotizacion({ document, updateDocument }: { documen
             {mainBlocks.map((b: any) => renderBlockWrapper(b.block, b.index))}
 
             {/* Menú para Añadir Bloques */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xl flex flex-wrap items-center justify-center gap-4 mt-8">
-              <span className="text-sm font-bold text-slate-400">Insertar:</span>
-              <button onClick={() => handleAddBlock('cover')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">Portada</button>
-              <button onClick={() => handleAddBlock('text')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">Texto</button>
-              <button onClick={() => handleAddBlock('image')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">Imagen</button>
-              <button onClick={() => handleAddBlock('mockup')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">Mockups</button>
-              <button onClick={() => handleAddBlock('pricing')} className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors shadow-sm border border-emerald-200">Cotización</button>
-              <button onClick={() => handleAddBlock('testimonial')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">Testimonio</button>
-              <button onClick={() => handleAddBlock('team')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">Equipo</button>
-              <button onClick={() => handleAddBlock('timeline')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">Cronograma</button>
-            </div>
+            {!isReadOnly && (
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xl flex flex-wrap items-center justify-center gap-4 mt-8">
+                <span className="text-sm font-bold text-slate-400">Insertar:</span>
+                <button onClick={() => handleAddBlock('cover')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">Portada</button>
+                <button onClick={() => handleAddBlock('text')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">Texto</button>
+                <button onClick={() => handleAddBlock('image')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">Imagen</button>
+                <button onClick={() => handleAddBlock('mockup')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">Mockups</button>
+                <button onClick={() => handleAddBlock('pricing')} className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors shadow-sm border border-emerald-200">Cotización</button>
+                <button onClick={() => handleAddBlock('testimonial')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">Testimonio</button>
+                <button onClick={() => handleAddBlock('team')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">Equipo</button>
+                <button onClick={() => handleAddBlock('timeline')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">Cronograma</button>
+              </div>
+            )}
           </div>
 
           {/* Columna Derecha: Panel Financiero Sticky */}

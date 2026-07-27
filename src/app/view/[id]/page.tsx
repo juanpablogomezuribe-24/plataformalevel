@@ -36,7 +36,18 @@ export default async function ViewDocument({ params }: { params: { id: string } 
     .single()
 
   if (!document) {
-    return <div className="min-h-screen flex items-center justify-center bg-slate-50 font-bold text-red-500">Documento no encontrado o Privado</div>
+    return <div className="min-h-screen flex items-center justify-center bg-slate-50 font-bold text-red-500">Documento no encontrado</div>
+  }
+
+  const isPublic = document.status === 'publicado' || document.status === 'aprobado' || document.status === 'enviado';
+  
+  if (!isPublic) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-6 text-center">
+        <h1 className="text-3xl font-black text-slate-900 mb-2">Acceso Denegado</h1>
+        <p className="text-slate-500 max-w-md">Este documento se encuentra en borrador o en revisión. Aún no ha sido aprobado para visualización pública.</p>
+      </div>
+    )
   }
 
   if (document.type === 'presentacion') {

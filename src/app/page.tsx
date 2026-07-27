@@ -79,16 +79,7 @@ export default function Dashboard() {
     }
   }
 
-  async function updateStatus(e: React.ChangeEvent<HTMLSelectElement>, id: string) {
-    e.stopPropagation()
-    const newStatus = e.target.value
-    const { error } = await supabase.from('documents').update({ status: newStatus }).eq('id', id)
-    if (error) {
-      alert("Error al actualizar estado: " + error.message)
-    } else {
-      fetchDocuments()
-    }
-  }
+
 
   async function handleDuplicate(e: React.MouseEvent, doc: any) {
     e.stopPropagation()
@@ -114,14 +105,7 @@ export default function Dashboard() {
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><p className="text-slate-500 font-bold">Cargando...</p></div>
   if (!session) return null // Prevents flashing before redirect
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'enviado': return 'text-blue-600 bg-blue-50'
-      case 'aprobado': return 'text-emerald-600 bg-emerald-50'
-      case 'rechazado': return 'text-red-600 bg-red-50'
-      default: return 'text-slate-600 bg-slate-100'
-    }
-  }
+
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
@@ -197,17 +181,16 @@ export default function Dashboard() {
                 </div>
                 <h3 className="font-bold text-lg text-slate-800 mb-2 line-clamp-1">{doc.title}</h3>
                 
-                <div className="mb-4" onClick={e => e.stopPropagation()}>
-                  <select 
-                    value={doc.status}
-                    onChange={(e) => updateStatus(e, doc.id)}
-                    className={`text-xs font-bold rounded-lg px-2 py-1 outline-none border border-transparent hover:border-slate-200 cursor-pointer transition-colors ${getStatusColor(doc.status)}`}
-                  >
-                    <option value="borrador">📝 Borrador</option>
-                    <option value="enviado">✉️ Enviado</option>
-                    <option value="aprobado">✅ Aprobado</option>
-                    <option value="rechazado">❌ Rechazado</option>
-                  </select>
+                <div className={`inline-block mb-4 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-md ${
+                  doc.status === 'en_revision' ? 'bg-amber-100 text-amber-600' :
+                  doc.status === 'publicado' ? 'bg-emerald-100 text-emerald-600' :
+                  doc.status === 'rechazado' ? 'bg-red-100 text-red-600' :
+                  'bg-slate-100 text-slate-600'
+                }`}>
+                  {doc.status === 'en_revision' ? 'En Revisión' : 
+                   doc.status === 'publicado' ? 'Publicado' : 
+                   doc.status === 'rechazado' ? 'Rechazado' : 
+                   'Borrador'}
                 </div>
 
                 <button 

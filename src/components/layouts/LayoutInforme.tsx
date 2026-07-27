@@ -19,6 +19,7 @@ import AlertBlock from '@/components/blocks/AlertBlock'
 
 export default function LayoutInforme({ document, updateDocument }: { document: any, updateDocument: (data: any) => void }) {
   const router = useRouter()
+  const isReadOnly = document.status === 'en_revision' || document.status === 'publicado' || document.status === 'aprobado' || document.status === 'enviado';
   // Mock data for sections until we have actual blocks
   const [sections] = useState([
     { id: 1, title: 'Portada', completed: true },
@@ -68,45 +69,51 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
           >
             PROPUESTA COMERCIAL
           </div>
-          <input 
-            type="text" 
-            value={document.title || ''}
-            onChange={(e) => updateDocument({ title: e.target.value })}
-            className="w-full text-2xl font-black leading-tight bg-transparent outline-none border-b border-transparent focus:border-cyan-500 transition-colors py-1"
-            placeholder="Título del Documento"
-          />
+          {isReadOnly ? (
+            <div className="w-full text-2xl font-black leading-tight text-white py-1">{document.title || 'Sin Título'}</div>
+          ) : (
+            <input 
+              type="text" 
+              value={document.title || ''}
+              onChange={(e) => updateDocument({ title: e.target.value })}
+              className="w-full text-2xl font-black leading-tight bg-transparent outline-none border-b border-transparent focus:border-cyan-500 transition-colors py-1"
+              placeholder="Título del Documento"
+            />
+          )}
         </div>
 
         {/* Progress Bar */}
         <div className="flex-1 overflow-y-auto p-6">
-          <div className="mb-8 p-4 bg-slate-800 rounded-2xl border border-slate-700 space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Palette className="w-4 h-4 text-cyan-400" />
-              <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest">Personalizar Marca</h3>
-            </div>
-            <div>
-              <label className="text-xs font-medium text-slate-400 block mb-2">Color Principal</label>
-              <div className="flex items-center gap-3">
+          {!isReadOnly && (
+            <div className="mb-8 p-4 bg-slate-800 rounded-2xl border border-slate-700 space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Palette className="w-4 h-4 text-cyan-400" />
+                <h3 className="text-xs font-bold text-slate-300 uppercase tracking-widest">Personalizar Marca</h3>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-400 block mb-2">Color Principal</label>
+                <div className="flex items-center gap-3">
+                  <input 
+                    type="color" 
+                    value={document.content?.brand?.primaryColor || '#06b6d4'} 
+                    onChange={(e) => updateDocument({ content: { ...document.content, brand: { ...document.content?.brand, primaryColor: e.target.value } } })}
+                    className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent p-0"
+                  />
+                  <span className="text-xs font-mono text-slate-400 bg-slate-900 px-2 py-1 rounded border border-slate-700">{document.content?.brand?.primaryColor || '#06b6d4'}</span>
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-400 block mb-2">URL del Logo (Opcional)</label>
                 <input 
-                  type="color" 
-                  value={document.content?.brand?.primaryColor || '#06b6d4'} 
-                  onChange={(e) => updateDocument({ content: { ...document.content, brand: { ...document.content?.brand, primaryColor: e.target.value } } })}
-                  className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent p-0"
+                  type="text" 
+                  placeholder="https://...logo.png"
+                  value={document.content?.brand?.logoUrl || ''} 
+                  onChange={(e) => updateDocument({ content: { ...document.content, brand: { ...document.content?.brand, logoUrl: e.target.value } } })}
+                  className="w-full bg-slate-900 text-sm text-slate-300 border border-slate-700 rounded-lg p-2 outline-none focus:border-cyan-500 transition-colors"
                 />
-                <span className="text-xs font-mono text-slate-400 bg-slate-900 px-2 py-1 rounded border border-slate-700">{document.content?.brand?.primaryColor || '#06b6d4'}</span>
               </div>
             </div>
-            <div>
-              <label className="text-xs font-medium text-slate-400 block mb-2">URL del Logo (Opcional)</label>
-              <input 
-                type="text" 
-                placeholder="https://...logo.png"
-                value={document.content?.brand?.logoUrl || ''} 
-                onChange={(e) => updateDocument({ content: { ...document.content, brand: { ...document.content?.brand, logoUrl: e.target.value } } })}
-                className="w-full bg-slate-900 text-sm text-slate-300 border border-slate-700 rounded-lg p-2 outline-none focus:border-cyan-500 transition-colors"
-              />
-            </div>
-          </div>
+          )}
 
           <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Progreso</h3>
           <div className="flex justify-between items-center mb-2">
@@ -145,20 +152,77 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
           ))}
         </div>
         
-        {/* Footer actions */}
+        {/* Footer actions / Estado */}
         <div className="p-6 border-t border-slate-200 bg-slate-50 flex flex-col gap-3">
-          <button 
-            onClick={() => {
-              const url = `${window.location.origin}/view/${document.id}`
-              navigator.clipboard.writeText(url)
-              alert("¡Enlace copiado al portapapeles! Ya puedes enviarlo a tu cliente.")
-            }}
-            className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-cyan-500/20 transition-all flex items-center justify-center gap-2"
-          >
-            <CheckCircle2 className="w-5 h-5" /> 
-            Copiar Enlace Cliente
-          </button>
-          <p className="text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest">
+          
+          {(!document.status || document.status === 'borrador') && (
+            <button 
+              onClick={() => updateDocument({ status: 'en_revision' })}
+              className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all text-sm"
+            >
+              Solicitar Revisión
+            </button>
+          )}
+
+          {document.status === 'en_revision' && (
+            <>
+              <div className="w-full bg-amber-100 text-amber-700 font-bold py-2 px-4 rounded-xl text-center text-sm border border-amber-200">
+                En Revisión (Bloqueado)
+              </div>
+              <button 
+                onClick={() => updateDocument({ status: 'publicado' })}
+                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all text-sm"
+              >
+                Aprobar y Publicar
+              </button>
+              <button 
+                onClick={() => updateDocument({ status: 'rechazado' })}
+                className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all text-sm"
+              >
+                Rechazar
+              </button>
+            </>
+          )}
+
+          {document.status === 'rechazado' && (
+            <>
+              <div className="w-full bg-red-100 text-red-700 font-bold py-2 px-4 rounded-xl text-center text-sm border border-red-200">
+                Rechazado
+              </div>
+              <button 
+                onClick={() => updateDocument({ status: 'borrador' })}
+                className="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-4 rounded-xl shadow-md transition-all text-sm"
+              >
+                Volver a Borrador
+              </button>
+            </>
+          )}
+
+          {(document.status === 'publicado' || document.status === 'aprobado' || document.status === 'enviado') && (
+            <>
+              <div className="w-full bg-blue-100 text-blue-700 font-bold py-2 px-4 rounded-xl text-center text-sm border border-blue-200">
+                {document.status.toUpperCase()}
+              </div>
+              <button 
+                onClick={() => {
+                  const url = `${window.location.origin}/view/${document.id}`
+                  navigator.clipboard.writeText(url)
+                  alert("¡Enlace copiado al portapapeles! Ya puedes enviarlo a tu cliente.")
+                }}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm"
+              >
+                <CheckCircle2 className="w-5 h-5" /> Copiar Enlace Cliente
+              </button>
+              <button 
+                onClick={() => updateDocument({ status: 'borrador' })}
+                className="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-xl shadow-md transition-all text-sm mt-2"
+              >
+                Editar (Borrador)
+              </button>
+            </>
+          )}
+          
+          <p className="text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest mt-2">
             Autoguardado Activado
           </p>
         </div>
@@ -210,85 +274,89 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
 
               return (
                 <div key={block.id} className="relative group/blockwrapper">
-                  <div className="absolute -right-6 top-6 opacity-0 group-hover/blockwrapper:opacity-100 z-10 transition-opacity flex flex-col gap-2">
-                    {index > 0 && (
-                      <button onClick={moveBlockUp} title="Mover Arriba" className="bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 p-2 rounded-xl shadow-md">
-                        <ArrowUp className="w-4 h-4" />
+                  {!isReadOnly && (
+                    <div className="absolute -right-6 top-6 opacity-0 group-hover/blockwrapper:opacity-100 z-10 transition-opacity flex flex-col gap-2">
+                      {index > 0 && (
+                        <button onClick={moveBlockUp} title="Mover Arriba" className="bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 p-2 rounded-xl shadow-md">
+                          <ArrowUp className="w-4 h-4" />
+                        </button>
+                      )}
+                      {index < document.content.blocks.length - 1 && (
+                        <button onClick={moveBlockDown} title="Mover Abajo" className="bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 p-2 rounded-xl shadow-md">
+                          <ArrowDown className="w-4 h-4" />
+                        </button>
+                      )}
+                      <button 
+                        onClick={deleteBlock}
+                        title="Eliminar Bloque"
+                        className="bg-white text-red-500 border border-red-100 hover:bg-red-50 p-2 rounded-xl shadow-lg shadow-red-500/10 mt-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </button>
-                    )}
-                    {index < document.content.blocks.length - 1 && (
-                      <button onClick={moveBlockDown} title="Mover Abajo" className="bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 p-2 rounded-xl shadow-md">
-                        <ArrowDown className="w-4 h-4" />
-                      </button>
-                    )}
-                    <button 
-                      onClick={deleteBlock}
-                      title="Eliminar Bloque"
-                      className="bg-white text-red-500 border border-red-100 hover:bg-red-50 p-2 rounded-xl shadow-lg shadow-red-500/10 mt-2"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                  {block.type === 'cover' && <CoverBlock data={block.data} onChange={updateBlockData} />}
-                  {block.type === 'mockup' && <MockupBlock data={block.data} onChange={updateBlockData} />}
-                  {block.type === 'pricing' && <PricingBlock data={block.data} onChange={updateBlockData} />}
-                  {block.type === 'text' && <TextBlock data={block.data} onChange={updateBlockData} />}
-                  {block.type === 'stats' && <StatsBlock data={block.data} onChange={updateBlockData} />}
-                  {block.type === 'image' && <ImageBlock data={block.data} onChange={updateBlockData} />}
-                  {block.type === 'video' && <VideoBlock data={block.data} onChange={updateBlockData} />}
-                  {block.type === 'divider' && <DividerBlock data={block.data} onChange={updateBlockData} />}
-                  {block.type === 'testimonial' && <TestimonialBlock data={block.data} onChange={updateBlockData} />}
-                  {block.type === 'timeline' && <TimelineBlock data={block.data} onChange={updateBlockData} />}
-                  {block.type === 'team' && <TeamBlock data={block.data} onChange={updateBlockData} />}
-                  {block.type === 'list' && <ListBlock data={block.data} onChange={updateBlockData} />}
-                  {block.type === 'alert' && <AlertBlock data={block.data} onChange={updateBlockData} />}
+                    </div>
+                  )}
+                  {block.type === 'cover' && <CoverBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+                  {block.type === 'mockup' && <MockupBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+                  {block.type === 'pricing' && <PricingBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+                  {block.type === 'text' && <TextBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+                  {block.type === 'stats' && <StatsBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+                  {block.type === 'image' && <ImageBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+                  {block.type === 'video' && <VideoBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+                  {block.type === 'divider' && <DividerBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+                  {block.type === 'testimonial' && <TestimonialBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+                  {block.type === 'timeline' && <TimelineBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+                  {block.type === 'team' && <TeamBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+                  {block.type === 'list' && <ListBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
+                  {block.type === 'alert' && <AlertBlock data={block.data} onChange={updateBlockData} readOnly={isReadOnly} />}
                 </div>
               )
             })}
 
             {/* Menú Flotante para Añadir Bloques */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-wrap items-center justify-center gap-4 mt-8 sticky bottom-8">
-              <span className="text-sm font-bold text-slate-400">Insertar:</span>
-              <button onClick={() => handleAddBlock('cover')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
-                Portada
-              </button>
-              <button onClick={() => handleAddBlock('text')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
-                Texto
-              </button>
-              <button onClick={() => handleAddBlock('image')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
-                Imagen
-              </button>
-              <button onClick={() => handleAddBlock('video')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
-                Video
-              </button>
-              <button onClick={() => handleAddBlock('testimonial')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
-                Testimonio
-              </button>
-              <button onClick={() => handleAddBlock('timeline')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
-                Cronograma
-              </button>
-              <button onClick={() => handleAddBlock('team')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
-                Equipo
-              </button>
-              <button onClick={() => handleAddBlock('list')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
-                Lista
-              </button>
-              <button onClick={() => handleAddBlock('alert')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
-                Alerta
-              </button>
-              <button onClick={() => handleAddBlock('stats')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
-                Métricas
-              </button>
-              <button onClick={() => handleAddBlock('divider')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
-                Divisor
-              </button>
-              <button onClick={() => handleAddBlock('mockup')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
-                Mockups
-              </button>
-              <button onClick={() => handleAddBlock('pricing')} className="bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
-                Tabla de Cotización
-              </button>
-            </div>
+            {!isReadOnly && (
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-wrap items-center justify-center gap-4 mt-8 sticky bottom-8">
+                <span className="text-sm font-bold text-slate-400">Insertar:</span>
+                <button onClick={() => handleAddBlock('cover')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                  Portada
+                </button>
+                <button onClick={() => handleAddBlock('text')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                  Texto
+                </button>
+                <button onClick={() => handleAddBlock('image')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                  Imagen
+                </button>
+                <button onClick={() => handleAddBlock('video')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                  Video
+                </button>
+                <button onClick={() => handleAddBlock('testimonial')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                  Testimonio
+                </button>
+                <button onClick={() => handleAddBlock('timeline')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                  Cronograma
+                </button>
+                <button onClick={() => handleAddBlock('team')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                  Equipo
+                </button>
+                <button onClick={() => handleAddBlock('list')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                  Lista
+                </button>
+                <button onClick={() => handleAddBlock('alert')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                  Alerta
+                </button>
+                <button onClick={() => handleAddBlock('stats')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                  Métricas
+                </button>
+                <button onClick={() => handleAddBlock('divider')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                  Divisor
+                </button>
+                <button onClick={() => handleAddBlock('mockup')} className="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                  Mockups
+                </button>
+                <button onClick={() => handleAddBlock('pricing')} className="bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold px-4 py-2 rounded-xl text-sm transition-colors">
+                  Tabla de Cotización
+                </button>
+              </div>
+            )}
 
           </div>
         </div>
