@@ -9,6 +9,7 @@ export default function Dashboard() {
   const [session, setSession] = useState<any>(null)
   const [documents, setDocuments] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -40,15 +41,14 @@ export default function Dashboard() {
     router.push('/login')
   }
 
-  async function handleCreateNew() {
+  async function createDocument(type: 'informe' | 'presentacion') {
     if (!session?.user?.id) return;
     
-    // Para el MVP, creamos un documento vacío tipo 'informe' de inmediato
     const { data, error } = await supabase.from('documents').insert([
       { 
         user_id: session.user.id,
-        title: 'Nuevo Informe ' + new Date().toLocaleDateString(), 
-        type: 'informe', 
+        title: 'Nueva ' + (type === 'informe' ? 'Cotización' : 'Presentación'), 
+        type: type, 
         status: 'borrador', 
         content: {} 
       }
@@ -61,8 +61,9 @@ export default function Dashboard() {
     }
 
     if (data && data[0]) {
+      setShowModal(false)
       fetchDocuments()
-      // Opcional: router.push(`/document/${data[0].id}`) // Ir directamente al editor
+      router.push(`/document/${data[0].id}`)
     }
   }
 
@@ -144,7 +145,7 @@ export default function Dashboard() {
             <p className="text-slate-500 text-sm">Gestiona tus cotizaciones, propuestas e informes.</p>
           </div>
           <button 
-            onClick={handleCreateNew}
+            onClick={() => setShowModal(true)}
             className="bg-slate-900 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20 flex items-center gap-2"
           >
             <Plus className="w-5 h-5" /> Nuevo Documento
@@ -158,7 +159,7 @@ export default function Dashboard() {
             </div>
             <h3 className="text-lg font-bold text-slate-800 mb-2">No tienes documentos</h3>
             <p className="text-slate-500 text-sm mb-6 max-w-sm mx-auto">Comienza creando tu primer informe o cotización basada en la arquitectura Level.</p>
-            <button onClick={handleCreateNew} className="text-cyan-600 font-bold hover:text-cyan-700">Crear ahora →</button>
+            <button onClick={() => setShowModal(true)} className="text-cyan-600 font-bold hover:text-cyan-700">Crear ahora →</button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -218,6 +219,52 @@ export default function Dashboard() {
           </div>
         )}
       </main>
+
+      {/* Modal de Creación */}
+      {showModal && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+          <div className="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl relative overflow-hidden">
+            <button 
+              onClick={() => setShowModal(false)}
+              className="absolute top-6 right-6 text-slate-400 hover:text-slate-600"
+            >
+              ✕
+            </button>
+            <h2 className="text-3xl font-black tracking-tight text-slate-900 mb-2">¿Qué vamos a crear hoy?</h2>
+            <p className="text-slate-500 mb-8">Elige el formato estructural (Layout) ideal para tu propuesta.</p>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Opción Informe */}
+              <button 
+                onClick={() => createDocument('informe')}
+                className="text-left group border-2 border-slate-100 hover:border-cyan-500 rounded-2xl p-6 transition-all hover:shadow-xl hover:shadow-cyan-500/10"
+              >
+                <div className="w-12 h-12 bg-cyan-100 text-cyan-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <FileText className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Informe / Cotización</h3>
+                <p className="text-sm text-slate-500 mb-4">Incluye barra de navegación lateral. Ideal para reportes largos, metodologías paso a paso y presupuestos detallados.</p>
+                <span className="text-cyan-600 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity">Usar este formato →</span>
+              </button>
+
+              {/* Opción Presentación */}
+              <button 
+                onClick={() => createDocument('presentacion')}
+                className="text-left group border-2 border-slate-100 hover:border-indigo-500 rounded-2xl p-6 transition-all hover:shadow-xl hover:shadow-indigo-500/10"
+              >
+                <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <div className="w-6 h-4 border-2 border-current rounded-sm flex items-center justify-center">
+                    <div className="w-2 h-2 bg-current rounded-full" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Presentación Creativa</h3>
+                <p className="text-sm text-slate-500 mb-4">Formato inmersivo a pantalla completa sin barra lateral. Ideal para mostrar portafolios, diseño de marca o campañas de alto impacto.</p>
+                <span className="text-indigo-600 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity">Usar este formato →</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

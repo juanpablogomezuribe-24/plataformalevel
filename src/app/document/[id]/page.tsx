@@ -1,12 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import LayoutInforme from '@/components/layouts/LayoutInforme'
+import LayoutPresentacion from '@/components/layouts/LayoutPresentacion'
 
 export default function DocumentEditorPage() {
   const params = useParams()
+  const router = useRouter()
   const [document, setDocument] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
@@ -41,7 +43,11 @@ export default function DocumentEditorPage() {
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50 font-bold text-slate-500">Cargando Editor...</div>
   if (!document) return <div className="min-h-screen flex items-center justify-center bg-slate-50 font-bold text-red-500">Documento no encontrado</div>
 
-  // Seleccionar Layout según el tipo (Por ahora solo hay informe en el MVP)
+  // Seleccionar Layout según el tipo
+  if (document.type === 'presentacion') {
+    return <LayoutPresentacion document={document} updateDocument={updateDocument} />
+  }
+
   if (document.type === 'informe') {
     return <LayoutInforme document={document} updateDocument={updateDocument} />
   }
