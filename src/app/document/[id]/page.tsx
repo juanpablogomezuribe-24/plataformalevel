@@ -31,14 +31,27 @@ export default function DocumentEditorPage() {
   }
 
   async function updateDocument(updates: any) {
+    const isStatusChange = updates.status && updates.status !== document.status;
+    const oldStatus = document.status;
+
     // Optimistic update locally
     setDocument({ ...document, ...updates })
 
     // Update in DB
-    await supabase
+    const { error: updateError } = await supabase
       .from('documents')
       .update(updates)
       .eq('id', document.id)
+
+    if (isStatusChange && !updateError) {
+      // Create automatic snapshot
+      await supabase.from('document_versions').insert({
+        document_id: document.id,
+        version_name: `Estado: ${updates.status.toUpperCase()} (antes ${oldStatus || 'nuevo'})`,
+        title: document.title, // Use current title (which hasn't changed in this update theoretically)
+        content: document.content
+      })
+    }
   }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50 font-bold text-slate-500">Cargando Editor...</div>

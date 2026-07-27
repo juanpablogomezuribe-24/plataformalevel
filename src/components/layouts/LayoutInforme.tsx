@@ -16,6 +16,7 @@ import TimelineBlock from '@/components/blocks/TimelineBlock'
 import TeamBlock from '@/components/blocks/TeamBlock'
 import ListBlock from '@/components/blocks/ListBlock'
 import AlertBlock from '@/components/blocks/AlertBlock'
+import VersionHistory from '@/components/VersionHistory'
 
 export default function LayoutInforme({ document, updateDocument }: { document: any, updateDocument: (data: any) => void }) {
   const router = useRouter()
@@ -155,6 +156,13 @@ export default function LayoutInforme({ document, updateDocument }: { document: 
         {/* Footer actions / Estado */}
         <div className="p-6 border-t border-slate-200 bg-slate-50 flex flex-col gap-3">
           
+          <div className="flex justify-center mb-2">
+            <VersionHistory 
+              document={document} 
+              onRestore={(title, content) => updateDocument({ title, content })} 
+            />
+          </div>
+
           {(!document.status || document.status === 'borrador') && (
             <button 
               onClick={() => updateDocument({ status: 'en_revision' })}

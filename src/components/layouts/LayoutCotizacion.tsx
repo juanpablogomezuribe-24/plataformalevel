@@ -16,6 +16,7 @@ import TimelineBlock from '@/components/blocks/TimelineBlock'
 import TeamBlock from '@/components/blocks/TeamBlock'
 import ListBlock from '@/components/blocks/ListBlock'
 import AlertBlock from '@/components/blocks/AlertBlock'
+import VersionHistory from '@/components/VersionHistory'
 
 export default function LayoutCotizacion({ document, updateDocument }: { document: any, updateDocument: (data: any) => void }) {
   const router = useRouter()
@@ -141,6 +142,10 @@ export default function LayoutCotizacion({ document, updateDocument }: { documen
         </div>
 
         <div className="flex items-center gap-4">
+          <VersionHistory 
+            document={document} 
+            onRestore={(title, content) => updateDocument({ title, content })} 
+          />
           {!isReadOnly && (
             <button 
               onClick={() => setShowSettings(!showSettings)}
