@@ -62,7 +62,7 @@ export default function VersionHistory({ document, onRestore }: { document: any,
     <>
       <button 
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 text-sm font-bold text-slate-300 hover:text-white transition-colors bg-white/5 px-3 py-1.5 rounded-lg"
+        className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm"
         title="Historial de Versiones"
       >
         <History className="w-4 h-4" /> Historial

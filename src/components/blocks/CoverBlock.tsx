@@ -1,9 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Image as ImageIcon } from 'lucide-react'
 
 export default function CoverBlock({ data, onChange, readOnly = false }: { data: any, onChange?: (data: any) => void, readOnly?: boolean }) {
+  const [localTitle, setLocalTitle] = useState(data.title || '')
+  const [localSubtitle, setLocalSubtitle] = useState(data.subtitle || '')
+
+  useEffect(() => {
+    setLocalTitle(data.title || '')
+    setLocalSubtitle(data.subtitle || '')
+  }, [data.title, data.subtitle])
+
   return (
     <div className="relative w-full h-[600px] bg-slate-900 rounded-3xl overflow-hidden group">
       {/* Imagen de fondo (placeholder o la real) */}
@@ -23,15 +31,17 @@ export default function CoverBlock({ data, onChange, readOnly = false }: { data:
           <input
             type="text"
             readOnly={readOnly}
-            value={data.title || ''}
-            onChange={(e) => onChange && onChange({ ...data, title: e.target.value })}
+            value={localTitle}
+            onChange={(e) => setLocalTitle(e.target.value)}
+            onBlur={() => onChange && onChange({ ...data, title: localTitle })}
             placeholder="Escribe el Título Principal"
             className={`w-full text-5xl md:text-7xl font-black text-white bg-transparent outline-none placeholder:text-white/30 mb-4 transition-all rounded-xl ${readOnly ? '' : 'focus:bg-white/10 p-2'}`}
           />
           <textarea
             readOnly={readOnly}
-            value={data.subtitle || ''}
-            onChange={(e) => onChange && onChange({ ...data, subtitle: e.target.value })}
+            value={localSubtitle}
+            onChange={(e) => setLocalSubtitle(e.target.value)}
+            onBlur={() => onChange && onChange({ ...data, subtitle: localSubtitle })}
             placeholder="Escribe el subtítulo o descripción corta aquí..."
             className={`w-full text-xl text-cyan-400 bg-transparent outline-none placeholder:text-cyan-400/50 resize-none h-24 transition-all font-medium rounded-xl ${readOnly ? '' : 'focus:bg-white/10 p-2'}`}
           />
