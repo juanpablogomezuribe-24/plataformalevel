@@ -87,6 +87,8 @@ REGLAS CRÍTICAS:
 
 function generateMockResponse(prompt: string, clientName: string, template: string) {
   // Simulación mock de la nueva estructura basada en páginas
+  const isLotbet = template === 'lotbet' || template === 'mundial'
+  
   const mockPages = [
     {
       id: 'page-1',
@@ -95,32 +97,49 @@ function generateMockResponse(prompt: string, clientName: string, template: stri
       variations: [
         {
           layoutType: 'cover',
-          data: { title: `Propuesta para ${clientName}`, subtitle: 'Estrategia Digital', description: prompt.substring(0, 100) }
+          data: { title: isLotbet ? `Dashboard ${clientName}` : `Propuesta para ${clientName}`, subtitle: 'Resumen Ejecutivo y Estrategia', description: prompt.substring(0, 100) + '...' }
         },
         {
           layoutType: 'two-column',
-          data: { title: `Proyecto ${clientName}`, left_content: 'Un enfoque disruptivo para el mercado.', right_content: prompt.substring(0, 50) }
+          data: { title: `Proyecto ${clientName}`, left_content: 'Un enfoque disruptivo para el mercado. Nuestro objetivo es dominar el segmento y acelerar el crecimiento.', right_content: prompt.substring(0, 80) + '...' }
         }
       ]
     },
     {
       id: 'page-2',
-      name: 'Análisis y Métricas',
+      name: 'Métricas Clave',
       activeVariationIndex: 0,
       variations: [
         {
           layoutType: 'metrics',
-          data: { title: 'KPIs Proyectados', items: [{ label: 'Conversión', value: '15%' }, { label: 'Alcance', value: '2.5M' }] }
+          data: { 
+            title: 'KPIs Proyectados', 
+            items: [
+              { label: 'Conversión', value: '18%' }, 
+              { label: 'Alcance Mensual', value: '3.2M' },
+              { label: 'Costo por Adquisición', value: '$1.4' },
+              { label: 'Retorno (ROI)', value: '250%' }
+            ] 
+          }
         },
         {
           layoutType: 'chart',
-          data: { title: 'Distribución de Inversión', chartType: 'pie', items: [{ name: 'Social', value: 60 }, { name: 'Search', value: 40 }] }
+          data: { 
+            title: 'Distribución de Audiencia', 
+            chartType: 'bar', 
+            items: [
+              { name: 'Instagram', value: 65 }, 
+              { name: 'TikTok', value: 85 }, 
+              { name: 'YouTube', value: 45 },
+              { name: 'Google', value: 90 }
+            ] 
+          }
         }
       ]
     }
   ];
 
-  if (template === 'cotizacion-generica' || template === 'balones') {
+  if (template === 'cotizacion-generica' || template === 'balones' || template === 'evolution') {
     mockPages.push({
       id: 'page-3',
       name: 'Inversión',
@@ -129,12 +148,16 @@ function generateMockResponse(prompt: string, clientName: string, template: stri
         {
           layoutType: 'pricing',
           data: { 
-            title: 'Cotización', 
+            title: 'Propuesta Económica', 
             items: [
-              { name: 'Licencia Core', price: 5000, features: 'Acceso total, soporte 24/7' },
-              { name: 'Módulo Analítico', price: 2000, features: 'Dashboards en tiempo real' }
+              { name: 'Fase Inicial', price: 15000, features: 'Análisis de mercado\nDiseño de estrategia\nSetup de campañas' },
+              { name: 'Fase de Escalamiento', price: 35000, features: 'Optimización de conversiones\nImplementación IA\nSoporte 24/7' }
             ]
           }
+        },
+        {
+          layoutType: 'content',
+          data: { title: 'Condiciones Comerciales', content: 'El pago se divide en dos fases. 50% al iniciar y 50% al finalizar la integración del sistema.' }
         }
       ]
     });

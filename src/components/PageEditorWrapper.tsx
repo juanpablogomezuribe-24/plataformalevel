@@ -164,7 +164,7 @@ export default function PageEditorWrapper({
           {/* Slide Container (16:9 Aspect Ratio) */}
           <div className="w-full max-w-5xl aspect-[16/9] bg-white rounded-xl shadow-xl overflow-hidden relative ring-1 ring-slate-200">
              {activePage ? (
-               <PageRenderer page={activePage} brandColor={brandColor} />
+               <PageRenderer page={activePage} brandColor={brandColor} template={document.content?.template} />
              ) : (
                <div className="w-full h-full flex items-center justify-center text-slate-400">Selecciona o crea una página</div>
              )}
@@ -236,10 +236,46 @@ export default function PageEditorWrapper({
            {/* Editor de Datos */}
            {activePage && activePage.variations && activePage.variations[activePage.activeVariationIndex] && (
              <div>
-               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">Contenido de la Página</label>
+               <div className="flex items-center justify-between mb-3">
+                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Contenido de la Página</label>
+               </div>
+               <p className="text-xs text-slate-500 mb-4 bg-indigo-50 text-indigo-700 p-3 rounded-lg border border-indigo-100 font-medium">
+                 Escribe en los siguientes campos para actualizar la diapositiva en tiempo real. (La edición directa sobre el lienzo estará disponible en futuras versiones).
+               </p>
                <div className="space-y-4">
                  {Object.keys(activePage.variations[activePage.activeVariationIndex].data || {}).map((key) => {
-                   if (key === 'items') return null; 
+                   if (key === 'items' && Array.isArray(activePage.variations[activePage.activeVariationIndex].data.items)) {
+                     return (
+                       <div key={key} className="mt-6 border-t border-slate-200 pt-4">
+                         <label className="text-xs font-bold text-slate-500 block mb-3 uppercase tracking-wider">Elementos (Métricas/Gráficos/Precios)</label>
+                         <div className="space-y-4">
+                           {activePage.variations[activePage.activeVariationIndex].data.items.map((item: any, i: number) => (
+                             <div key={i} className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                               {Object.keys(item).map(itemKey => (
+                                 <div key={itemKey}>
+                                    <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase">{itemKey}</label>
+                                    <input
+                                      type="text"
+                                      value={item[itemKey] || ''}
+                                      onChange={(e) => {
+                                        const newPages = JSON.parse(JSON.stringify(pages));
+                                        const pageIndex = newPages.findIndex((p: any) => p.id === activePage.id);
+                                        newPages[pageIndex].variations[activePage.activeVariationIndex].data.items[i][itemKey] = e.target.value;
+                                        setPages(newPages);
+                                      }}
+                                      onBlur={() => {
+                                        updateDocument({ content: { ...document.content, pages } });
+                                      }}
+                                      className="w-full bg-slate-50 border border-slate-200 rounded-md p-1.5 text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+                                    />
+                                 </div>
+                               ))}
+                             </div>
+                           ))}
+                         </div>
+                       </div>
+                     )
+                   }
                    return (
                      <div key={key}>
                        <label className="text-xs font-medium text-slate-500 block mb-1 capitalize">{key.replace('_', ' ')}</label>
@@ -247,10 +283,13 @@ export default function PageEditorWrapper({
                          <textarea
                            value={activePage.variations[activePage.activeVariationIndex].data[key] || ''}
                            onChange={(e) => {
-                             const newPages = [...pages];
-                             const pageIndex = newPages.findIndex(p => p.id === activePage.id);
+                             const newPages = JSON.parse(JSON.stringify(pages));
+                             const pageIndex = newPages.findIndex((p: any) => p.id === activePage.id);
                              newPages[pageIndex].variations[activePage.activeVariationIndex].data[key] = e.target.value;
                              setPages(newPages);
+                           }}
+                           onBlur={() => {
+                             updateDocument({ content: { ...document.content, pages } });
                            }}
                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm text-slate-700 focus:outline-none focus:border-indigo-500 min-h-[80px]"
                          />
@@ -259,10 +298,13 @@ export default function PageEditorWrapper({
                            type="text"
                            value={activePage.variations[activePage.activeVariationIndex].data[key] || ''}
                            onChange={(e) => {
-                             const newPages = [...pages];
-                             const pageIndex = newPages.findIndex(p => p.id === activePage.id);
+                             const newPages = JSON.parse(JSON.stringify(pages));
+                             const pageIndex = newPages.findIndex((p: any) => p.id === activePage.id);
                              newPages[pageIndex].variations[activePage.activeVariationIndex].data[key] = e.target.value;
                              setPages(newPages);
+                           }}
+                           onBlur={() => {
+                             updateDocument({ content: { ...document.content, pages } });
                            }}
                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm text-slate-700 focus:outline-none focus:border-indigo-500"
                          />

@@ -321,7 +321,7 @@ export default function CreateDocumentModal({
                     <div className="bg-white border-2 border-transparent hover:border-slate-300 rounded-2xl p-4 transition-colors">
                       <div className="h-48 bg-slate-100 rounded-xl mb-4 flex items-center justify-center text-center p-4">
                          <span className="text-3xl mb-2">⚽️</span>
-                         <h4 className="text-sm font-bold text-slate-800">Balones (Legacy)</h4>
+                         <h4 className="text-sm font-bold text-slate-800">Template 3 (Legacy)</h4>
                       </div>
                       <p className="text-xs text-slate-500 mb-4 line-clamp-2">Template rígido original.</p>
                       <button onClick={() => handleNextStep3('balones')} className="w-full py-2.5 border border-slate-200 text-slate-600 font-bold text-sm rounded-xl hover:bg-slate-50 transition-colors">
@@ -336,7 +336,7 @@ export default function CreateDocumentModal({
                     <div className="bg-white border-2 border-indigo-500 rounded-2xl p-4 shadow-lg shadow-indigo-500/10 relative overflow-hidden group">
                       <div className="absolute top-4 left-4 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Activo</div>
                       <div className="h-48 bg-slate-900 rounded-xl mb-4 flex items-center justify-center">
-                         <h4 className="text-xl font-bold text-white">Lotbet</h4>
+                         <h4 className="text-xl font-bold text-white">Template 1</h4>
                       </div>
                       <p className="text-xs text-slate-500 mb-4">Diseño oscuro premium con menú lateral.</p>
                       <button onClick={() => handleNextStep3('lotbet')} className="w-full py-2.5 bg-indigo-50 text-indigo-600 font-bold text-sm rounded-xl hover:bg-indigo-100 transition-colors">
@@ -347,7 +347,7 @@ export default function CreateDocumentModal({
                     <div className="bg-white border-2 border-pink-500 rounded-2xl p-4 shadow-lg shadow-pink-500/10 relative overflow-hidden group">
                       <div className="absolute top-4 left-4 bg-pink-600 text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Activo</div>
                       <div className="h-48 bg-gradient-to-br from-pink-50 to-white rounded-xl mb-4 flex items-center justify-center border border-pink-100">
-                         <h4 className="text-xl font-black text-slate-900">Evolution</h4>
+                         <h4 className="text-xl font-black text-slate-900">Template 4</h4>
                       </div>
                       <p className="text-xs text-slate-500 mb-4">Arquitectura avanzada, colores vibrantes.</p>
                       <button onClick={() => handleNextStep3('evolution')} className="w-full py-2.5 bg-pink-50 text-pink-600 font-bold text-sm rounded-xl hover:bg-pink-100 transition-colors">
@@ -362,7 +362,7 @@ export default function CreateDocumentModal({
                     <div className="bg-white border-2 border-indigo-500 rounded-2xl p-4 shadow-lg shadow-indigo-500/10 relative overflow-hidden group">
                       <div className="absolute top-4 left-4 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Activo</div>
                       <div className="h-48 bg-slate-900 rounded-xl mb-4 flex items-center justify-center">
-                         <h4 className="text-xl font-bold text-white text-center">Lotbet Informe<br/><span className="text-sm font-normal text-slate-400">Dashboard</span></h4>
+                         <h4 className="text-xl font-bold text-white text-center">Template 1<br/><span className="text-sm font-normal text-slate-400">Dashboard</span></h4>
                       </div>
                       <p className="text-xs text-slate-500 mb-4">Plantilla con métricas de alto contraste.</p>
                       <button onClick={() => handleNextStep3('lotbet')} className="w-full py-2.5 bg-indigo-50 text-indigo-600 font-bold text-sm rounded-xl hover:bg-indigo-100 transition-colors">
@@ -373,7 +373,7 @@ export default function CreateDocumentModal({
                     <div className="bg-white border-2 border-emerald-500 rounded-2xl p-4 shadow-lg shadow-emerald-500/10 relative overflow-hidden group">
                       <div className="absolute top-4 left-4 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Activo</div>
                       <div className="h-48 bg-emerald-900 rounded-xl mb-4 flex items-center justify-center">
-                         <h4 className="text-xl font-black text-emerald-50 text-center">Informe WPlay<br/><span className="text-sm font-normal opacity-80">(Mundial)</span></h4>
+                         <h4 className="text-xl font-black text-emerald-50 text-center">Template 2<br/><span className="text-sm font-normal opacity-80">(Clean)</span></h4>
                       </div>
                       <p className="text-xs text-slate-500 mb-4">Plantilla limpia con gráficos estelares.</p>
                       <button onClick={() => handleNextStep3('mundial')} className="w-full py-2.5 bg-emerald-50 text-emerald-600 font-bold text-sm rounded-xl hover:bg-emerald-100 transition-colors">
