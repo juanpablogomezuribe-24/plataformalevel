@@ -6,14 +6,14 @@ interface FlowStep {
   label: string;
 }
 
-export interface LotbetObjectiveData {
+export interface LevelObjectiveData {
   title: string;
   quote: string;
   flowTitle: string;
   flowSteps: FlowStep[];
 }
 
-export const LotbetObjective: React.FC<{ data: LotbetObjectiveData }> = ({ data }) => {
+export const LevelObjective: React.FC<{ data: LevelObjectiveData }> = ({ data }) => {
   const getIcon = (id: string) => {
     switch (id) {
       case 'database': return <Database className="w-4 h-4 text-cyan-500" />;

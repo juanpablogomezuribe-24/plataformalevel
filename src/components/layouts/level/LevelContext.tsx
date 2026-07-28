@@ -1,7 +1,7 @@
 import React from 'react';
 import { Users, Check, Target, AlertCircle } from 'lucide-react';
 
-export interface LotbetContextData {
+export interface LevelContextData {
   title: string;
   statsTitle: string;
   statsSubtitle: string;
@@ -14,7 +14,7 @@ export interface LotbetContextData {
   risks: string[];
 }
 
-export const LotbetContext: React.FC<{ data: LotbetContextData }> = ({ data }) => {
+export const LevelContext: React.FC<{ data: LevelContextData }> = ({ data }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-8 mt-12">
       <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight">{data.title}</h2>

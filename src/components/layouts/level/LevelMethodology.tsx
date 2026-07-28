@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ToggleRight, ToggleLeft, Star, ExternalLink, Camera } from 'lucide-react';
 
-export const EvoMethodology: React.FC<{ data?: any }> = ({ data }) => {
+export const LevelMethodology: React.FC<{ data?: any }> = ({ data }) => {
   const [im, setIm] = useState(false);
 
   const toggleInfluencerMode = () => setIm(!im);

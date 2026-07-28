@@ -6,13 +6,13 @@ interface Phase {
   description: React.ReactNode;
 }
 
-export interface LotbetStrategyData {
+export interface LevelStrategyPillarsData {
   title: string;
   phases: Phase[];
   summary: React.ReactNode;
 }
 
-export const LotbetStrategy: React.FC<{ data: LotbetStrategyData }> = ({ data }) => {
+export const LevelStrategyPillars: React.FC<{ data: LevelStrategyPillarsData }> = ({ data }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-8 mt-12">
       <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight">{data.title}</h2>

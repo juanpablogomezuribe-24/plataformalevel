@@ -11,13 +11,13 @@ interface Step {
   subtitle: string;
 }
 
-export interface LotbetCrmData {
+export interface LevelCrmData {
   title: string;
   metrics: Metric[];
   steps: Step[];
 }
 
-export const LotbetCrm: React.FC<{ data: LotbetCrmData }> = ({ data }) => {
+export const LevelCrm: React.FC<{ data: LevelCrmData }> = ({ data }) => {
   return (
     <div className="max-w-5xl mx-auto space-y-8 mt-12">
       <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight text-center">{data.title}</h2>

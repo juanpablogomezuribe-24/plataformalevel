@@ -7,13 +7,13 @@ interface Metric {
   value: string;
 }
 
-export interface LotbetCoverData {
+export interface LevelCoverData {
   title: React.ReactNode;
   subtitle: string;
   metrics: Metric[];
 }
 
-export const LotbetCover: React.FC<{ data: LotbetCoverData }> = ({ data }) => {
+export const LevelCover: React.FC<{ data: LevelCoverData }> = ({ data }) => {
   const getIcon = (id: string) => {
     switch (id) {
       case 'start': return <Calendar className="w-6 h-6 text-slate-400 mb-3" />;

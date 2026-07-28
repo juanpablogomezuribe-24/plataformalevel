@@ -6,13 +6,13 @@ interface FlowNode {
   styleClass?: string;
 }
 
-export interface LotbetLinearFlowData {
+export interface LevelLinearFlowData {
   title: string;
   quote: string;
   nodes: FlowNode[];
 }
 
-export const LotbetLinearFlow: React.FC<{ data: LotbetLinearFlowData }> = ({ data }) => {
+export const LevelLinearFlow: React.FC<{ data: LevelLinearFlowData }> = ({ data }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-8 mt-12 text-center">
       <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight mb-8">{data.title}</h2>

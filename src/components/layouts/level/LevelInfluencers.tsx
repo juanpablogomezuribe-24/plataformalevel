@@ -14,7 +14,7 @@ export interface Influencer {
   audience?: string;
 }
 
-interface EvoInfluencersProps {
+interface LevelInfluencersProps {
   data?: {
     influencersData: Influencer[];
   };
@@ -37,7 +37,7 @@ const getPlatformColor = (platform: string) => {
   return 'bg-pink-600';
 };
 
-export const EvoInfluencers: React.FC<EvoInfluencersProps> = ({ data }) => {
+export const LevelInfluencers: React.FC<LevelInfluencersProps> = ({ data }) => {
   const influencers = data?.influencersData || [];
 
   return (

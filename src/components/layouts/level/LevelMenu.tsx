@@ -8,13 +8,13 @@ interface MenuItem {
   onClick?: () => void;
 }
 
-export interface LotbetMenuData {
+export interface LevelMenuData {
   title: string;
   subtitle: string;
   items: MenuItem[];
 }
 
-export const LotbetMenu: React.FC<{ data: LotbetMenuData }> = ({ data }) => {
+export const LevelMenu: React.FC<{ data: LevelMenuData }> = ({ data }) => {
   const getIconAndColors = (id: string) => {
     switch (id) {
       case 'context': return { icon: <Target className="w-8 h-8" />, colors: "bg-cyan-50 text-cyan-600 group-hover:bg-cyan-500 group-hover:text-white" };

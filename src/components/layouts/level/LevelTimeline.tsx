@@ -5,12 +5,12 @@ interface TimelineEvent {
   type: 'default' | 'warning' | 'danger' | 'info';
 }
 
-export interface LotbetTimelineData {
+export interface LevelTimelineData {
   title: string;
   events: TimelineEvent[];
 }
 
-export const LotbetTimeline: React.FC<{ data: LotbetTimelineData }> = ({ data }) => {
+export const LevelTimeline: React.FC<{ data: LevelTimelineData }> = ({ data }) => {
   const getStyles = (type: string) => {
     switch (type) {
       case 'warning': return { dot: "bg-amber-500", box: "bg-amber-50 border-amber-100 text-amber-900" };

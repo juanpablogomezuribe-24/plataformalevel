@@ -7,13 +7,13 @@ interface ScopeItem {
   subtitle: string;
 }
 
-export interface LotbetScopeData {
+export interface LevelScopeData {
   title: string;
   items: ScopeItem[];
   clarification: React.ReactNode;
 }
 
-export const LotbetScope: React.FC<{ data: LotbetScopeData }> = ({ data }) => {
+export const LevelScope: React.FC<{ data: LevelScopeData }> = ({ data }) => {
   const getIcon = (id: string) => {
     switch (id) {
       case 'setup': return <Settings className="w-8 h-8 text-slate-400 mb-3" />;

@@ -67,7 +67,7 @@ ESTRUCTURA ESTRICTA REQUERIDA (JSON):
         "activeVariationIndex": 0,
         "variations": [
           {
-            "layoutType": "cover" | "content" | "two-column" | "metrics" | "chart" | "pricing" | "profiles" | "data-table" | "timeline" | "lotbet-cover" | "lotbet-menu" | "lotbet-context" | "lotbet-objective" | "lotbet-strategy" | "lotbet-infrastructure" | "lotbet-funnel" | "lotbet-timeline" | "evo-strategy" | "evo-methodology" | "evo-influencers" | "evo-packages" | "evo-livespins" | "evo-mediakits" | "evo-pilotplan" | "evo-informe",
+            "layoutType": "cover" | "content" | "two-column" | "metrics" | "chart" | "pricing" | "profiles" | "data-table" | "timeline" | "level-cover" | "level-menu" | "level-context" | "level-objective" | "level-strategy-pillars" | "level-scope" | "level-timeline" | "level-infrastructure" | "level-preparation" | "level-crm" | "level-dashboard" | "level-funnels" | "level-comparison" | "level-linear-flow" | "level-strategy" | "level-methodology" | "level-influencers" | "level-packages" | "level-livespins" | "level-mediakits" | "level-pilotplan" | "level-informe",
             "data": { 
                // Los campos exactos dependen del layoutType.
                // Para cover: title, subtitle, description
@@ -90,25 +90,22 @@ ESTRUCTURA ESTRICTA REQUERIDA (JSON):
 REGLAS CRÍTICAS:
 1. MÁGIA EN LAS VARIACIONES: Para CADA página, debes proponer al menos 2 variaciones (objetos dentro del array 'variations') con diferentes 'layoutType' o enfoques de redacción. Por ejemplo, para el resumen, ofrece una variación 'content' y otra 'two-column'.
 2. ADAPTACIÓN AL TEMPLATE:
-   - Si el template es 'lotbet' o 'mundial' (Informes): ABANDONA LOS LAYOUTS GENÉRICOS. Usa ÚNICAMENTE los layouts de la serie 'lotbet-':
-     - Usa 'lotbet-cover' para la portada con fechas y cifras contratadas vs anticipo.
-     - Usa 'lotbet-menu' para crear un menú interactivo.
-     - Usa 'lotbet-context' para describir el punto de partida (base histórica) y restricciones (alertas rojas).
-     - Usa 'lotbet-objective' para presentar el objetivo en un gran quote.
-     - Usa 'lotbet-strategy' para fases de estrategia en cards lado a lado.
-     - Usa 'lotbet-infrastructure' para contar activos digitales (Instagram, FB, WABA).
-     - Usa 'lotbet-funnel' para mostrar embudos previstos vs reales.
-     - Usa 'lotbet-timeline' para cronogramas detallados de ejecución.
-   - Si el template es 'cotizacion-generica': Asegúrate de incluir una página con layout 'pricing' y otra con 'profiles' o 'two-column' para mostrar productos/servicios.
-   - Si el template es 'evolution' (Propuestas Comerciales): ABANDONA LOS LAYOUTS GENÉRICOS. Usa ÚNICAMENTE los layouts de la serie 'evo-':
-     - Usa 'evo-strategy' para mostrar el approach (ej. Awarenes -> Adquisición).
-     - Usa 'evo-methodology' para los pasos de trabajo de la agencia.
-     - Usa 'evo-influencers' para mostrar el roster de creadores de contenido (data.items: [{name, role, metric}]).
-     - Usa 'evo-packages' para los tiers de precios o paquetes.
-     - Usa 'evo-livespins' para dinámicas de streaming o sorteos.
-     - Usa 'evo-mediakits' para mostrar métricas individuales de un influencer.
-     - Usa 'evo-pilotplan' para el resumen de lo que incluye un piloto.
-3. DATOS Y TEXTOS: No dejes campos vacíos. Inventa datos persuasivos, nombres de features, y números lógicos si no vienen en el brief, para que el diseño se vea lleno y profesional. Para los layouts de lotbet y evo, guíate por el nombre del layout para inferir la estructura esperada en 'data'.
+   - Usa 'level-cover' para la portada con fechas y cifras contratadas vs anticipo.
+   - Usa 'level-menu' para crear un menú interactivo.
+   - Usa 'level-context' para describir el punto de partida (base histórica) y restricciones (alertas rojas).
+   - Usa 'level-objective' para presentar el objetivo en un gran quote.
+   - Usa 'level-strategy-pillars' para fases de estrategia en cards lado a lado.
+   - Usa 'level-infrastructure' para contar activos digitales (Instagram, FB, WABA).
+   - Usa 'level-funnels' para mostrar embudos previstos vs reales.
+   - Usa 'level-timeline' para cronogramas detallados de ejecución.
+   - Usa 'level-strategy' para mostrar el approach (ej. Awarenes -> Adquisición).
+   - Usa 'level-methodology' para los pasos de trabajo de la agencia.
+   - Usa 'level-influencers' para mostrar el roster de creadores de contenido (data.items: [{name, role, metric}]).
+   - Usa 'level-packages' para los tiers de precios o paquetes.
+   - Usa 'level-livespins' para dinámicas de streaming o sorteos.
+   - Usa 'level-mediakits' para mostrar métricas individuales de un influencer.
+   - Usa 'level-pilotplan' para el resumen de lo que incluye un piloto.
+3. DATOS Y TEXTOS: No dejes campos vacíos. Inventa datos persuasivos, nombres de features, y números lógicos si no vienen en el brief, para que el diseño se vea lleno y profesional. Guíate por el nombre del layout para inferir la estructura esperada en 'data'.
     `;
 
     const response = await openai.chat.completions.create({

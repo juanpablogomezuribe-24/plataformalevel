@@ -7,14 +7,14 @@ export interface LiveInfluencer {
   image: string;
 }
 
-interface EvoLiveSpinsProps {
+interface LevelLiveSpinsProps {
   data?: {
     liveInfluencers: Record<string, LiveInfluencer>;
     logoGlobal?: string;
   };
 }
 
-export const EvoLiveSpins: React.FC<EvoLiveSpinsProps> = ({ data }) => {
+export const LevelLiveSpins: React.FC<LevelLiveSpinsProps> = ({ data }) => {
   const [selectedInfluencer, setSelectedInfluencer] = useState('conragen');
   
   const liveInfluencers = data?.liveInfluencers || {

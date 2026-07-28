@@ -19,14 +19,14 @@ export interface PackageData {
   benefits?: string[];
 }
 
-interface EvoPackagesProps {
+interface LevelPackagesProps {
   data?: {
     packages: Record<number, PackageData>;
     logoGlobal?: string;
   };
 }
 
-export const EvoPackages: React.FC<EvoPackagesProps> = ({ data }) => {
+export const LevelPackages: React.FC<LevelPackagesProps> = ({ data }) => {
   const [selectedPackage, setSelectedPackage] = useState<number>(1);
   const packages = data?.packages || {};
   const pkg = packages[selectedPackage];

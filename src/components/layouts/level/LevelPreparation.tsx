@@ -1,14 +1,14 @@
 import React from 'react';
 import { Flame, CheckCircle } from 'lucide-react';
 
-export interface LotbetPreparationData {
+export interface LevelPreparationData {
   title: string;
   durationLabel: string;
   description: string;
   checklist: string[];
 }
 
-export const LotbetPreparation: React.FC<{ data: LotbetPreparationData }> = ({ data }) => {
+export const LevelPreparation: React.FC<{ data: LevelPreparationData }> = ({ data }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-8 mt-12">
       <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight">{data.title}</h2>

@@ -11,7 +11,7 @@ interface MetricBox {
   badge?: string;
 }
 
-export interface LotbetComparisonData {
+export interface LevelComparisonData {
   title: string;
   leftBox: MetricBox;
   rightBox: MetricBox;
@@ -19,7 +19,7 @@ export interface LotbetComparisonData {
   decisionText: React.ReactNode;
 }
 
-export const LotbetComparison: React.FC<{ data: LotbetComparisonData }> = ({ data }) => {
+export const LevelComparison: React.FC<{ data: LevelComparisonData }> = ({ data }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-8 mt-12 text-center">
       <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight mb-12">{data.title}</h2>

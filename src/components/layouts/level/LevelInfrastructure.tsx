@@ -12,14 +12,14 @@ interface InfraBox {
   colorClass: string;
 }
 
-export interface LotbetInfrastructureData {
+export interface LevelInfrastructureData {
   title: string;
   subtitle: string;
   stats: InfraStat[];
   boxes: InfraBox[];
 }
 
-export const LotbetInfrastructure: React.FC<{ data: LotbetInfrastructureData }> = ({ data }) => {
+export const LevelInfrastructure: React.FC<{ data: LevelInfrastructureData }> = ({ data }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-8 mt-12">
       <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight text-center">{data.title}</h2>

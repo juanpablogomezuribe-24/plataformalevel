@@ -15,7 +15,7 @@ export interface StrategyStep {
   type: string;
 }
 
-interface EvoStrategyProps {
+interface LevelStrategyProps {
   data?: {
     strategySteps: StrategyStep[];
     logoGlobal?: string;
@@ -29,7 +29,7 @@ const iconMap: Record<string, React.ReactNode> = {
   rocket: <TrendingUp className="w-24 h-24 text-indigo-400 stroke-1" />
 };
 
-export const EvoStrategy: React.FC<EvoStrategyProps> = ({ data }) => {
+export const LevelStrategy: React.FC<LevelStrategyProps> = ({ data }) => {
   const [strategyStep, setStrategyStep] = useState(1);
   const steps = data?.strategySteps || [];
   const step = steps[strategyStep - 1];

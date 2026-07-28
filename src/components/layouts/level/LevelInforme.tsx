@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarChart2, Target, ClipboardCheck, CheckCircle, Users, MousePointerClick, Eye, Smartphone, Gamepad2 } from 'lucide-react';
 
-export const EvoInforme: React.FC<{ data?: any }> = ({ data }) => {
+export const LevelInforme: React.FC<{ data?: any }> = ({ data }) => {
   return (
     <div className="animate-slide-up p-4 md:p-10 max-w-7xl mx-auto pb-20 text-slate-200">
         <div className="text-center mb-10">

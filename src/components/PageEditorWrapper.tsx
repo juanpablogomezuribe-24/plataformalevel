@@ -16,44 +16,45 @@ const AVAILABLE_LAYOUTS = [
   { id: 'profiles', name: 'Perfiles / Equipo' },
   { id: 'data-table', name: 'Tabla de Acciones' },
   { id: 'timeline', name: 'Flujo / Timeline' },
-  { id: 'lotbet-cover', name: 'Lotbet - Portada' },
-  { id: 'lotbet-menu', name: 'Lotbet - Menú' },
-  { id: 'lotbet-context', name: 'Lotbet - Contexto' },
-  { id: 'lotbet-objective', name: 'Lotbet - Objetivo' },
-  { id: 'lotbet-strategy', name: 'Lotbet - Estrategia' },
-  { id: 'lotbet-scope', name: 'Lotbet - Alcance' },
-  { id: 'lotbet-timeline', name: 'Lotbet - Timeline' },
-  { id: 'lotbet-infrastructure', name: 'Lotbet - Infraestructura' },
-  { id: 'lotbet-preparation', name: 'Lotbet - Preparación' },
-  { id: 'lotbet-crm', name: 'Lotbet - CRM' },
-  { id: 'lotbet-dashboard', name: 'Lotbet - Dashboard' },
-  { id: 'lotbet-funnels', name: 'Lotbet - Embudos' },
-  { id: 'lotbet-comparison', name: 'Lotbet - Comparación' },
-  { id: 'lotbet-linear-flow', name: 'Lotbet - Flujo Lineal' },
+  // LEVEL LAYOUTS (Lotbet Legacy)
+  { id: 'level-cover', name: 'Level - Portada' },
+  { id: 'level-menu', name: 'Level - Menú' },
+  { id: 'level-context', name: 'Level - Contexto' },
+  { id: 'level-objective', name: 'Level - Objetivo' },
+  { id: 'level-strategy-pillars', name: 'Level - Pilares Estratégicos' },
+  { id: 'level-scope', name: 'Level - Alcance' },
+  { id: 'level-timeline', name: 'Level - Timeline' },
+  { id: 'level-infrastructure', name: 'Level - Infraestructura' },
+  { id: 'level-preparation', name: 'Level - Preparación' },
+  { id: 'level-crm', name: 'Level - CRM' },
+  { id: 'level-dashboard', name: 'Level - Dashboard' },
+  { id: 'level-funnels', name: 'Level - Embudos' },
+  { id: 'level-comparison', name: 'Level - Comparación' },
+  { id: 'level-linear-flow', name: 'Level - Flujo Lineal' },
   
-  // EVOLUTION LAYOUTS
-  { id: 'evo-strategy', name: 'Evolution - Estrategia' },
-  { id: 'evo-methodology', name: 'Evolution - Metodología' },
-  { id: 'evo-influencers', name: 'Evolution - Influencers' },
-  { id: 'evo-packages', name: 'Evolution - Paquetes' },
-  { id: 'evo-livespins', name: 'Evolution - Live Spins' },
-  { id: 'evo-mediakits', name: 'Evolution - Media Kits' },
-  { id: 'evo-pilotplan', name: 'Evolution - Plan Piloto' },
-  { id: 'evo-informe', name: 'Evolution - Informe' },
+  // LEVEL LAYOUTS (Evolution Legacy)
+  { id: 'level-strategy', name: 'Level - Estrategia' },
+  { id: 'level-methodology', name: 'Level - Metodología' },
+  { id: 'level-influencers', name: 'Level - Influencers' },
+  { id: 'level-packages', name: 'Level - Paquetes' },
+  { id: 'level-livespins', name: 'Level - Live Spins' },
+  { id: 'level-mediakits', name: 'Level - Media Kits' },
+  { id: 'level-pilotplan', name: 'Level - Plan Piloto' },
+  { id: 'level-informe', name: 'Level - Informe' },
 ];
 
 const getDefaultDataForLayout = (layoutId: string, currentData: any = {}) => {
   const base = { title: currentData.title || '' };
   
-  if (layoutId === 'cover' || layoutId === 'lotbet-cover') return { ...base, subtitle: currentData.subtitle || '', description: currentData.description || '' };
-  if (layoutId === 'content' || layoutId === 'evo-informe' || layoutId === 'lotbet-context') return { ...base, content: currentData.content || '' };
+  if (layoutId === 'cover' || layoutId === 'level-cover') return { ...base, subtitle: currentData.subtitle || '', description: currentData.description || '' };
+  if (layoutId === 'content' || layoutId === 'level-informe' || layoutId === 'level-context') return { ...base, content: currentData.content || '' };
   if (layoutId === 'two-column') return { ...base, left_content: currentData.left_content || '', right_content: currentData.right_content || '' };
   
-  if (layoutId === 'metrics' || layoutId === 'lotbet-dashboard') return { ...base, items: [{ label: 'Métrica 1', value: '100' }, { label: 'Métrica 2', value: '200' }] };
-  if (layoutId === 'pricing' || layoutId === 'evo-packages') return { ...base, items: [{ name: 'Plan Básico', price: '1000', features: 'Feature 1' }, { name: 'Plan Pro', price: '2000', features: 'Feature 2' }] };
-  if (layoutId === 'profiles' || layoutId === 'evo-influencers') return { ...base, items: [{ name: 'Usuario 1', role: 'Rol', metric: '100K' }] };
-  if (layoutId === 'data-table' || layoutId === 'lotbet-crm' || layoutId === 'lotbet-scope') return { ...base, items: [{ action: 'Acción 1', person: 'Resp', status: 'Pendiente' }] };
-  if (layoutId === 'timeline' || layoutId === 'lotbet-timeline') return { ...base, items: [{ phase: 'Fase 1', name: 'Hito', date: 'Fecha' }] };
+  if (layoutId === 'metrics' || layoutId === 'level-dashboard') return { ...base, items: [{ label: 'Métrica 1', value: '100' }, { label: 'Métrica 2', value: '200' }] };
+  if (layoutId === 'pricing' || layoutId === 'level-packages') return { ...base, items: [{ name: 'Plan Básico', price: '1000', features: 'Feature 1' }, { name: 'Plan Pro', price: '2000', features: 'Feature 2' }] };
+  if (layoutId === 'profiles' || layoutId === 'level-influencers') return { ...base, items: [{ name: 'Usuario 1', role: 'Rol', metric: '100K' }] };
+  if (layoutId === 'data-table' || layoutId === 'level-crm' || layoutId === 'level-scope') return { ...base, items: [{ action: 'Acción 1', person: 'Resp', status: 'Pendiente' }] };
+  if (layoutId === 'timeline' || layoutId === 'level-timeline') return { ...base, items: [{ phase: 'Fase 1', name: 'Hito', date: 'Fecha' }] };
   if (layoutId === 'chart') return { ...base, items: [{ name: 'A', value: '50' }, { name: 'B', value: '80' }] };
   
   return { ...base, content: currentData.content || '' };
@@ -331,12 +332,24 @@ export default function PageEditorWrapper({
                  {Object.keys(activePage.variations[activePage.activeVariationIndex].data || {}).map((key) => {
                    if (key === 'items' && Array.isArray(activePage.variations[activePage.activeVariationIndex].data.items)) {
                      return (
-                       <div key={key} className="mt-6 border-t border-slate-200 pt-4">
-                         <label className="text-xs font-bold text-slate-500 block mb-3 uppercase tracking-wider">Elementos (Métricas/Gráficos/Precios)</label>
-                         <div className="space-y-4">
-                           {activePage.variations[activePage.activeVariationIndex].data.items.map((item: any, i: number) => (
-                             <div key={i} className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-3">
-                               {Object.keys(item).map(itemKey => (
+                        <div key={key} className="mt-6 border-t border-slate-200 pt-4">
+                          <label className="text-xs font-bold text-slate-500 block mb-3 uppercase tracking-wider">Elementos (Métricas/Gráficos/Precios)</label>
+                          <div className="space-y-4">
+                            {activePage.variations[activePage.activeVariationIndex].data.items.map((item: any, i: number) => (
+                              <div key={i} className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-3 relative group">
+                                <button 
+                                  onClick={() => {
+                                    const newPages = JSON.parse(JSON.stringify(pages));
+                                    const pageIndex = newPages.findIndex((p: any) => p.id === activePage.id);
+                                    newPages[pageIndex].variations[activePage.activeVariationIndex].data.items.splice(i, 1);
+                                    setPages(newPages);
+                                    updateDocument({ content: { ...document.content, pages: newPages } });
+                                  }}
+                                  className="absolute -top-2 -right-2 bg-red-100 text-red-500 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-500 hover:text-white"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                                {Object.keys(item).map(itemKey => (
                                  <div key={itemKey}>
                                     <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase">{itemKey}</label>
                                     <input
@@ -355,10 +368,25 @@ export default function PageEditorWrapper({
                                     />
                                  </div>
                                ))}
-                             </div>
-                           ))}
-                         </div>
-                       </div>
+                              </div>
+                            ))}
+                          </div>
+                          <button
+                            onClick={() => {
+                              const newPages = JSON.parse(JSON.stringify(pages));
+                              const pageIndex = newPages.findIndex((p: any) => p.id === activePage.id);
+                              const items = newPages[pageIndex].variations[activePage.activeVariationIndex].data.items;
+                              const templateItem = items.length > 0 ? { ...items[0] } : { name: '', value: '' };
+                              Object.keys(templateItem).forEach(k => templateItem[k] = '');
+                              items.push(templateItem);
+                              setPages(newPages);
+                              updateDocument({ content: { ...document.content, pages: newPages } });
+                            }}
+                            className="mt-4 w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-slate-400 font-bold text-xs flex items-center justify-center gap-2 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                          >
+                            <Plus className="w-3 h-3" /> Agregar Elemento
+                          </button>
+                        </div>
                      )
                    }
                    return (

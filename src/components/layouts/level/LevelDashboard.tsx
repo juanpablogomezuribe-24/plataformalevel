@@ -13,13 +13,13 @@ interface SummaryStat {
   valueColorClass?: string;
 }
 
-export interface LotbetDashboardData {
+export interface LevelDashboardData {
   title: string;
   stats: Stat[];
   summaries: SummaryStat[];
 }
 
-export const LotbetDashboard: React.FC<{ data: LotbetDashboardData }> = ({ data }) => {
+export const LevelDashboard: React.FC<{ data: LevelDashboardData }> = ({ data }) => {
   return (
     <div className="max-w-5xl mx-auto space-y-8 mt-12">
       <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight">{data.title}</h2>

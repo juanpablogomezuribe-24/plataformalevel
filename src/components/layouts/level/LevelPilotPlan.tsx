@@ -1,7 +1,7 @@
 import React from 'react';
 import { Swords, Link, MonitorPlay, Gift, Clapperboard, ListChecks, Calendar, Wallet, BarChart2, CheckSquare } from 'lucide-react';
 
-export const EvoPilotPlan: React.FC<{ data?: any }> = ({ data }) => {
+export const LevelPilotPlan: React.FC<{ data?: any }> = ({ data }) => {
   return (
     <div className="animate-slide-up p-4 md:p-10 max-w-7xl mx-auto pb-20 text-slate-200">
         <div className="text-center mb-10">

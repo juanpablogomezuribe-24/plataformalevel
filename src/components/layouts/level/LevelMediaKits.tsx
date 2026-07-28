@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarChart2, CheckCircle, Target, Image as ImageIcon } from 'lucide-react';
 
-export const EvoMediaKits: React.FC<{ data?: any }> = ({ data }) => {
+export const LevelMediaKits: React.FC<{ data?: any }> = ({ data }) => {
   return (
     <div className="animate-slide-up p-4 md:p-10 max-w-7xl mx-auto pb-20 text-slate-200">
         <div className="text-center mb-10">

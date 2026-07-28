@@ -14,8 +14,8 @@ export async function POST(req: Request) {
       return NextResponse.json({
         reply: "No tengo API Key de OpenAI configurada. Te devolveré una estructura de prueba para que puedas continuar.",
         outline: [
-          { name: "Portada", templateId: template === 'evolution' ? 'evo-strategy' : 'lotbet-cover', intent: "Título principal y logo" },
-          { name: "Metodología", templateId: template === 'evolution' ? 'evo-methodology' : 'lotbet-strategy', intent: "Explicación del plan" }
+          { name: "Portada", templateId: template === 'evolution' ? 'level-strategy' : 'level-cover', intent: "Título principal y logo" },
+          { name: "Metodología", templateId: template === 'evolution' ? 'level-methodology' : 'level-strategy-pillars', intent: "Explicación del plan" }
         ]
       });
     }
@@ -33,8 +33,7 @@ INSTRUCCIONES PARA TU RESPUESTA:
 1. Responde de forma amable, corta y directa al usuario (campo "reply").
 2. Si tienes suficiente contexto, propón una estructura de diapositivas en el campo "outline".
 3. Usa estrictamente estos IDs para los layouts propuestos en el outline:
-   - FAMILIA LOTBET: lotbet-cover, lotbet-menu, lotbet-context, lotbet-objective, lotbet-strategy, lotbet-scope, lotbet-timeline, lotbet-infrastructure, lotbet-preparation, lotbet-crm, lotbet-dashboard, lotbet-funnels, lotbet-comparison, lotbet-linear-flow
-   - FAMILIA EVOLUTION: evo-strategy, evo-methodology, evo-influencers, evo-packages, evo-livespins, evo-mediakits, evo-pilotplan, evo-informe
+   - FAMILIA LEVEL: level-cover, level-menu, level-context, level-objective, level-strategy-pillars, level-scope, level-timeline, level-infrastructure, level-preparation, level-crm, level-dashboard, level-funnels, level-comparison, level-linear-flow, level-strategy, level-methodology, level-influencers, level-packages, level-livespins, level-mediakits, level-pilotplan, level-informe
    - GENÉRICOS: cover, content, two-column, metrics, chart, pricing, profiles, data-table, timeline
 
 FORMATO DE SALIDA ESTRICTO JSON:
