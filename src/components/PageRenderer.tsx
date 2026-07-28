@@ -160,6 +160,101 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
         </div>
       )
 
+    case 'profiles':
+      return (
+        <div className={`w-full h-full p-16 flex flex-col justify-center ${bgClass}`}>
+          <h2 className={`text-5xl font-black mb-16 tracking-tight text-center ${titleClass}`}>{data.title || 'Equipo / Influenciadores'}</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {(data.items || [{name:'Juan P.', role:'Macro Influencer', metric:'1.2M'}, {name:'Maria C.', role:'Content Creator', metric:'850K'}]).map((item:any, i:number) => (
+              <div key={i} className={`p-8 rounded-[2rem] flex flex-col items-center text-center group hover:scale-105 transition-all duration-300 shadow-xl ${cardClass}`}>
+                <div className={`w-32 h-32 rounded-full mb-6 flex items-center justify-center p-1 border-2 ${isEvolution ? 'border-pink-500' : isMundial ? 'border-emerald-500' : 'border-indigo-500'}`}>
+                  <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${item.name.replace(' ', '')}`} alt={item.name} className="w-full h-full rounded-full bg-slate-100" />
+                </div>
+                <h3 className={`text-2xl font-black mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>{item.name}</h3>
+                <p className={`text-sm font-bold uppercase tracking-widest mb-4 ${textMutedClass}`}>{item.role}</p>
+                <div className={`mt-auto py-2 px-6 rounded-full font-black text-lg ${isEvolution ? 'bg-pink-500/20 text-pink-400' : isMundial ? 'bg-emerald-500/20 text-emerald-400' : isLotbet ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-100 text-slate-700'}`}>
+                  {item.metric}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+
+    case 'data-table':
+      return (
+        <div className={`w-full h-full p-16 flex flex-col ${bgClass}`}>
+          <h2 className={`text-4xl font-black mb-12 tracking-tight ${titleClass}`}>{data.title || 'Plan de Acción y Entregables'}</h2>
+          <div className={`flex-1 rounded-[2rem] overflow-hidden shadow-2xl flex flex-col ${cardClass}`}>
+            <div className={`grid grid-cols-4 gap-4 px-10 py-6 border-b text-sm font-bold uppercase tracking-widest ${isDark ? 'border-slate-700/50 bg-slate-900/50 text-slate-400' : 'border-slate-200 bg-slate-50 text-slate-500'}`}>
+              <div className="col-span-2">Acción / Entregable</div>
+              <div>Responsable</div>
+              <div className="text-right">Estado / Presupuesto</div>
+            </div>
+            <div className="overflow-y-auto flex-1 p-4 space-y-2">
+              {(data.items || [
+                { action: '1x Reel Instagram (Q3)', person: 'Juan P.', status: 'En Proceso' },
+                { action: 'Campaña Expectativa', person: 'Maria C.', status: 'Completado' },
+                { action: 'Evento Lanzamiento', person: 'Equipo PR', status: 'Aprobado' }
+              ]).map((item:any, i:number) => (
+                <div key={i} className={`grid grid-cols-4 gap-4 px-6 py-5 rounded-2xl items-center transition-colors ${isDark ? 'hover:bg-white/5' : 'hover:bg-slate-50'}`}>
+                  <div className="col-span-2 font-bold text-lg">{item.action}</div>
+                  <div className={`text-base ${textMutedClass}`}>
+                    <span className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-slate-200 overflow-hidden shrink-0"><img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${item.person.replace(' ', '')}`} alt="" className="w-full h-full" /></div>
+                      {item.person}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider ${
+                      item.status?.toLowerCase().includes('completado') || item.status?.toLowerCase().includes('aprobado')
+                        ? 'bg-emerald-500/20 text-emerald-500'
+                        : item.status?.toLowerCase().includes('proceso')
+                        ? 'bg-amber-500/20 text-amber-500'
+                        : isEvolution ? 'bg-pink-500/20 text-pink-400' : 'bg-blue-500/20 text-blue-500'
+                    }`}>
+                      {item.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )
+
+    case 'timeline':
+      return (
+        <div className={`w-full h-full p-16 flex flex-col justify-center ${bgClass}`}>
+          <h2 className={`text-5xl font-black mb-20 tracking-tight text-center ${titleClass}`}>{data.title || 'Cronograma del Proyecto'}</h2>
+          <div className="relative flex justify-between items-start max-w-5xl mx-auto w-full">
+            {/* Connecting Line */}
+            <div className={`absolute top-8 left-0 w-full h-1 -z-10 ${isDark ? 'bg-slate-700/50' : 'bg-slate-200'}`}>
+              <div className={`h-full w-2/3 ${isEvolution ? 'bg-pink-500' : isMundial ? 'bg-emerald-500' : isLotbet ? 'bg-indigo-500' : 'bg-slate-400'}`}></div>
+            </div>
+            
+            {(data.items || [
+              { phase: 'Fase 1', name: 'Kickoff', date: 'Semana 1' },
+              { phase: 'Fase 2', name: 'Producción', date: 'Semana 2-3' },
+              { phase: 'Fase 3', name: 'Lanzamiento', date: 'Semana 4' }
+            ]).map((item:any, i:number) => (
+              <div key={i} className="flex flex-col items-center text-center w-64 group relative">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center font-black text-xl mb-8 shadow-xl transition-transform group-hover:scale-110 ${
+                  i < 2 
+                    ? (isEvolution ? 'bg-pink-500 text-white shadow-pink-500/40' : isMundial ? 'bg-emerald-500 text-white shadow-emerald-500/40' : isLotbet ? 'bg-indigo-500 text-white shadow-indigo-500/40' : 'bg-slate-800 text-white')
+                    : (isDark ? 'bg-slate-800 text-slate-400 border-2 border-slate-600' : 'bg-white text-slate-400 border-2 border-slate-300')
+                }`}>
+                  {i + 1}
+                </div>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${isEvolution ? 'text-pink-400' : isMundial ? 'text-emerald-400' : isLotbet ? 'text-indigo-400' : 'text-slate-500'}`}>{item.phase}</p>
+                <h3 className={`text-2xl font-black mb-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>{item.name}</h3>
+                <p className={`text-base ${textMutedClass}`}>{item.date}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+
     default:
       return (
         <div className={`w-full h-full p-12 flex flex-col items-center justify-center text-center ${bgClass}`}>

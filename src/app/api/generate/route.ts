@@ -34,7 +34,7 @@ ESTRUCTURA ESTRICTA REQUERIDA (JSON):
         "activeVariationIndex": 0,
         "variations": [
           {
-            "layoutType": "cover" | "content" | "two-column" | "metrics" | "chart" | "pricing" | "gallery",
+            "layoutType": "cover" | "content" | "two-column" | "metrics" | "chart" | "pricing" | "profiles" | "data-table" | "timeline",
             "data": { 
                // Los campos exactos dependen del layoutType.
                // Para cover: title, subtitle, description
@@ -43,6 +43,9 @@ ESTRUCTURA ESTRICTA REQUERIDA (JSON):
                // Para metrics: title, items: [{label, value}]
                // Para chart: title, chartType (pie|bar|line), items: [{name, value}]
                // Para pricing: title, items: [{name, price, features}]
+               // Para profiles (influencers/equipo): title, items: [{name, role, metric}]
+               // Para data-table (cronogramas/acciones): title, items: [{action, person, status}]
+               // Para timeline (flujo/historia): title, items: [{phase, name, date}]
             }
           }
         ]
@@ -54,9 +57,9 @@ ESTRUCTURA ESTRICTA REQUERIDA (JSON):
 REGLAS CRÍTICAS:
 1. MÁGIA EN LAS VARIACIONES: Para CADA página, debes proponer al menos 2 variaciones (objetos dentro del array 'variations') con diferentes 'layoutType' o enfoques de redacción. Por ejemplo, para el resumen, ofrece una variación 'content' y otra 'two-column'.
 2. ADAPTACIÓN AL TEMPLATE:
-   - Si el template es 'lotbet' o 'mundial' (Informes): Prioriza páginas con layouts 'metrics' y 'chart'. Extrae datos numéricos.
-   - Si el template es 'cotizacion-generica': Asegúrate de incluir una página con layout 'pricing' y otra con 'gallery' o 'two-column' para mostrar productos/servicios.
-   - Si el template es 'evolution': Estilo vanguardista, textos directos, layouts 'cover' potentes y 'two-column' para beneficios.
+   - Si el template es 'lotbet' o 'mundial' (Informes): Prioriza páginas con layouts 'metrics' y 'chart'. Extrae datos numéricos. Usa 'data-table' para desglosar acciones.
+   - Si el template es 'cotizacion-generica': Asegúrate de incluir una página con layout 'pricing' y otra con 'profiles' o 'two-column' para mostrar productos/servicios.
+   - Si el template es 'evolution': Estilo vanguardista. Usa obligatoriamente 'profiles' para influencers, 'timeline' para cronogramas y 'data-table' para acciones, creando una historia interactiva.
 3. DATOS Y TEXTOS: No dejes campos vacíos. Inventa datos persuasivos, nombres de features, y números lógicos si no vienen en el brief, para que el diseño se vea lleno y profesional.
     `;
 
@@ -133,6 +136,48 @@ function generateMockResponse(prompt: string, clientName: string, template: stri
               { name: 'YouTube', value: 45 },
               { name: 'Google', value: 90 }
             ] 
+          }
+        }
+      ]
+    },
+    {
+      id: 'page-interactive',
+      name: 'Flujo Interactivo',
+      activeVariationIndex: 0,
+      variations: [
+        {
+          layoutType: 'profiles',
+          data: {
+            title: 'Roster de Influenciadores',
+            items: [
+              { name: 'Sofia T.', role: 'Lifestyle', metric: '2.5M' },
+              { name: 'Carlos V.', role: 'Tech & Gaming', metric: '900K' },
+              { name: 'Ana M.', role: 'Fitness', metric: '1.1M' },
+              { name: 'David C.', role: 'Comedia', metric: '3.2M' }
+            ]
+          }
+        },
+        {
+          layoutType: 'data-table',
+          data: {
+            title: 'Entregables de Campaña',
+            items: [
+              { action: '3x Stories (Unboxing)', person: 'Sofia T.', status: 'En Proceso' },
+              { action: '1x Reel (Review)', person: 'Carlos V.', status: 'Completado' },
+              { action: 'Live Workout', person: 'Ana M.', status: 'Pendiente' },
+              { action: 'Mención en Podcast', person: 'David C.', status: 'Aprobado' }
+            ]
+          }
+        },
+        {
+          layoutType: 'timeline',
+          data: {
+            title: 'Fases de Lanzamiento',
+            items: [
+              { phase: 'Fase 1', name: 'Teaser & Expectativa', date: 'Oct 1 - Oct 15' },
+              { phase: 'Fase 2', name: 'Drop Oficial', date: 'Oct 16' },
+              { phase: 'Fase 3', name: 'Sostenimiento', date: 'Oct 17 - Nov 30' }
+            ]
           }
         }
       ]

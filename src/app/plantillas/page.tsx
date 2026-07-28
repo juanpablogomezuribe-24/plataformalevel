@@ -191,7 +191,7 @@ export default function PlantillasPage() {
           }}
           onSuccess={(id) => {
             setShowModal(false)
-            router.push(\`/document/\${id}\`)
+            router.push(`/document/${id}`)
           }}
           defaultTemplate={defaultTemplate}
           defaultDocType={defaultDocType}
