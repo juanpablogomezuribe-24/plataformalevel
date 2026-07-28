@@ -54,7 +54,7 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
   const activeVariation = page.variations[page.activeVariationIndex] || page.variations[0]
   if (!activeVariation) return null
 
-  const { layoutType, data } = activeVariation
+  const { layoutType, data = {} } = activeVariation
 
   // THEMES CONFIGURATION
   const isLotbet = template === 'lotbet'
@@ -158,10 +158,10 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
         <div className={`w-full h-full p-16 flex flex-col justify-center ${bgClass}`}>
           <h2 className={`text-4xl font-black mb-16 text-center tracking-tight ${titleClass}`}>{data.title || 'KPIs Principales'}</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {(data.items || []).map((item: any, i: number) => (
+            {(Array.isArray(data.items) ? data.items : [{label:'Ejemplo', value:'100'}]).map((item: any, i: number) => (
               <div key={i} className={`p-8 rounded-[2rem] text-center shadow-2xl transition-transform hover:-translate-y-2 ${cardClass}`}>
-                <p className={`text-sm font-bold tracking-widest uppercase mb-6 ${textMutedClass}`}>{item.label}</p>
-                <p className={`text-6xl font-black ${isEvolution ? 'text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-500' : isMundial ? 'text-emerald-400' : isLotbet ? 'text-white' : ''}`} style={!isDark ? { color: brandColor } : {}}>{item.value}</p>
+                <p className={`text-sm font-bold tracking-widest uppercase mb-6 ${textMutedClass}`}>{item?.label || 'Dato'}</p>
+                <p className={`text-6xl font-black ${isEvolution ? 'text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-500' : isMundial ? 'text-emerald-400' : isLotbet ? 'text-white' : ''}`} style={!isDark ? { color: brandColor } : {}}>{item?.value || '0'}</p>
               </div>
             ))}
           </div>
@@ -173,13 +173,13 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
         <div className={`w-full h-full p-16 flex flex-col items-center justify-center text-center ${bgClass}`}>
           <h2 className={`text-4xl font-black mb-16 tracking-tight ${titleClass}`}>{data.title || 'Gráfico de Datos'}</h2>
           <div className={`w-full max-w-3xl h-80 border-b-2 border-l-2 flex items-end justify-between px-12 pt-8 ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
-            {(data.items || [{name:'A', value:30}, {name:'B', value:80}, {name:'C', value:50}]).map((item:any, i:number) => (
+            {(Array.isArray(data.items) ? data.items : [{name:'A', value:30}, {name:'B', value:80}, {name:'C', value:50}]).map((item:any, i:number) => (
               <div key={i} className="flex flex-col items-center gap-6 w-24 group">
                 <div 
                   className={`w-full rounded-t-xl transition-all duration-700 shadow-lg group-hover:opacity-100 ${isDark ? 'opacity-90' : 'opacity-80'}`} 
-                  style={{ height: `${Math.min(item.value, 100)}%`, backgroundColor: brandColor, backgroundImage: isLotbet ? 'linear-gradient(to top, #3b82f6, #6366f1)' : isMundial ? 'linear-gradient(to top, #10b981, #34d399)' : isEvolution ? 'linear-gradient(to top, #ec4899, #a855f7)' : 'none' }}
+                  style={{ height: `${Math.min(Number(item?.value || 0), 100)}%`, backgroundColor: brandColor, backgroundImage: isLotbet ? 'linear-gradient(to top, #3b82f6, #6366f1)' : isMundial ? 'linear-gradient(to top, #10b981, #34d399)' : isEvolution ? 'linear-gradient(to top, #ec4899, #a855f7)' : 'none' }}
                 ></div>
-                <span className={`text-base font-bold truncate w-full uppercase tracking-wider ${textMutedClass}`}>{item.name}</span>
+                <span className={`text-base font-bold truncate w-full uppercase tracking-wider ${textMutedClass}`}>{item?.name || 'Item'}</span>
               </div>
             ))}
           </div>
@@ -191,18 +191,18 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
         <div className={`w-full h-full p-16 flex flex-col items-center justify-center ${bgClass}`}>
            <h2 className={`text-5xl font-black mb-16 tracking-tight ${titleClass}`}>{data.title || 'Inversión'}</h2>
            <div className="flex gap-8 w-full max-w-6xl justify-center items-stretch">
-             {(data.items || [{name:'Opción A', price:1000, features:'Feature 1'}, {name:'Opción B', price:2000, features:'Feature 1, 2'}]).map((item:any, i:number) => (
+             {(Array.isArray(data.items) ? data.items : [{name:'Opción A', price:1000, features:'Feature 1'}, {name:'Opción B', price:2000, features:'Feature 1, 2'}]).map((item:any, i:number) => (
                <div key={i} className={`flex-1 rounded-[2rem] p-12 hover:shadow-2xl transition-all hover:-translate-y-4 relative overflow-hidden flex flex-col ${cardClass} ${i === 1 ? 'scale-105 z-10 ring-4 ring-indigo-500/30' : ''}`}>
                  {i === 1 && <div className="absolute top-0 inset-x-0 h-3 bg-gradient-to-r from-amber-400 to-orange-500"></div>}
                  {i === 1 && <div className="absolute top-4 right-4 bg-amber-500 text-white text-[10px] font-black uppercase px-2 py-1 rounded-full">Recomendado</div>}
                  
-                 <h3 className={`text-3xl font-black mb-6 ${isDark ? 'text-white' : 'text-slate-900'}`}>{item.name}</h3>
+                 <h3 className={`text-3xl font-black mb-6 ${isDark ? 'text-white' : 'text-slate-900'}`}>{item?.name || 'Plan'}</h3>
                  <p className={`text-6xl font-black mb-10 tracking-tighter ${isMundial ? 'text-emerald-400' : isLotbet ? 'text-indigo-400' : isEvolution ? 'text-pink-400' : ''}`} style={(!isDark) ? { color: brandColor } : {}}>
-                   ${Number(item.price).toLocaleString()}
+                   ${Number(item?.price || 0).toLocaleString()}
                  </p>
                  <div className={`h-px w-full mb-10 ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
                  <div className="flex-1">
-                    <p className={`text-xl whitespace-pre-wrap leading-relaxed font-light ${textNormalClass}`}>{item.features}</p>
+                    <p className={`text-xl whitespace-pre-wrap leading-relaxed font-light ${textNormalClass}`}>{item?.features || 'Sin detalles'}</p>
                  </div>
                  <button className={`mt-10 w-full py-5 rounded-2xl font-black text-white text-lg transition-all hover:scale-105 shadow-xl ${isLotbet ? 'bg-indigo-600 shadow-indigo-600/30' : isMundial ? 'bg-emerald-600 shadow-emerald-600/30' : isEvolution ? 'bg-pink-600 shadow-pink-600/30' : ''}`} style={(!isDark) ? { backgroundColor: brandColor } : {}}>
                    Seleccionar Plan
@@ -218,15 +218,15 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
         <div className={`w-full h-full p-16 flex flex-col justify-center ${bgClass}`}>
           <h2 className={`text-5xl font-black mb-16 tracking-tight text-center ${titleClass}`}>{data.title || 'Equipo / Influenciadores'}</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {(data.items || [{name:'Juan P.', role:'Macro Influencer', metric:'1.2M'}, {name:'Maria C.', role:'Content Creator', metric:'850K'}]).map((item:any, i:number) => (
+            {(Array.isArray(data.items) ? data.items : [{name:'Juan P.', role:'Macro Influencer', metric:'1.2M'}, {name:'Maria C.', role:'Content Creator', metric:'850K'}]).map((item:any, i:number) => (
               <div key={i} className={`p-8 rounded-[2rem] flex flex-col items-center text-center group hover:scale-105 transition-all duration-300 shadow-xl ${cardClass}`}>
                 <div className={`w-32 h-32 rounded-full mb-6 flex items-center justify-center p-1 border-2 ${isEvolution ? 'border-pink-500' : isMundial ? 'border-emerald-500' : 'border-indigo-500'}`}>
-                  <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${item.name.replace(' ', '')}`} alt={item.name} className="w-full h-full rounded-full bg-slate-100" />
+                  <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${(item?.name || 'User').replace(' ', '')}`} alt={item?.name || 'User'} className="w-full h-full rounded-full bg-slate-100" />
                 </div>
-                <h3 className={`text-2xl font-black mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>{item.name}</h3>
-                <p className={`text-sm font-bold uppercase tracking-widest mb-4 ${textMutedClass}`}>{item.role}</p>
+                <h3 className={`text-2xl font-black mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>{item?.name || 'User'}</h3>
+                <p className={`text-sm font-bold uppercase tracking-widest mb-4 ${textMutedClass}`}>{item?.role || 'Role'}</p>
                 <div className={`mt-auto py-2 px-6 rounded-full font-black text-lg ${isEvolution ? 'bg-pink-500/20 text-pink-400' : isMundial ? 'bg-emerald-500/20 text-emerald-400' : isLotbet ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-100 text-slate-700'}`}>
-                  {item.metric}
+                  {item?.metric || '0'}
                 </div>
               </div>
             ))}
@@ -245,19 +245,14 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
               <div className="text-right">Estado / Presupuesto</div>
             </div>
             <div className="overflow-y-auto flex-1 p-4 space-y-2">
-              {(data.items || [
+              {(Array.isArray(data.items) ? data.items : [
                 { action: '1x Reel Instagram (Q3)', person: 'Juan P.', status: 'En Proceso' },
                 { action: 'Campaña Expectativa', person: 'Maria C.', status: 'Completado' },
-                { action: 'Evento Lanzamiento', person: 'Equipo PR', status: 'Aprobado' }
+                { action: 'Evento Lanzamiento', person: 'Agencia', status: 'Pendiente' }
               ]).map((item:any, i:number) => (
-                <div key={i} className={`grid grid-cols-4 gap-4 px-6 py-5 rounded-2xl items-center transition-colors ${isDark ? 'hover:bg-white/5' : 'hover:bg-slate-50'}`}>
-                  <div className="col-span-2 font-bold text-lg">{item.action}</div>
-                  <div className={`text-base ${textMutedClass}`}>
-                    <span className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-slate-200 overflow-hidden shrink-0"><img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${item.person.replace(' ', '')}`} alt="" className="w-full h-full" /></div>
-                      {item.person}
-                    </span>
-                  </div>
+                <div key={i} className={`grid grid-cols-4 gap-4 px-6 py-4 rounded-xl items-center ${isDark ? 'bg-slate-800/30 hover:bg-slate-800/50' : 'bg-white hover:bg-slate-50'} transition-colors`}>
+                  <div className={`col-span-2 font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{item?.action || 'Acción'}</div>
+                  <div className={`text-sm font-medium ${textNormalClass}`}>{item?.person || 'Responsable'}</div>
                   <div className="text-right">
                     <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider ${
                       item.status?.toLowerCase().includes('completado') || item.status?.toLowerCase().includes('aprobado')
@@ -266,7 +261,7 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
                         ? 'bg-amber-500/20 text-amber-500'
                         : isEvolution ? 'bg-pink-500/20 text-pink-400' : 'bg-blue-500/20 text-blue-500'
                     }`}>
-                      {item.status}
+                      {item?.status || 'Pendiente'}
                     </span>
                   </div>
                 </div>
@@ -286,7 +281,7 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
               <div className={`h-full w-2/3 ${isEvolution ? 'bg-pink-500' : isMundial ? 'bg-emerald-500' : isLotbet ? 'bg-indigo-500' : 'bg-slate-400'}`}></div>
             </div>
             
-            {(data.items || [
+            {(Array.isArray(data.items) ? data.items : [
               { phase: 'Fase 1', name: 'Kickoff', date: 'Semana 1' },
               { phase: 'Fase 2', name: 'Producción', date: 'Semana 2-3' },
               { phase: 'Fase 3', name: 'Lanzamiento', date: 'Semana 4' }
@@ -299,9 +294,9 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
                 }`}>
                   {i + 1}
                 </div>
-                <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${isEvolution ? 'text-pink-400' : isMundial ? 'text-emerald-400' : isLotbet ? 'text-indigo-400' : 'text-slate-500'}`}>{item.phase}</p>
-                <h3 className={`text-2xl font-black mb-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>{item.name}</h3>
-                <p className={`text-base ${textMutedClass}`}>{item.date}</p>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${isEvolution ? 'text-pink-400' : isMundial ? 'text-emerald-400' : isLotbet ? 'text-indigo-400' : 'text-slate-500'}`}>{item?.phase || 'Fase'}</p>
+                <h3 className={`text-2xl font-black mb-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>{item?.name || 'Hito'}</h3>
+                <p className={`text-base ${textMutedClass}`}>{item?.date || 'Fecha'}</p>
               </div>
             ))}
           </div>
