@@ -126,43 +126,44 @@ export default function DraftRoom() {
         })
       })
 
+      let finalPages: any = [];
       if (response.ok) {
         const generatedData = await response.json()
-        let finalPages = generatedData.data?.pages;
-
-        // Validar que la respuesta sea un array de páginas válido. Si falla, construir fallback robusto.
-        if (!Array.isArray(finalPages) || finalPages.length === 0 || !finalPages[0].variations) {
-           console.warn("La IA no devolvió un array válido. Usando el esqueleto como fallback.");
-           finalPages = outline.map((slide: any, i: number) => ({
-             id: `page-${Date.now()}-${i}`,
-             name: slide.name || `Diapositiva ${i + 1}`,
-             activeVariationIndex: 0,
-             variations: [
-               {
-                 layoutType: slide.templateId || 'content',
-                 data: { 
-                   title: slide.name, 
-                   content: slide.intent || 'Estructura base (la IA no pudo completar el texto).' 
-                 }
-               }
-             ]
-           }))
-        }
-
-        // Update document with the final JSON and change status to borrador
-        const { error } = await supabase.from('documents').update({
-          status: 'borrador',
-          content: { ...document.content, pages: finalPages }
-        }).eq('id', document.id)
-
-        if (error) throw error
-        
-        router.push(`/document/${document.id}`)
+        finalPages = generatedData.data?.pages;
       } else {
-        throw new Error("Fallo al generar el documento final")
+        console.warn("La IA falló o tardó demasiado (Timeout). Usando el esqueleto como fallback.");
       }
+
+      // Validar que la respuesta sea un array de páginas válido. Si falla (o hubo error 504), construir fallback robusto.
+      if (!Array.isArray(finalPages) || finalPages.length === 0 || !finalPages[0]?.variations) {
+         console.warn("Estructura inválida o fallback activo. Construyendo desde el esqueleto.");
+         finalPages = outline.map((slide: any, i: number) => ({
+           id: `page-${Date.now()}-${i}`,
+           name: slide.name || `Diapositiva ${i + 1}`,
+           activeVariationIndex: 0,
+           variations: [
+             {
+               layoutType: slide.templateId || 'content',
+               data: { 
+                 title: slide.name, 
+                 content: slide.intent || 'Estructura base (la IA no pudo completar el texto).' 
+               }
+             }
+           ]
+         }))
+      }
+
+      // Update document with the final JSON and change status to borrador
+      const { error } = await supabase.from('documents').update({
+        status: 'borrador',
+        content: { ...document.content, pages: finalPages }
+      }).eq('id', document.id)
+
+      if (error) throw error
+      
+      router.push(`/document/${document.id}`)
     } catch (err: any) {
-      alert("Error: " + err.message)
+      alert("Error crítico al actualizar el documento: " + err.message)
       setIsGenerating(false)
     }
   }

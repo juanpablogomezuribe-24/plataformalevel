@@ -77,10 +77,10 @@ export default function PageEditorWrapper({
   // Initialize from document content
   useEffect(() => {
     if (document.content?.pages) {
-      const validPages = Array.isArray(document.content.pages) ? document.content.pages : [];
+      const validPages = Array.isArray(document.content.pages) ? document.content.pages.filter(Boolean) : [];
       setPages(validPages)
       if (validPages.length > 0 && !activePageId) {
-        setActivePageId(validPages[0].id)
+        setActivePageId(validPages[0]?.id)
       }
     }
   }, [document.content])
@@ -104,11 +104,11 @@ export default function PageEditorWrapper({
     setSaving(false)
   }
 
-  const activePage = pages.find(p => p.id === activePageId)
+  const activePage = pages.find(p => p?.id === activePageId)
   
   const handleVariationChange = (pageId: string, variationIndex: number) => {
     const updatedPages = pages.map(p => {
-      if (p.id === pageId) {
+      if (p?.id === pageId) {
         return { ...p, activeVariationIndex: variationIndex }
       }
       return p
@@ -156,12 +156,12 @@ export default function PageEditorWrapper({
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {(Array.isArray(pages) ? pages : []).map((page, index) => (
+          {(Array.isArray(pages) ? pages : []).filter(Boolean).map((page, index) => (
             <div 
-              key={page.id || index}
-              onClick={() => setActivePageId(page.id)}
+              key={page?.id || index}
+              onClick={() => setActivePageId(page?.id)}
               className={`group relative p-3 rounded-xl cursor-pointer border-2 transition-all ${
-                activePageId === page.id 
+                activePageId === page?.id 
                   ? 'border-indigo-600 bg-indigo-50/50' 
                   : 'border-transparent hover:border-slate-200 hover:bg-slate-50'
               }`}
@@ -265,7 +265,8 @@ export default function PageEditorWrapper({
                  onChange={(e) => {
                    const newLayoutType = e.target.value;
                    const newPages = JSON.parse(JSON.stringify(pages));
-                   const pageIndex = newPages.findIndex((p: any) => p.id === activePage.id);
+                   const pageIndex = newPages.findIndex((p: any) => p?.id === activePage?.id);
+                   if (pageIndex === -1) return;
                    const currentVariation = newPages[pageIndex].variations[activePage.activeVariationIndex || 0];
                    
                    currentVariation.layoutType = newLayoutType;
@@ -341,7 +342,8 @@ export default function PageEditorWrapper({
                                 <button 
                                   onClick={() => {
                                     const newPages = JSON.parse(JSON.stringify(pages));
-                                    const pageIndex = newPages.findIndex((p: any) => p.id === activePage.id);
+                                    const pageIndex = newPages.findIndex((p: any) => p?.id === activePage?.id);
+                                    if (pageIndex === -1) return;
                                     newPages[pageIndex].variations[activePage.activeVariationIndex || 0].data.items.splice(i, 1);
                                     setPages(newPages);
                                     updateDocument({ content: { ...document.content, pages: newPages } });
@@ -358,7 +360,8 @@ export default function PageEditorWrapper({
                                       value={item[itemKey] || ''}
                                       onChange={(e) => {
                                         const newPages = JSON.parse(JSON.stringify(pages));
-                                        const pageIndex = newPages.findIndex((p: any) => p.id === activePage.id);
+                                        const pageIndex = newPages.findIndex((p: any) => p?.id === activePage?.id);
+                                        if (pageIndex === -1) return;
                                         newPages[pageIndex].variations[activePage.activeVariationIndex || 0].data.items[i][itemKey] = e.target.value;
                                         setPages(newPages);
                                       }}
@@ -375,7 +378,8 @@ export default function PageEditorWrapper({
                           <button
                             onClick={() => {
                               const newPages = JSON.parse(JSON.stringify(pages));
-                              const pageIndex = newPages.findIndex((p: any) => p.id === activePage.id);
+                              const pageIndex = newPages.findIndex((p: any) => p?.id === activePage?.id);
+                              if (pageIndex === -1) return;
                               const items = newPages[pageIndex].variations[activePage.activeVariationIndex || 0].data.items;
                               const templateItem = items.length > 0 ? { ...items[0] } : { name: '', value: '' };
                               Object.keys(templateItem).forEach(k => templateItem[k] = '');
@@ -398,7 +402,8 @@ export default function PageEditorWrapper({
                            value={activePage.variations[activePage.activeVariationIndex || 0].data[key] || ''}
                            onChange={(e) => {
                              const newPages = JSON.parse(JSON.stringify(pages));
-                             const pageIndex = newPages.findIndex((p: any) => p.id === activePage.id);
+                             const pageIndex = newPages.findIndex((p: any) => p?.id === activePage?.id);
+                             if (pageIndex === -1) return;
                              newPages[pageIndex].variations[activePage.activeVariationIndex || 0].data[key] = e.target.value;
                              setPages(newPages);
                            }}
@@ -413,7 +418,8 @@ export default function PageEditorWrapper({
                            value={activePage.variations[activePage.activeVariationIndex || 0].data[key] || ''}
                            onChange={(e) => {
                              const newPages = JSON.parse(JSON.stringify(pages));
-                             const pageIndex = newPages.findIndex((p: any) => p.id === activePage.id);
+                             const pageIndex = newPages.findIndex((p: any) => p?.id === activePage?.id);
+                             if (pageIndex === -1) return;
                              newPages[pageIndex].variations[activePage.activeVariationIndex || 0].data[key] = e.target.value;
                              setPages(newPages);
                            }}
