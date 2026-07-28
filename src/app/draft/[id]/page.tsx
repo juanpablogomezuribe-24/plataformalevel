@@ -128,7 +128,26 @@ export default function DraftRoom() {
 
       if (response.ok) {
         const generatedData = await response.json()
-        const finalPages = generatedData.data?.pages || outline 
+        let finalPages = generatedData.data?.pages;
+
+        // Validar que la respuesta sea un array de páginas válido. Si falla, construir fallback robusto.
+        if (!Array.isArray(finalPages) || finalPages.length === 0 || !finalPages[0].variations) {
+           console.warn("La IA no devolvió un array válido. Usando el esqueleto como fallback.");
+           finalPages = outline.map((slide: any, i: number) => ({
+             id: `page-${Date.now()}-${i}`,
+             name: slide.name || `Diapositiva ${i + 1}`,
+             activeVariationIndex: 0,
+             variations: [
+               {
+                 layoutType: slide.templateId || 'content',
+                 data: { 
+                   title: slide.name, 
+                   content: slide.intent || 'Estructura base (la IA no pudo completar el texto).' 
+                 }
+               }
+             ]
+           }))
+        }
 
         // Update document with the final JSON and change status to borrador
         const { error } = await supabase.from('documents').update({

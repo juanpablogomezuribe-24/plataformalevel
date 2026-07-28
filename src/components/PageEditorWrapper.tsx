@@ -77,9 +77,10 @@ export default function PageEditorWrapper({
   // Initialize from document content
   useEffect(() => {
     if (document.content?.pages) {
-      setPages(document.content.pages)
-      if (document.content.pages.length > 0 && !activePageId) {
-        setActivePageId(document.content.pages[0].id)
+      const validPages = Array.isArray(document.content.pages) ? document.content.pages : [];
+      setPages(validPages)
+      if (validPages.length > 0 && !activePageId) {
+        setActivePageId(validPages[0].id)
       }
     }
   }, [document.content])
@@ -155,9 +156,9 @@ export default function PageEditorWrapper({
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {pages.map((page, index) => (
+          {(Array.isArray(pages) ? pages : []).map((page, index) => (
             <div 
-              key={page.id}
+              key={page.id || index}
               onClick={() => setActivePageId(page.id)}
               className={`group relative p-3 rounded-xl cursor-pointer border-2 transition-all ${
                 activePageId === page.id 
@@ -349,7 +350,7 @@ export default function PageEditorWrapper({
                                 >
                                   <Trash2 className="w-3 h-3" />
                                 </button>
-                                {Object.keys(item).map(itemKey => (
+                                {item && typeof item === 'object' && Object.keys(item).map(itemKey => (
                                  <div key={itemKey}>
                                     <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase">{itemKey}</label>
                                     <input
