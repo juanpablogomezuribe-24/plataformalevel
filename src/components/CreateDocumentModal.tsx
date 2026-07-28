@@ -113,26 +113,13 @@ export default function CreateDocumentModal({
     const clientNameStr = client ? client.name : 'Sin Cliente'
 
     try {
-      let pages: any[] = []
-      
-      if (aiPrompt.trim()) {
-        const response = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: aiPrompt, clientName: clientNameStr, template })
-        })
-
-        if (response.ok) {
-          const generatedData = await response.json()
-          // Asumimos que la nueva API devuelve { data: { pages: [...] } }
-          pages = generatedData.data?.pages || [] 
-        } else {
-          const errorData = await response.json()
-          throw new Error("Error de IA: " + (errorData.error || "Fallo desconocido al conectar con OpenAI"))
-        }
-      } else {
-        // Generar al menos 1 página vacía basada en el template
-        pages = [{ id: 'page-1', templateId: template, name: 'Página 1', elements: {} }]
+      // En el nuevo flujo conversacional, no llamamos a /api/generate desde aquí.
+      // Solo preparamos el documento y redirigimos a la sala de draft.
+      // Guardaremos el prompt inicial y cualquier texto de archivo en content.initialPrompt.
+      const initialContent = {
+        template,
+        initialPrompt: aiPrompt.trim() || 'Necesito crear una nueva presentación base.',
+        pages: [] // Aún no hay páginas
       }
 
       const { data, error } = await supabase.from('documents').insert([
@@ -140,22 +127,22 @@ export default function CreateDocumentModal({
           user_id: session.user.id,
           title: projectName, 
           type: docType, 
-          status: 'borrador',
+          status: 'drafting',
           client_id: selectedClient,
           campaign_id: selectedCampaign,
           client_name: clientNameStr, // Mantenemos para fallback
-          content: { template, pages } 
+          content: initialContent 
         }
       ]).select()
 
       if (error) throw error
 
-      if (data && data[0]) {
+      if (data && data.length > 0) {
         onSuccess(data[0].id)
+        window.location.href = `/draft/${data[0].id}`
       }
-    } catch (error: any) {
-      console.error(error)
-      alert("Hubo un error al crear el documento: " + error.message)
+    } catch (err: any) {
+      alert("Error al crear proyecto: " + err.message)
     } finally {
       setIsGenerating(false)
     }

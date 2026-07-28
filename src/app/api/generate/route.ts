@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 
 export async function POST(req: Request) {
   try {
-    const { prompt, clientName, template } = await req.json();
+    const { prompt, clientName, template, outline } = await req.json();
 
     if (!prompt) {
       return NextResponse.json({ error: "No prompt provided" }, { status: 400 });
@@ -19,7 +19,40 @@ export async function POST(req: Request) {
     });
 
     // Nuevo System Prompt enfocado en el Editor de Diapositivas con Variaciones
-    const systemPrompt = `
+    const systemPrompt = outline ? `
+Eres la IA central de "Level", una plataforma de presentaciones y propuestas corporativas premium.
+El usuario ya ha aprobado un esqueleto estructural estricto para su presentación. Tu ÚNICA tarea es rellenar los datos ('data') para CADA layout especificado en el esqueleto.
+
+ESQUELETO APROBADO:
+${JSON.stringify(outline, null, 2)}
+
+ESTRUCTURA ESTRICTA REQUERIDA (JSON):
+Debes devolver un JSON con un array 'pages'. Cada página corresponderá a un elemento del esqueleto aprobado.
+{
+  "data": {
+    "pages": [
+      {
+        "id": "GeneraUnUUIDCorto",
+        "name": "Nombre exacto del esqueleto",
+        "activeVariationIndex": 0,
+        "variations": [
+          {
+            "layoutType": "ID-del-layout-del-esqueleto",
+            "data": {
+               // INVENTA Y COMPLETA LOS DATOS AQUÍ BASADO EN EL BRIEF Y EL INTENT
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+
+REGLAS CRÍTICAS:
+1. DEBES respetar exactamente el orden y los 'layoutType' del esqueleto aprobado. No inventes nuevas páginas ni omitas ninguna.
+2. DATOS Y TEXTOS: No dejes campos vacíos. Inventa datos persuasivos, nombres de features, y números lógicos basados en el brief.
+3. INSPIRACIÓN DEL BRIEF: ${prompt}
+` : `
 Eres la IA central de "Level", una plataforma de presentaciones y propuestas corporativas premium.
 Tu tarea es leer el brief del usuario y generar la estructura completa de un documento basado en páginas (diapositivas).
 El usuario ha seleccionado el template base: "${template}". Utiliza la esencia visual y narrativa de ese template para inspirar el contenido.
@@ -115,11 +148,11 @@ function generateMockResponse(prompt: string, clientName: string, template: stri
       variations: [
         {
           layoutType: 'cover',
-          data: { title: isLotbet ? `Dashboard ${clientName}` : `Propuesta para ${clientName}`, subtitle: 'Resumen Ejecutivo y Estrategia', description: prompt.substring(0, 100) + '...' }
+          data: { title: isLotbet ? `Dashboard ${clientName}` : `Propuesta para ${clientName}`, subtitle: 'Resumen Ejecutivo y Estrategia', description: prompt ? prompt.substring(0, 100) + '...' : 'Descripción breve' }
         },
         {
           layoutType: 'two-column',
-          data: { title: `Proyecto ${clientName}`, left_content: 'Un enfoque disruptivo para el mercado. Nuestro objetivo es dominar el segmento y acelerar el crecimiento.', right_content: prompt.substring(0, 80) + '...' }
+          data: { title: `Proyecto ${clientName}`, left_content: 'Un enfoque disruptivo para el mercado. Nuestro objetivo es dominar el segmento y acelerar el crecimiento.', right_content: prompt ? prompt.substring(0, 80) + '...' : 'Contexto' }
         }
       ]
     },

@@ -79,7 +79,7 @@ export default function Dashboard() {
 
   // Filtrado de documentos basado en status (Mapeo a las pestañas de Figma)
   const filteredDocs = documents.filter(doc => {
-    if (activeTab === 'pendientes') return doc.status === 'borrador' || doc.status === 'en_revision'
+    if (activeTab === 'pendientes') return doc.status === 'borrador' || doc.status === 'en_revision' || doc.status === 'drafting'
     if (activeTab === 'publicadas') return doc.status === 'publicado'
     if (activeTab === 'compartidas') return doc.status === 'compartido' || doc.status === 'publicado'
     if (activeTab === 'cambios') return doc.status === 'cambios_solicitados'
