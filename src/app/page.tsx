@@ -115,11 +115,11 @@ export default function Dashboard() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={\`pb-4 text-sm font-bold border-b-2 transition-colors \${
+              className={`pb-4 text-sm font-bold border-b-2 transition-colors ${
                 activeTab === tab.id 
                   ? 'border-indigo-600 text-indigo-600' 
                   : 'border-transparent text-slate-500 hover:text-slate-700'
-              }\`}
+              }`}
             >
               {tab.label}
             </button>
@@ -173,15 +173,15 @@ export default function Dashboard() {
                 {filteredDocs.map(doc => (
                   <div 
                     key={doc.id}
-                    onClick={() => router.push(\`/document/\${doc.id}\`)}
+                    onClick={() => router.push(`/document/${doc.id}`)}
                     className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-slate-50 cursor-pointer group transition-colors"
                   >
                     <div className="col-span-4 flex items-center gap-3">
-                      <div className={\`w-8 h-8 rounded-lg flex items-center justify-center \${
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
                         doc.type === 'cotizacion' ? 'bg-indigo-50 text-indigo-600' :
                         doc.type === 'presentacion' ? 'bg-pink-50 text-pink-600' :
                         'bg-emerald-50 text-emerald-600'
-                      }\`}>
+                      }`}>
                         <FileText className="w-4 h-4" />
                       </div>
                       <span className="font-bold text-sm text-slate-900 truncate">{doc.title}</span>
@@ -193,12 +193,12 @@ export default function Dashboard() {
                       v1
                     </div>
                     <div className="col-span-2">
-                      <span className={\`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold \${
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
                         doc.status === 'borrador' ? 'bg-amber-50 text-amber-600' :
                         doc.status === 'publicado' ? 'bg-emerald-50 text-emerald-600' :
                         doc.status === 'en_revision' ? 'bg-blue-50 text-blue-600' :
                         'bg-slate-100 text-slate-600'
-                      }\`}>
+                      }`}>
                         {doc.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </span>
                     </div>
@@ -236,7 +236,7 @@ export default function Dashboard() {
           onSuccess={(id) => {
             setShowModal(false)
             fetchDocuments()
-            router.push(\`/document/\${id}\`)
+            router.push(`/document/${id}`)
           }}
         />
       )}

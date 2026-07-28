@@ -62,8 +62,8 @@ export default function PageEditorWrapper({
 
   const addPage = () => {
     const newPage = {
-      id: \`page-\${Date.now()}\`,
-      name: \`Nueva Página\`,
+      id: `page-${Date.now()}`,
+      name: `Nueva Página`,
       activeVariationIndex: 0,
       variations: [
         {
@@ -104,11 +104,11 @@ export default function PageEditorWrapper({
             <div 
               key={page.id}
               onClick={() => setActivePageId(page.id)}
-              className={\`group relative p-3 rounded-xl cursor-pointer border-2 transition-all \${
+              className={`group relative p-3 rounded-xl cursor-pointer border-2 transition-all ${
                 activePageId === page.id 
                   ? 'border-indigo-600 bg-indigo-50/50' 
                   : 'border-transparent hover:border-slate-200 hover:bg-slate-50'
-              }\`}
+              }`}
             >
               <div className="text-xs font-bold text-slate-400 mb-2">{index + 1}. {page.name || 'Página'}</div>
               <div className="aspect-[16/9] bg-white rounded-lg shadow-sm border border-slate-100 overflow-hidden flex items-center justify-center relative">
@@ -190,7 +190,7 @@ export default function PageEditorWrapper({
                   <button 
                     key={color}
                     onClick={() => setBrandColor(color)}
-                    className={\`w-8 h-8 rounded-full \${brandColor === color ? 'ring-2 ring-offset-2 ring-slate-400' : ''}\`}
+                    className={`w-8 h-8 rounded-full ${brandColor === color ? 'ring-2 ring-offset-2 ring-slate-400' : ''}`}
                     style={{ backgroundColor: color }}
                   />
                 ))}
@@ -210,19 +210,19 @@ export default function PageEditorWrapper({
                    <button
                      key={idx}
                      onClick={() => handleVariationChange(activePage.id, idx)}
-                     className={\`w-full text-left p-3 rounded-xl border-2 transition-all flex items-center gap-3 \${
+                     className={`w-full text-left p-3 rounded-xl border-2 transition-all flex items-center gap-3 ${
                        activePage.activeVariationIndex === idx 
                         ? 'border-indigo-600 bg-indigo-50/30' 
                         : 'border-slate-100 hover:border-slate-300'
-                     }\`}
+                     }`}
                    >
-                     <div className={\`w-4 h-4 rounded-full border-2 flex items-center justify-center \${
+                     <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                        activePage.activeVariationIndex === idx ? 'border-indigo-600' : 'border-slate-300'
-                     }\`}>
+                     }`}>
                         {activePage.activeVariationIndex === idx && <div className="w-2 h-2 rounded-full bg-indigo-600" />}
                      </div>
                      <div>
-                       <div className={\`text-sm font-bold \${activePage.activeVariationIndex === idx ? 'text-indigo-900' : 'text-slate-700'}\`}>
+                       <div className={`text-sm font-bold ${activePage.activeVariationIndex === idx ? 'text-indigo-900' : 'text-slate-700'}`}>
                          Opción {idx + 1}
                        </div>
                        <div className="text-xs text-slate-400 capitalize">Layout: {variation.layoutType}</div>

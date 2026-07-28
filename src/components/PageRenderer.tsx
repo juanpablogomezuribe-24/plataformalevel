@@ -92,7 +92,7 @@ export default function PageRenderer({ page, brandColor = '#4f46e5' }: PageRende
               <div key={i} className="flex flex-col items-center gap-2 w-16">
                 <div 
                   className="w-full rounded-t-lg transition-all" 
-                  style={{ height: \`\${Math.min(item.value, 100)}%\`, backgroundColor: brandColor, opacity: 0.8 }}
+                  style={{ height: `${Math.min(item.value, 100)}%`, backgroundColor: brandColor, opacity: 0.8 }}
                 ></div>
                 <span className="text-xs font-bold text-slate-500 truncate w-full">{item.name}</span>
               </div>

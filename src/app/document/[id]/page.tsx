@@ -50,7 +50,7 @@ export default function DocumentEditorPage() {
       // Create automatic snapshot
       await supabase.from('document_versions').insert({
         document_id: document.id,
-        version_name: \`Estado: \${updates.status.toUpperCase()} (antes \${oldStatus || 'nuevo'})\`,
+        version_name: `Estado: ${updates.status.toUpperCase()} (antes ${oldStatus || 'nuevo'})`,
         title: document.title,
         content: document.content
       })
