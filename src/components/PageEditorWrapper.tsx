@@ -42,6 +42,23 @@ const AVAILABLE_LAYOUTS = [
   { id: 'evo-informe', name: 'Evolution - Informe' },
 ];
 
+const getDefaultDataForLayout = (layoutId: string, currentData: any = {}) => {
+  const base = { title: currentData.title || '' };
+  
+  if (layoutId === 'cover' || layoutId === 'lotbet-cover') return { ...base, subtitle: currentData.subtitle || '', description: currentData.description || '' };
+  if (layoutId === 'content' || layoutId === 'evo-informe' || layoutId === 'lotbet-context') return { ...base, content: currentData.content || '' };
+  if (layoutId === 'two-column') return { ...base, left_content: currentData.left_content || '', right_content: currentData.right_content || '' };
+  
+  if (layoutId === 'metrics' || layoutId === 'lotbet-dashboard') return { ...base, items: [{ label: 'Métrica 1', value: '100' }, { label: 'Métrica 2', value: '200' }] };
+  if (layoutId === 'pricing' || layoutId === 'evo-packages') return { ...base, items: [{ name: 'Plan Básico', price: '1000', features: 'Feature 1' }, { name: 'Plan Pro', price: '2000', features: 'Feature 2' }] };
+  if (layoutId === 'profiles' || layoutId === 'evo-influencers') return { ...base, items: [{ name: 'Usuario 1', role: 'Rol', metric: '100K' }] };
+  if (layoutId === 'data-table' || layoutId === 'lotbet-crm' || layoutId === 'lotbet-scope') return { ...base, items: [{ action: 'Acción 1', person: 'Resp', status: 'Pendiente' }] };
+  if (layoutId === 'timeline' || layoutId === 'lotbet-timeline') return { ...base, items: [{ phase: 'Fase 1', name: 'Hito', date: 'Fecha' }] };
+  if (layoutId === 'chart') return { ...base, items: [{ name: 'A', value: '50' }, { name: 'B', value: '80' }] };
+  
+  return { ...base, content: currentData.content || '' };
+};
+
 export default function PageEditorWrapper({ 
   document, 
   updateDocument, 
@@ -244,9 +261,15 @@ export default function PageEditorWrapper({
                <select
                  value={activePage.variations[activePage.activeVariationIndex].layoutType}
                  onChange={(e) => {
+                   const newLayoutType = e.target.value;
                    const newPages = JSON.parse(JSON.stringify(pages));
                    const pageIndex = newPages.findIndex((p: any) => p.id === activePage.id);
-                   newPages[pageIndex].variations[activePage.activeVariationIndex].layoutType = e.target.value;
+                   const currentVariation = newPages[pageIndex].variations[activePage.activeVariationIndex];
+                   
+                   currentVariation.layoutType = newLayoutType;
+                   // Reset data so the fields update based on the new layout
+                   currentVariation.data = getDefaultDataForLayout(newLayoutType, currentVariation.data);
+                   
                    setPages(newPages);
                    updateDocument({ content: { ...document.content, pages: newPages } });
                  }}
