@@ -54,5 +54,5 @@ export default async function ViewDocument({ params }: Props) {
     )
   }
 
-  return <DocumentViewer document={document} />
+  return <DocumentViewer doc={document} />
 }

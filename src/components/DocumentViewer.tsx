@@ -6,15 +6,15 @@ import { ChevronLeft, ChevronRight, Maximize, Minimize } from 'lucide-react'
 import PageRenderer from './PageRenderer'
 
 interface DocumentViewerProps {
-  document: any
+  doc: any
 }
 
-export default function DocumentViewer({ document }: DocumentViewerProps) {
+export default function DocumentViewer({ doc }: DocumentViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const pages = document.content?.pages || []
-  const template = document.content?.template || 'genérica'
-  const brandColor = document.content?.brand?.color || '#4f46e5'
+  const pages = doc.content?.pages || []
+  const template = doc.content?.template || 'genérica'
+  const brandColor = doc.content?.brand?.color || '#4f46e5'
 
   const handleNext = useCallback(() => {
     if (currentIndex < pages.length - 1) {
@@ -65,8 +65,8 @@ export default function DocumentViewer({ document }: DocumentViewerProps) {
     <div className="relative w-screen h-screen overflow-hidden bg-black text-white flex flex-col">
       {/* HEADER / BRAND (Optional overlay) */}
       <div className="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-50 pointer-events-none">
-        {document.content?.brand?.logoUrl && (
-          <img src={document.content.brand.logoUrl} alt="Logo" className="h-8 object-contain drop-shadow-md opacity-80" />
+        {doc.content?.brand?.logoUrl && (
+          <img src={doc.content.brand.logoUrl} alt="Logo" className="h-8 object-contain drop-shadow-md opacity-80" />
         )}
         <div className="pointer-events-auto flex gap-4 items-center">
           <button 
