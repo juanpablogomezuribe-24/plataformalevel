@@ -6,11 +6,15 @@ import Link from 'next/link'
 export default function CreateDocumentModal({ 
   session, 
   onClose, 
-  onSuccess 
+  onSuccess,
+  defaultTemplate,
+  defaultDocType
 }: { 
   session: any, 
   onClose: () => void, 
-  onSuccess: (id: string) => void 
+  onSuccess: (id: string) => void,
+  defaultTemplate?: string,
+  defaultDocType?: 'cotizacion' | 'presentacion' | 'informe'
 }) {
   const [step, setStep] = useState(1)
   
@@ -25,10 +29,10 @@ export default function CreateDocumentModal({
   const [projectName, setProjectName] = useState('')
 
   // Step 2: Type
-  const [docType, setDocType] = useState<'cotizacion' | 'presentacion' | 'informe' | null>(null)
+  const [docType, setDocType] = useState<'cotizacion' | 'presentacion' | 'informe' | null>(defaultDocType || null)
   
   // Step 3: Template
-  const [template, setTemplate] = useState<string | null>(null)
+  const [template, setTemplate] = useState<string | null>(defaultTemplate || null)
   
   // Step 4: Content
   const [aiPrompt, setAiPrompt] = useState('')
@@ -66,7 +70,11 @@ export default function CreateDocumentModal({
       alert("Por favor selecciona un cliente, campaña y dale nombre al proyecto")
       return
     }
-    setStep(2)
+    if (defaultTemplate && defaultDocType) {
+      setStep(4)
+    } else {
+      setStep(2)
+    }
   }
 
   const handleNextStep2 = (type: 'cotizacion' | 'presentacion' | 'informe') => {
