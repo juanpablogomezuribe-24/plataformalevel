@@ -35,6 +35,24 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
 
   const { layoutType, data = {} } = activeVariation
 
+  // SANITIZACIÓN ROBUSTA: Prevenir crashes si la IA alucina objetos en vez de arrays o si faltan.
+  const safeData = { ...data };
+  const knownArrayKeys = ['items', 'events', 'influencersData', 'pillars', 'packages', 'funnels', 'profiles', 'rows'];
+  
+  // 1. Si un campo conocido falta, inicializarlo como array vacío
+  knownArrayKeys.forEach(key => {
+    if (safeData[key] === undefined || safeData[key] === null) {
+      safeData[key] = [];
+    }
+  });
+
+  // 2. Si un objeto se devolvió en vez de un array (ej: { "0": {...} }), lo convertimos.
+  for (const key of Object.keys(safeData)) {
+    if (typeof safeData[key] === 'object' && safeData[key] !== null && !Array.isArray(safeData[key])) {
+       safeData[key] = Object.values(safeData[key]);
+    }
+  }
+
   // THEMES CONFIGURATION
   const isLotbet = template === 'lotbet'
   const isMundial = template === 'mundial'
