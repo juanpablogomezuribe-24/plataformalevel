@@ -89,7 +89,7 @@ function generateMockResponse(prompt: string, clientName: string, template: stri
   // Simulación mock de la nueva estructura basada en páginas
   const isLotbet = template === 'lotbet' || template === 'mundial'
   
-  const mockPages = [
+  const mockPages: any[] = [
     {
       id: 'page-1',
       name: 'Portada',

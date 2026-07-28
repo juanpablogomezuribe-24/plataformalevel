@@ -199,7 +199,7 @@ export default function Dashboard() {
                         doc.status === 'en_revision' ? 'bg-blue-50 text-blue-600' :
                         'bg-slate-100 text-slate-600'
                       }`}>
-                        {doc.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        {doc.status.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                       </span>
                     </div>
                     <div className="col-span-2 flex items-center justify-between text-sm text-slate-500">
