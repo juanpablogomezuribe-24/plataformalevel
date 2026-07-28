@@ -1,9 +1,46 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { LayoutTemplate, Plus, Trash2, ArrowLeft, Share, Globe, Settings2, Sparkles } from 'lucide-react'
+import { Plus, Trash2, ArrowLeft, Share, Globe, Settings2, LayoutTemplate, Sparkles, LayoutGrid } from 'lucide-react'
 import PageRenderer from './PageRenderer'
 import Link from 'next/link'
+
+const AVAILABLE_LAYOUTS = [
+  { id: 'cover', name: 'Portada Clásica' },
+  { id: 'content', name: 'Texto Simple' },
+  { id: 'two-column', name: 'Dos Columnas' },
+  { id: 'metrics', name: 'Grid de Métricas' },
+  { id: 'chart', name: 'Gráfico Estadístico' },
+  { id: 'pricing', name: 'Tabla de Precios' },
+  { id: 'gallery', name: 'Galería de Imágenes' },
+  { id: 'profiles', name: 'Perfiles / Equipo' },
+  { id: 'data-table', name: 'Tabla de Acciones' },
+  { id: 'timeline', name: 'Flujo / Timeline' },
+  { id: 'lotbet-cover', name: 'Lotbet - Portada' },
+  { id: 'lotbet-menu', name: 'Lotbet - Menú' },
+  { id: 'lotbet-context', name: 'Lotbet - Contexto' },
+  { id: 'lotbet-objective', name: 'Lotbet - Objetivo' },
+  { id: 'lotbet-strategy', name: 'Lotbet - Estrategia' },
+  { id: 'lotbet-scope', name: 'Lotbet - Alcance' },
+  { id: 'lotbet-timeline', name: 'Lotbet - Timeline' },
+  { id: 'lotbet-infrastructure', name: 'Lotbet - Infraestructura' },
+  { id: 'lotbet-preparation', name: 'Lotbet - Preparación' },
+  { id: 'lotbet-crm', name: 'Lotbet - CRM' },
+  { id: 'lotbet-dashboard', name: 'Lotbet - Dashboard' },
+  { id: 'lotbet-funnels', name: 'Lotbet - Embudos' },
+  { id: 'lotbet-comparison', name: 'Lotbet - Comparación' },
+  { id: 'lotbet-linear-flow', name: 'Lotbet - Flujo Lineal' },
+  
+  // EVOLUTION LAYOUTS
+  { id: 'evo-strategy', name: 'Evolution - Estrategia' },
+  { id: 'evo-methodology', name: 'Evolution - Metodología' },
+  { id: 'evo-influencers', name: 'Evolution - Influencers' },
+  { id: 'evo-packages', name: 'Evolution - Paquetes' },
+  { id: 'evo-livespins', name: 'Evolution - Live Spins' },
+  { id: 'evo-mediakits', name: 'Evolution - Media Kits' },
+  { id: 'evo-pilotplan', name: 'Evolution - Plan Piloto' },
+  { id: 'evo-informe', name: 'Evolution - Informe' },
+];
 
 export default function PageEditorWrapper({ 
   document, 
@@ -196,6 +233,31 @@ export default function PageEditorWrapper({
                 ))}
              </div>
            </div>
+
+           {/* Selector de Diseño (Layout Picker) */}
+           {activePage && activePage.variations && activePage.variations[activePage.activeVariationIndex] && (
+             <div className="mb-8">
+               <div className="flex items-center gap-2 mb-3">
+                 <LayoutGrid className="w-4 h-4 text-indigo-500" />
+                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Diseño de la Diapositiva</label>
+               </div>
+               <select
+                 value={activePage.variations[activePage.activeVariationIndex].layoutType}
+                 onChange={(e) => {
+                   const newPages = JSON.parse(JSON.stringify(pages));
+                   const pageIndex = newPages.findIndex((p: any) => p.id === activePage.id);
+                   newPages[pageIndex].variations[activePage.activeVariationIndex].layoutType = e.target.value;
+                   setPages(newPages);
+                   updateDocument({ content: { ...document.content, pages: newPages } });
+                 }}
+                 className="w-full bg-white border-2 border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-700 focus:outline-none focus:border-indigo-500 cursor-pointer shadow-sm hover:border-indigo-300 transition-colors"
+               >
+                 {AVAILABLE_LAYOUTS.map(layout => (
+                   <option key={layout.id} value={layout.id}>{layout.name}</option>
+                 ))}
+               </select>
+             </div>
+           )}
 
            {/* Variaciones de la IA */}
            {activePage && activePage.variations && activePage.variations.length > 1 && (

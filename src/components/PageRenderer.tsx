@@ -1,6 +1,32 @@
 'use client'
 
 import React from 'react'
+import {
+  LotbetCover,
+  LotbetMenu,
+  LotbetContext,
+  LotbetObjective,
+  LotbetStrategy,
+  LotbetScope,
+  LotbetTimeline,
+  LotbetInfrastructure,
+  LotbetPreparation,
+  LotbetCrm,
+  LotbetDashboard,
+  LotbetFunnels,
+  LotbetComparison,
+  LotbetLinearFlow
+} from './layouts/lotbet';
+import {
+  EvoStrategy,
+  EvoMethodology,
+  EvoInfluencers,
+  EvoPackages,
+  EvoLiveSpins,
+  EvoMediaKits,
+  EvoPilotPlan,
+  EvoInforme
+} from './layouts/evolution';
 
 interface Variation {
   layoutType: string
@@ -56,6 +82,33 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
   const textNormalClass = isDark ? 'text-slate-300' : 'text-slate-600'
 
   switch (layoutType) {
+    // --- LOTBET LAYOUTS ---
+    case 'lotbet-cover': return <LotbetCover data={data} />
+    case 'lotbet-menu': return <LotbetMenu data={data} />
+    case 'lotbet-context': return <LotbetContext data={data} />
+    case 'lotbet-objective': return <LotbetObjective data={data} />
+    case 'lotbet-strategy': return <LotbetStrategy data={data} />
+    case 'lotbet-scope': return <LotbetScope data={data} />
+    case 'lotbet-timeline': return <LotbetTimeline data={data} />
+    case 'lotbet-infrastructure': return <LotbetInfrastructure data={data} />
+    case 'lotbet-preparation': return <LotbetPreparation data={data} />
+    case 'lotbet-crm': return <LotbetCrm data={data} />
+    case 'lotbet-dashboard': return <LotbetDashboard data={data} />
+    case 'lotbet-funnels': return <LotbetFunnels data={data} />
+    case 'lotbet-comparison': return <LotbetComparison data={data} />
+    case 'lotbet-linear-flow': return <LotbetLinearFlow data={data} />
+
+    // --- EVOLUTION LAYOUTS ---
+    case 'evo-strategy': return <EvoStrategy data={data} />
+    case 'evo-methodology': return <EvoMethodology data={data} />
+    case 'evo-influencers': return <EvoInfluencers data={data} />
+    case 'evo-packages': return <EvoPackages data={data} />
+    case 'evo-livespins': return <EvoLiveSpins data={data} />
+    case 'evo-mediakits': return <EvoMediaKits data={data} />
+    case 'evo-pilotplan': return <EvoPilotPlan data={data} />
+    case 'evo-informe': return <EvoInforme data={data} />
+
+    // --- GENERIC LAYOUTS ---
     case 'cover':
       return (
         <div className={`w-full h-full flex flex-col items-center justify-center text-center p-12 ${bgClass}`}>
