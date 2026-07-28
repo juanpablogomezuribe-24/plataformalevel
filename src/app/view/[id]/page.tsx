@@ -10,11 +10,16 @@ import PropuestaEvolution from '@/components/templates/PropuestaEvolution'
 import InformeLotbet from '@/components/templates/InformeLotbet'
 import InformeMundial from '@/components/templates/InformeMundial'
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+type Props = {
+  params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const resolvedParams = await params;
   const { data: document } = await supabase
     .from('documents')
     .select('title, content')
-    .eq('id', params.id)
+    .eq('id', resolvedParams.id)
     .single()
     
   if (!document) {
@@ -34,11 +39,12 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   }
 }
 
-export default async function ViewDocument({ params }: { params: { id: string } }) {
+export default async function ViewDocument({ params }: Props) {
+  const resolvedParams = await params;
   const { data: document } = await supabase
     .from('documents')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', resolvedParams.id)
     .single()
 
   if (!document) {
