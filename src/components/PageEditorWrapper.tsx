@@ -233,13 +233,44 @@ export default function PageEditorWrapper({
              </div>
            )}
 
-           {/* Editor de Datos (Básico para MVP) */}
-           {activePage && (
+           {/* Editor de Datos */}
+           {activePage && activePage.variations && activePage.variations[activePage.activeVariationIndex] && (
              <div>
-               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">Contenido del Layout</label>
-               <p className="text-sm text-slate-500 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                 Aquí podrás editar los textos, métricas y gráficas específicas del layout seleccionado directamente sobre el lienzo.
-               </p>
+               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">Contenido de la Página</label>
+               <div className="space-y-4">
+                 {Object.keys(activePage.variations[activePage.activeVariationIndex].data || {}).map((key) => {
+                   if (key === 'items') return null; 
+                   return (
+                     <div key={key}>
+                       <label className="text-xs font-medium text-slate-500 block mb-1 capitalize">{key.replace('_', ' ')}</label>
+                       {typeof activePage.variations[activePage.activeVariationIndex].data[key] === 'string' && activePage.variations[activePage.activeVariationIndex].data[key].length > 50 ? (
+                         <textarea
+                           value={activePage.variations[activePage.activeVariationIndex].data[key] || ''}
+                           onChange={(e) => {
+                             const newPages = [...pages];
+                             const pageIndex = newPages.findIndex(p => p.id === activePage.id);
+                             newPages[pageIndex].variations[activePage.activeVariationIndex].data[key] = e.target.value;
+                             setPages(newPages);
+                           }}
+                           className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm text-slate-700 focus:outline-none focus:border-indigo-500 min-h-[80px]"
+                         />
+                       ) : (
+                         <input
+                           type="text"
+                           value={activePage.variations[activePage.activeVariationIndex].data[key] || ''}
+                           onChange={(e) => {
+                             const newPages = [...pages];
+                             const pageIndex = newPages.findIndex(p => p.id === activePage.id);
+                             newPages[pageIndex].variations[activePage.activeVariationIndex].data[key] = e.target.value;
+                             setPages(newPages);
+                           }}
+                           className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm text-slate-700 focus:outline-none focus:border-indigo-500"
+                         />
+                       )}
+                     </div>
+                   )
+                 })}
+               </div>
              </div>
            )}
 
