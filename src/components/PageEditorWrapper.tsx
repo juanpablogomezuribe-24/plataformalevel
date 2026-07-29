@@ -375,46 +375,68 @@ export default function PageEditorWrapper({
                </p>
                <div className="space-y-4">
                  {Object.keys(activePage.variations[activePage.activeVariationIndex || 0].data || {}).map((key) => {
-                   if (key === 'items' && Array.isArray(activePage.variations[activePage.activeVariationIndex || 0].data.items)) {
-                     return (
+                    const arrayData = activePage.variations[activePage.activeVariationIndex || 0].data[key];
+                    if (Array.isArray(arrayData)) {
+                      return (
                         <div key={key} className="mt-6 border-t border-slate-200 pt-4">
-                          <label className="text-xs font-bold text-slate-500 block mb-3 uppercase tracking-wider">Elementos (Métricas/Gráficos/Precios)</label>
+                          <label className="text-xs font-bold text-slate-500 block mb-3 uppercase tracking-wider">{key} (Lista)</label>
                           <div className="space-y-4">
-                            {activePage.variations[activePage.activeVariationIndex || 0].data.items.map((item: any, i: number) => (
+                            {arrayData.map((item: any, i: number) => (
                               <div key={i} className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-3 relative group">
                                 <button 
                                   onClick={() => {
                                     const newPages = JSON.parse(JSON.stringify(pages));
                                     const pageIndex = newPages.findIndex((p: any) => p?.id === activePage?.id);
                                     if (pageIndex === -1) return;
-                                    newPages[pageIndex].variations[activePage.activeVariationIndex || 0].data.items.splice(i, 1);
+                                    newPages[pageIndex].variations[activePage.activeVariationIndex || 0].data[key].splice(i, 1);
                                     setPages(newPages);
                                     updateDocument({ content: { ...document.content, pages: newPages } });
                                   }}
-                                  className="absolute -top-2 -right-2 bg-red-100 text-red-500 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-500 hover:text-white"
+                                  className="absolute -top-2 -right-2 bg-red-100 text-red-500 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-500 hover:text-white z-10"
                                 >
                                   <Trash2 className="w-3 h-3" />
                                 </button>
-                                {item && typeof item === 'object' && Object.keys(item).map(itemKey => (
-                                 <div key={itemKey}>
-                                    <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase">{itemKey}</label>
+                                
+                                {item && typeof item === 'object' ? (
+                                  Object.keys(item).map(itemKey => (
+                                   <div key={itemKey}>
+                                      <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase">{itemKey}</label>
+                                      <input
+                                        type="text"
+                                        value={item[itemKey] || ''}
+                                        onChange={(e) => {
+                                          const newPages = JSON.parse(JSON.stringify(pages));
+                                          const pageIndex = newPages.findIndex((p: any) => p?.id === activePage?.id);
+                                          if (pageIndex === -1) return;
+                                          newPages[pageIndex].variations[activePage.activeVariationIndex || 0].data[key][i][itemKey] = e.target.value;
+                                          setPages(newPages);
+                                        }}
+                                        onBlur={() => {
+                                          updateDocument({ content: { ...document.content, pages } });
+                                        }}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-md p-1.5 text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+                                      />
+                                   </div>
+                                 ))
+                                ) : (
+                                  <div>
                                     <input
                                       type="text"
-                                      value={item[itemKey] || ''}
+                                      value={item || ''}
                                       onChange={(e) => {
                                         const newPages = JSON.parse(JSON.stringify(pages));
                                         const pageIndex = newPages.findIndex((p: any) => p?.id === activePage?.id);
                                         if (pageIndex === -1) return;
-                                        newPages[pageIndex].variations[activePage.activeVariationIndex || 0].data.items[i][itemKey] = e.target.value;
+                                        newPages[pageIndex].variations[activePage.activeVariationIndex || 0].data[key][i] = e.target.value;
                                         setPages(newPages);
                                       }}
                                       onBlur={() => {
                                         updateDocument({ content: { ...document.content, pages } });
                                       }}
-                                      className="w-full bg-slate-50 border border-slate-200 rounded-md p-1.5 text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+                                      className="w-full bg-slate-50 border border-slate-200 rounded-md p-2 text-sm text-slate-700 focus:outline-none focus:border-indigo-500"
                                     />
-                                 </div>
-                               ))}
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -423,20 +445,26 @@ export default function PageEditorWrapper({
                               const newPages = JSON.parse(JSON.stringify(pages));
                               const pageIndex = newPages.findIndex((p: any) => p?.id === activePage?.id);
                               if (pageIndex === -1) return;
-                              const items = newPages[pageIndex].variations[activePage.activeVariationIndex || 0].data.items;
-                              const templateItem = items.length > 0 ? { ...items[0] } : { name: '', value: '' };
-                              Object.keys(templateItem).forEach(k => templateItem[k] = '');
-                              items.push(templateItem);
+                              const arr = newPages[pageIndex].variations[activePage.activeVariationIndex || 0].data[key];
+                              if (arr.length > 0 && typeof arr[0] === 'object' && arr[0] !== null) {
+                                const templateItem = { ...arr[0] };
+                                Object.keys(templateItem).forEach(k => templateItem[k] = '');
+                                arr.push(templateItem);
+                              } else if (arr.length > 0) {
+                                arr.push('Nuevo elemento');
+                              } else {
+                                arr.push('');
+                              }
                               setPages(newPages);
                               updateDocument({ content: { ...document.content, pages: newPages } });
                             }}
                             className="mt-4 w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-slate-400 font-bold text-xs flex items-center justify-center gap-2 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
                           >
-                            <Plus className="w-3 h-3" /> Agregar Elemento
+                            <Plus className="w-3 h-3" /> Agregar a {key}
                           </button>
                         </div>
-                     )
-                   }
+                      )
+                    }
                    return (
                      <div key={key}>
                        <label className="text-xs font-bold text-slate-400 block mb-2 uppercase tracking-wider">{key}</label>
