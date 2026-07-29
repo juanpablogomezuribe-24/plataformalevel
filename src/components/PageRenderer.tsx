@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   LevelCover, LevelObjective, LevelMethodology, LevelCatalog, LevelTimeline
 } from './layouts/level';
+import {
+  LotbetCover, LotbetContext, LotbetObjective, LotbetStrategy, LotbetExecution, LotbetFinancial
+} from './layouts/lotbet';
 
 interface Variation {
   layoutType: string

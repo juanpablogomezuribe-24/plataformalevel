@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, PieChart, Edit3, X, Save, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
