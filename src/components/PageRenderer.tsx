@@ -86,6 +86,14 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
     case 'level-catalog': return <LevelCatalog data={safeData} />
     case 'level-timeline': return <LevelTimeline data={safeData} />
     
+    // --- LOTBET LAYOUTS ---
+    case 'lotbet-cover': return <LotbetCover data={safeData} />
+    case 'lotbet-context': return <LotbetContext data={safeData} />
+    case 'lotbet-objective': return <LotbetObjective data={safeData} />
+    case 'lotbet-strategy': return <LotbetStrategy data={safeData} />
+    case 'lotbet-execution': return <LotbetExecution data={safeData} />
+    case 'lotbet-financial': return <LotbetFinancial data={safeData} />
+    
     // --- FALLBACK GENÉRICO (Por si la IA o el caché devuelven uno viejo) ---
     default:
       return (

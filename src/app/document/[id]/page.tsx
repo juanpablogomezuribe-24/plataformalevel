@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
-import PageEditorWrapper from '@/components/PageEditorWrapper'
+import PresentationViewer from '@/components/PresentationViewer'
 import { Loader2 } from 'lucide-react'
 
 export default function DocumentEditorPage() {
@@ -60,15 +60,15 @@ export default function DocumentEditorPage() {
   if (loading) return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-slate-500">
       <Loader2 className="w-8 h-8 animate-spin mb-4 text-indigo-600" />
-      <p className="font-bold">Cargando Editor...</p>
+      <p className="font-bold">Cargando Presentación...</p>
     </div>
   )
   
   if (!document) return <div className="min-h-screen flex items-center justify-center bg-slate-50 font-bold text-red-500">Documento no encontrado</div>
 
-  // Usar el nuevo Editor Basado en Páginas si el documento tiene la estructura correcta
+  // Usar el nuevo Presentation Viewer (Estilo LotBet)
   if (document.content?.pages) {
-    return <PageEditorWrapper document={document} updateDocument={updateDocument} session={session} />
+    return <PresentationViewer document={document} updateDocument={updateDocument} session={session} />
   }
 
   // Fallback para documentos viejos (si existen)

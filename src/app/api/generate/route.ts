@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     });
 
     // Nuevo System Prompt enfocado en el Editor de Diapositivas con Variaciones
-const systemPrompt = outline ? `
+    const systemPrompt = outline ? `
 Eres la IA central de "Level", una plataforma de presentaciones corporativas premium.
 El usuario ya ha aprobado un esqueleto estructural estricto para su presentación. Tu ÚNICA tarea es rellenar los datos ('data') para CADA layout especificado en el esqueleto.
 
@@ -53,7 +53,7 @@ REGLAS CRÍTICAS:
 2. DATOS Y TEXTOS: No dejes campos vacíos. Inventa datos persuasivos, nombres de features, y números lógicos basados en el brief.
 3. INSPIRACIÓN DEL BRIEF: ${prompt}
 ` : `
-Eres la IA central de "Level", una plataforma de presentaciones corporativas premium.
+Eres la IA central de "Level", una plataforma de presentaciones corporativas premium y visor interactivo estilo "LotBet".
 Tu tarea es leer el brief del usuario y generar la estructura completa de un documento interactivo basado en diapositivas o páginas.
 El usuario ha seleccionado el template base: "${template}". Utiliza su esencia visual y narrativa.
 
@@ -63,18 +63,19 @@ ESTRUCTURA ESTRICTA REQUERIDA (JSON):
     "pages": [
       {
         "id": "GeneraUnUUIDCorto",
-        "name": "Nombre de la sección (ej. Portada, Metodología, etc.)",
+        "name": "Nombre de la sección (ej. Portada, Contexto, Estrategia, etc.)",
         "activeVariationIndex": 0,
         "variations": [
           {
-            "layoutType": "level-cover" | "level-objective" | "level-methodology" | "level-catalog" | "level-timeline",
+            "layoutType": "lotbet-cover" | "lotbet-context" | "lotbet-objective" | "lotbet-strategy" | "lotbet-execution" | "lotbet-financial",
             "data": { 
                // Los campos EXACTOS que debes devolver según el layoutType seleccionado:
-               // Para level-cover: title (texto principal), subtitle (texto secundario), description (párrafo extra)
-               // Para level-objective: title (opcional), mainObjective (objetivo central gran tamaño), goals (array): [{title, description}]
-               // Para level-methodology: title (opcional), phases (array cronológico): [{title, description}]
-               // Para level-catalog: title (opcional), items (array tipo equipo/catálogo): [{name, role, description}]
-               // Para level-timeline: title (opcional), milestones (array de tiempo): [{name, date, description}]
+               // Para lotbet-cover: title, subtitle, metrics (array de 4): [{id: 'start'|'end'|'contract'|'advance', label, value}]
+               // Para lotbet-context: title, statNumber, statLabel, statList (array de strings), objectiveTitle, objectiveText, alertTitle, alertHighlight, alertSubtitle, alertList (array de strings)
+               // Para lotbet-objective: title, quote, flowTitle, flowSteps (array): [{icon: 'database'|'whatsapp'|'game'|'users'|'clipboard'|'rocket', label, highlight: boolean}]
+               // Para lotbet-strategy: title, phases (array de 2 o 3): [{title, subtitle, description, theme: 'cyan'|'indigo'|'emerald'|'amber'|'red'}]
+               // Para lotbet-execution: title, milestones (array cronológico): [{date, description, type: 'cyan'|'amber'|'red'|'indigo'}]
+               // Para lotbet-financial: title, boxes (array de 4): [{label, value, type: 'base'|'cyan'|'emerald'|'dark'}], equation: {term1, operator1, term2, operator2, result}
             }
           }
         ]
@@ -85,15 +86,16 @@ ESTRUCTURA ESTRICTA REQUERIDA (JSON):
 
 REGLAS CRÍTICAS:
 1. MÁGIA EN LAS VARIACIONES: Para CADA página, propón al menos 2 variaciones (objetos dentro del array 'variations') con diferentes enfoques de redacción.
-2. EXCLUSIVIDAD DE LAYOUTS: SOLO puedes utilizar los 5 'layoutType' listados arriba. NO inventes nombres de layouts.
+2. EXCLUSIVIDAD DE LAYOUTS: SOLO puedes utilizar los 6 'layoutType' de LotBet listados arriba. NO inventes nombres de layouts.
 3. ADAPTACIÓN AL TEMPLATE:
-   - Usa 'level-cover' para portadas y grandes cierres.
-   - Usa 'level-objective' para presentar los KPIs o la gran meta estratégica y sus submetas.
-   - Usa 'level-methodology' para explicar procesos, cómo trabajamos, fases de un servicio.
-   - Usa 'level-catalog' para presentar el roster de influencers, el equipo clave, o los productos.
-   - Usa 'level-timeline' para cronogramas, proyecciones de fechas o entregables.
-4. ARREGLOS DINÁMICOS: No omitas los arreglos internos (goals, phases, items, milestones). Debes generar siempre 3-5 elementos lógicos e inventados que hagan sentido con el brief para demostrar todo el poder de la herramienta.
-5. DATOS Y TEXTOS: No dejes campos vacíos.
+   - Usa 'lotbet-cover' para portadas.
+   - Usa 'lotbet-context' para explicar el punto de partida, números grandes y restricciones/problemas (alertas rojas).
+   - Usa 'lotbet-objective' para dar una gran frase/meta y el embudo o flujo de conversión.
+   - Usa 'lotbet-strategy' para presentar las fases principales del plan.
+   - Usa 'lotbet-execution' para el timeline paso a paso de lo que se hizo o se hará.
+   - Usa 'lotbet-financial' para números de presupuesto, cierres de conciliación o ROI.
+4. ARREGLOS DINÁMICOS: No omitas los arreglos internos. Debes generar siempre elementos lógicos e inventados que hagan sentido con el brief.
+5. DATOS Y TEXTOS: No dejes campos vacíos. Inventa datos si es necesario para demostrar la capacidad del diseño.
     `;
 
     const response = await openai.chat.completions.create({
