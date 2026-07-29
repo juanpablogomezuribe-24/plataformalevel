@@ -17,10 +17,10 @@ const getDefaultDataForLayout = (layoutId: string, currentData: any = {}) => {
   const base = { title: currentData.title || '' };
   
   if (layoutId === 'level-cover') return { ...base, subtitle: currentData.subtitle || '', description: currentData.description || '' };
-  if (layoutId === 'level-objective') return { ...base, mainObjective: currentData.mainObjective || 'Nuestro objetivo principal', goals: [{ title: 'Sub-objetivo 1', description: 'Descripción' }] };
-  if (layoutId === 'level-methodology') return { ...base, phases: [{ title: 'Fase 1', description: 'Descripción de la fase' }] };
-  if (layoutId === 'level-catalog') return { ...base, items: [{ name: 'Elemento 1', role: 'Rol o Categoría', description: 'Descripción detallada' }] };
-  if (layoutId === 'level-timeline') return { ...base, milestones: [{ name: 'Hito 1', date: 'Fecha', description: 'Detalle del hito' }] };
+  if (layoutId === 'level-objective') return { ...base, mainObjective: currentData.mainObjective || 'Nuestro objetivo principal', goals: Array.isArray(currentData.goals) && currentData.goals.length > 0 ? currentData.goals : [{ title: 'Sub-objetivo 1', description: 'Descripción' }] };
+  if (layoutId === 'level-methodology') return { ...base, phases: Array.isArray(currentData.phases) && currentData.phases.length > 0 ? currentData.phases : [{ title: 'Fase 1', description: 'Descripción de la fase' }] };
+  if (layoutId === 'level-catalog') return { ...base, items: Array.isArray(currentData.items) && currentData.items.length > 0 ? currentData.items : [{ name: 'Elemento 1', role: 'Rol o Categoría', description: 'Descripción detallada' }] };
+  if (layoutId === 'level-timeline') return { ...base, milestones: Array.isArray(currentData.milestones) && currentData.milestones.length > 0 ? currentData.milestones : [{ name: 'Hito 1', date: 'Fecha', description: 'Detalle del hito' }] };
   
   return { ...base, content: currentData.content || '' };
 };
@@ -44,9 +44,21 @@ export default function PageEditorWrapper({
   useEffect(() => {
     if (pages.length === 0 && document?.content?.pages) {
       const validPages = Array.isArray(document.content.pages) ? document.content.pages.filter(Boolean) : [];
-      setPages(validPages)
-      if (validPages.length > 0 && !activePageId) {
-        setActivePageId(validPages[0]?.id)
+      
+      // SANITIZAR Y LIMPIAR LA DATA:
+      // Esto remueve propiedades basura (como 'content' en un layout de Timeline)
+      // y asegura que existan los arreglos obligatorios.
+      const sanitizedPages = validPages.map(page => ({
+        ...page,
+        variations: (page.variations || []).map((v: any) => ({
+          ...v,
+          data: getDefaultDataForLayout(v.layoutType, v.data || {})
+        }))
+      }));
+
+      setPages(sanitizedPages)
+      if (sanitizedPages.length > 0 && !activePageId) {
+        setActivePageId(sanitizedPages[0]?.id)
       }
     }
   }, [document?.id])
