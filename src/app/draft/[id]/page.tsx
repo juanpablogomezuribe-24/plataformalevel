@@ -115,77 +115,25 @@ export default function DraftRoom() {
     }
     
     setIsGenerating(true)
-    setGenerationProgress({ current: 0, total: outline.length })
     
     try {
-      const CHUNK_SIZE = 5;
-      let finalPages: any[] = [];
-      let hasTimeout = false;
-
-      // PROCESAMIENTO POR LOTES (CHUNKS) PARA EVITAR TIMEOUT DE VERCEL (10s) Y ALUCINACIONES DE LA IA
-      for (let i = 0; i < outline.length; i += CHUNK_SIZE) {
-        const chunk = outline.slice(i, i + CHUNK_SIZE);
-        setGenerationProgress({ current: Math.min(i + CHUNK_SIZE, outline.length), total: outline.length });
-
-        const response = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            outline: chunk, // Enviamos solo el bloque actual
-            template: document.content.template,
-            clientName: document.client_name,
-            prompt: messages.map(m => m.content).join('\n')
-          })
-        });
-
-        if (response.ok) {
-          const generatedData = await response.json();
-          const chunkPages = generatedData.data?.pages;
-          
-          if (Array.isArray(chunkPages) && chunkPages.length > 0 && chunkPages[0]?.variations) {
-            finalPages = finalPages.concat(chunkPages);
-          } else {
-             // Fallback para este chunk específico si la IA alucina la estructura
-             const fallbackChunk = chunk.map((slide: any, idx: number) => ({
-               id: `page-${Date.now()}-${i + idx}`,
-               name: slide.name || `Diapositiva ${i + idx + 1}`,
-               activeVariationIndex: 0,
-               variations: [
-                 {
-                   layoutType: slide.templateId || 'content',
-                   data: { 
-                     title: slide.name, 
-                     content: slide.intent || 'Estructura base (la IA no pudo generar el texto de esta sección).' 
-                   }
-                 }
-               ]
-             }));
-             finalPages = finalPages.concat(fallbackChunk);
-          }
-        } else {
-          hasTimeout = true;
-          // Fallback para este chunk si hace timeout
-          const fallbackChunk = chunk.map((slide: any, idx: number) => ({
-             id: `page-${Date.now()}-${i + idx}`,
-             name: slide.name || `Diapositiva ${i + idx + 1}`,
-             activeVariationIndex: 0,
-             variations: [
-               {
-                 layoutType: slide.templateId || 'content',
-                 data: { 
-                   title: slide.name, 
-                   content: slide.intent || 'Estructura base (la IA tardó demasiado en esta sección).' 
-                 }
-               }
-             ]
-           }));
-           finalPages = finalPages.concat(fallbackChunk);
-        }
-      }
-
-      if (hasTimeout) {
-        console.warn("Algunas secciones tardaron demasiado o fallaron. Se usó el esqueleto como fallback parcial.");
-      }
+      // PROCESAMIENTO INSTANTÁNEO (OPCIÓN B)
+      // En lugar de llamar a la IA para toda la presentación, convertimos el esqueleto 
+      // en diapositivas estructuradas pero vacías de contenido.
+      const finalPages = outline.map((slide: any, i: number) => ({
+         id: `page-${Date.now()}-${i}`,
+         name: slide.name || `Diapositiva ${i + 1}`,
+         activeVariationIndex: 0,
+         variations: [
+           {
+             layoutType: slide.templateId || 'content',
+             data: { 
+               title: slide.name, 
+               content: slide.intent || 'Genera el contenido con IA usando el botón mágico en el editor.' 
+             }
+           }
+         ]
+      }));
 
       // Update document with the final JSON and change status to borrador
       const { error } = await supabase.from('documents').update({
@@ -332,9 +280,7 @@ export default function DraftRoom() {
               {isGenerating ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" /> 
-                  {generationProgress 
-                    ? `Generando ${generationProgress.current} de ${generationProgress.total}...`
-                    : 'Convirtiendo y Generando Contenido...'}
+                  Redirigiendo al Editor...
                 </>
               ) : (
                 <>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Trash2, ArrowLeft, Share, Globe, Settings2, LayoutTemplate, Sparkles, LayoutGrid } from 'lucide-react'
+import { Plus, Trash2, ArrowLeft, Share, Globe, Settings2, LayoutTemplate, Sparkles, LayoutGrid, Bot, Loader2 } from 'lucide-react'
 import PageRenderer from './PageRenderer'
 import Link from 'next/link'
 
@@ -71,6 +71,7 @@ export default function PageEditorWrapper({
 }) {
   const [pages, setPages] = useState<any[]>([])
   const [activePageId, setActivePageId] = useState<string | null>(null)
+  const [isGeneratingSlide, setIsGeneratingSlide] = useState(false)
   const [brandColor, setBrandColor] = useState('#4f46e5') // Default
   const [saving, setSaving] = useState(false)
 
@@ -114,6 +115,45 @@ export default function PageEditorWrapper({
       return p
     })
     setPages(updatedPages)
+  }
+
+  const generateSlideContent = async () => {
+    if (!activePage) return;
+    const currentVariation = activePage.variations[activePage.activeVariationIndex || 0];
+    
+    setIsGeneratingSlide(true);
+    try {
+      const response = await fetch('/api/generate-slide', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: document.content?.prompt || '',
+          clientName: document.client_name,
+          template: document.content?.template || 'genérica',
+          layoutType: currentVariation.layoutType,
+          slideName: activePage.name,
+          intent: currentVariation.data?.content || ''
+        })
+      });
+
+      if (!response.ok) throw new Error("Error en el servidor al generar");
+      
+      const { data } = await response.json();
+      
+      if (data) {
+        const newPages = JSON.parse(JSON.stringify(pages));
+        const pageIndex = newPages.findIndex((p: any) => p?.id === activePage.id);
+        if (pageIndex > -1) {
+           newPages[pageIndex].variations[activePage.activeVariationIndex || 0].data = data;
+           setPages(newPages);
+           updateDocument({ content: { ...document.content, pages: newPages } });
+        }
+      }
+    } catch (error: any) {
+      alert("Error generando diapositiva: " + error.message);
+    } finally {
+      setIsGeneratingSlide(false);
+    }
   }
 
   const addPage = () => {
@@ -326,6 +366,14 @@ export default function PageEditorWrapper({
              <div>
                <div className="flex items-center justify-between mb-3">
                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Contenido de la Página</label>
+                 <button 
+                   onClick={generateSlideContent}
+                   disabled={isGeneratingSlide}
+                   className="text-xs flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 to-cyan-400 text-white font-bold px-3 py-1.5 rounded-full hover:shadow-lg hover:shadow-indigo-500/25 transition-all disabled:opacity-50"
+                 >
+                   {isGeneratingSlide ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Bot className="w-3.5 h-3.5" />}
+                   {isGeneratingSlide ? "Generando..." : "✨ IA"}
+                 </button>
                </div>
                <p className="text-xs text-slate-500 mb-4 bg-indigo-50 text-indigo-700 p-3 rounded-lg border border-indigo-100 font-medium">
                  Escribe en los siguientes campos para actualizar la diapositiva en tiempo real. (La edición directa sobre el lienzo estará disponible en futuras versiones).
