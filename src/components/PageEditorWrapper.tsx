@@ -75,24 +75,19 @@ export default function PageEditorWrapper({
   const [brandColor, setBrandColor] = useState('#4f46e5') // Default
   const [saving, setSaving] = useState(false)
 
-  // Initialize from document content
+  // Initialize from document content ONLY ONCE when document is loaded
   useEffect(() => {
-    if (document.content?.pages) {
+    if (pages.length === 0 && document?.content?.pages) {
       const validPages = Array.isArray(document.content.pages) ? document.content.pages.filter(Boolean) : [];
       setPages(validPages)
       if (validPages.length > 0 && !activePageId) {
         setActivePageId(validPages[0]?.id)
       }
     }
-  }, [document.content])
+  }, [document?.id])
 
-  // Save changes to DB
-  useEffect(() => {
-    // Basic debounce could be added here
-    if (pages.length > 0 && document.content?.pages !== pages) {
-      handleSave(pages)
-    }
-  }, [pages])
+  // Removed useEffect on [pages] because it caused an infinite loop and focus loss on keystrokes.
+  // Saving is now handled manually via onBlur on text inputs and explicit actions (IA button, variation change, etc).
 
   const handleSave = async (newPages: any[]) => {
     setSaving(true)
