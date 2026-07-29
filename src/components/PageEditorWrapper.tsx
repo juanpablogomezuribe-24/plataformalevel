@@ -6,56 +6,21 @@ import PageRenderer from './PageRenderer'
 import Link from 'next/link'
 
 const AVAILABLE_LAYOUTS = [
-  { id: 'cover', name: 'Portada Clásica' },
-  { id: 'content', name: 'Texto Simple' },
-  { id: 'two-column', name: 'Dos Columnas' },
-  { id: 'metrics', name: 'Grid de Métricas' },
-  { id: 'chart', name: 'Gráfico Estadístico' },
-  { id: 'pricing', name: 'Tabla de Precios' },
-  { id: 'gallery', name: 'Galería de Imágenes' },
-  { id: 'profiles', name: 'Perfiles / Equipo' },
-  { id: 'data-table', name: 'Tabla de Acciones' },
-  { id: 'timeline', name: 'Flujo / Timeline' },
-  // LEVEL LAYOUTS (Lotbet Legacy)
-  { id: 'level-cover', name: 'Level - Portada' },
-  { id: 'level-menu', name: 'Level - Menú' },
-  { id: 'level-context', name: 'Level - Contexto' },
-  { id: 'level-objective', name: 'Level - Objetivo' },
-  { id: 'level-strategy-pillars', name: 'Level - Pilares Estratégicos' },
-  { id: 'level-scope', name: 'Level - Alcance' },
-  { id: 'level-timeline', name: 'Level - Timeline' },
-  { id: 'level-infrastructure', name: 'Level - Infraestructura' },
-  { id: 'level-preparation', name: 'Level - Preparación' },
-  { id: 'level-crm', name: 'Level - CRM' },
-  { id: 'level-dashboard', name: 'Level - Dashboard' },
-  { id: 'level-funnels', name: 'Level - Embudos' },
-  { id: 'level-comparison', name: 'Level - Comparación' },
-  { id: 'level-linear-flow', name: 'Level - Flujo Lineal' },
-  
-  // LEVEL LAYOUTS (Evolution Legacy)
-  { id: 'level-strategy', name: 'Level - Estrategia' },
-  { id: 'level-methodology', name: 'Level - Metodología' },
-  { id: 'level-influencers', name: 'Level - Influencers' },
-  { id: 'level-packages', name: 'Level - Paquetes' },
-  { id: 'level-livespins', name: 'Level - Live Spins' },
-  { id: 'level-mediakits', name: 'Level - Media Kits' },
-  { id: 'level-pilotplan', name: 'Level - Plan Piloto' },
-  { id: 'level-informe', name: 'Level - Informe' },
+  { id: 'level-cover', name: 'Portada Premium' },
+  { id: 'level-objective', name: 'Objetivos Estratégicos' },
+  { id: 'level-methodology', name: 'Metodología y Fases' },
+  { id: 'level-catalog', name: 'Catálogo / Perfiles' },
+  { id: 'level-timeline', name: 'Línea de Tiempo' }
 ];
 
 const getDefaultDataForLayout = (layoutId: string, currentData: any = {}) => {
   const base = { title: currentData.title || '' };
   
-  if (layoutId === 'cover' || layoutId === 'level-cover') return { ...base, subtitle: currentData.subtitle || '', description: currentData.description || '' };
-  if (layoutId === 'content' || layoutId === 'level-informe' || layoutId === 'level-context') return { ...base, content: currentData.content || '' };
-  if (layoutId === 'two-column') return { ...base, left_content: currentData.left_content || '', right_content: currentData.right_content || '' };
-  
-  if (layoutId === 'metrics' || layoutId === 'level-dashboard') return { ...base, items: [{ label: 'Métrica 1', value: '100' }, { label: 'Métrica 2', value: '200' }] };
-  if (layoutId === 'pricing' || layoutId === 'level-packages') return { ...base, items: [{ name: 'Plan Básico', price: '1000', features: 'Feature 1' }, { name: 'Plan Pro', price: '2000', features: 'Feature 2' }] };
-  if (layoutId === 'profiles' || layoutId === 'level-influencers') return { ...base, items: [{ name: 'Usuario 1', role: 'Rol', metric: '100K' }] };
-  if (layoutId === 'data-table' || layoutId === 'level-crm' || layoutId === 'level-scope') return { ...base, items: [{ action: 'Acción 1', person: 'Resp', status: 'Pendiente' }] };
-  if (layoutId === 'timeline' || layoutId === 'level-timeline') return { ...base, items: [{ phase: 'Fase 1', name: 'Hito', date: 'Fecha' }] };
-  if (layoutId === 'chart') return { ...base, items: [{ name: 'A', value: '50' }, { name: 'B', value: '80' }] };
+  if (layoutId === 'level-cover') return { ...base, subtitle: currentData.subtitle || '', description: currentData.description || '' };
+  if (layoutId === 'level-objective') return { ...base, mainObjective: currentData.mainObjective || 'Nuestro objetivo principal', goals: [{ title: 'Sub-objetivo 1', description: 'Descripción' }] };
+  if (layoutId === 'level-methodology') return { ...base, phases: [{ title: 'Fase 1', description: 'Descripción de la fase' }] };
+  if (layoutId === 'level-catalog') return { ...base, items: [{ name: 'Elemento 1', role: 'Rol o Categoría', description: 'Descripción detallada' }] };
+  if (layoutId === 'level-timeline') return { ...base, milestones: [{ name: 'Hito 1', date: 'Fecha', description: 'Detalle del hito' }] };
   
   return { ...base, content: currentData.content || '' };
 };

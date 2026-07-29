@@ -3,8 +3,7 @@
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  LevelCover, LevelMenu, LevelContext, LevelObjective, LevelStrategyPillars, LevelScope, LevelTimeline, LevelInfrastructure, LevelPreparation, LevelCrm, LevelDashboard, LevelFunnels, LevelComparison, LevelLinearFlow,
-  LevelStrategy, LevelMethodology, LevelInfluencers, LevelPackages, LevelLiveSpins, LevelMediaKits, LevelPilotPlan, LevelInforme
+  LevelCover, LevelObjective, LevelMethodology, LevelCatalog, LevelTimeline
 } from './layouts/level';
 
 interface Variation {
@@ -37,7 +36,7 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
 
   // SANITIZACIÓN ROBUSTA: Prevenir crashes si la IA alucina objetos en vez de arrays o si faltan.
   const safeData = { ...data };
-  const knownArrayKeys = ['items', 'events', 'influencersData', 'pillars', 'packages', 'funnels', 'profiles', 'rows', 'benefits', 'risks', 'summaryItems', 'steps', 'metrics', 'flowSteps', 'nodes', 'stats', 'summaries', 'checklist', 'boxes'];
+  const knownArrayKeys = ['goals', 'phases', 'items', 'milestones'];
   
   // 1. Si un campo conocido falta, inicializarlo como array vacío
   knownArrayKeys.forEach(key => {
@@ -80,235 +79,26 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
 
   const renderLayout = () => {
     switch (layoutType) {
-    // --- LEVEL LAYOUTS ---
+    // --- 5 PREMIUM LAYOUTS ---
     case 'level-cover': return <LevelCover data={safeData} />
-    case 'level-menu': return <LevelMenu data={safeData} />
-    case 'level-context': return <LevelContext data={safeData} />
     case 'level-objective': return <LevelObjective data={safeData} />
-    case 'level-strategy-pillars': return <LevelStrategyPillars data={safeData} />
-    case 'level-scope': return <LevelScope data={safeData} />
-    case 'level-timeline': return <LevelTimeline data={safeData} />
-    case 'level-infrastructure': return <LevelInfrastructure data={safeData} />
-    case 'level-preparation': return <LevelPreparation data={safeData} />
-    case 'level-crm': return <LevelCrm data={safeData} />
-    case 'level-dashboard': return <LevelDashboard data={safeData} />
-    case 'level-funnels': return <LevelFunnels data={safeData} />
-    case 'level-comparison': return <LevelComparison data={safeData} />
-    case 'level-linear-flow': return <LevelLinearFlow data={safeData} />
-
-    case 'level-strategy': return <LevelStrategy data={safeData} />
     case 'level-methodology': return <LevelMethodology data={safeData} />
-    case 'level-influencers': return <LevelInfluencers data={safeData} />
-    case 'level-packages': return <LevelPackages data={safeData} />
-    case 'level-livespins': return <LevelLiveSpins data={safeData} />
-    case 'level-mediakits': return <LevelMediaKits data={safeData} />
-    case 'level-pilotplan': return <LevelPilotPlan data={safeData} />
-    case 'level-informe': return <LevelInforme data={safeData} />
-
-    // --- GENERIC LAYOUTS ---
-    case 'cover':
-      return (
-        <div className={`w-full h-full flex flex-col items-center justify-center text-center p-12 ${bgClass}`}>
-          {isLotbet && <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 mix-blend-overlay"></div>}
-          {isEvolution && <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/10 to-purple-500/10"></div>}
-          <div className="relative z-10 flex flex-col items-center">
-            <div className={`w-32 h-2 mb-10 ${isEvolution ? 'bg-gradient-to-r from-pink-500 to-purple-500 rounded-full' : ''}`} style={!isEvolution ? { backgroundColor: brandColor } : {}}></div>
-            <h1 className={`text-6xl font-black mb-8 leading-tight max-w-4xl tracking-tight ${titleClass}`}>{safeData.title || 'Título de Presentación'}</h1>
-            <p className={`text-2xl max-w-3xl font-light leading-relaxed ${textMutedClass}`}>{safeData.subtitle || 'Subtítulo o descripción breve'}</p>
-            {safeData.description && <p className={`mt-8 max-w-2xl mx-auto text-lg ${textNormalClass}`}>{safeData.description}</p>}
-          </div>
-        </div>
-      )
+    case 'level-catalog': return <LevelCatalog data={safeData} />
+    case 'level-timeline': return <LevelTimeline data={safeData} />
     
-    case 'content':
-      return (
-        <div className={`w-full h-full p-16 flex flex-col justify-center ${bgClass} relative overflow-hidden`}>
-          {isEvolution && <div className="absolute -top-32 -right-32 w-96 h-96 bg-pink-500/20 blur-3xl rounded-full"></div>}
-          {isMundial && <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-emerald-500/10 to-transparent"></div>}
-          
-          <h2 className={`text-5xl font-black mb-10 tracking-tight ${titleClass}`}>{safeData.title || 'Sección'}</h2>
-          <div className={`text-2xl leading-relaxed max-w-5xl relative z-10 font-light ${textNormalClass}`}>
-            {safeData.content || 'Contenido principal...'}
-          </div>
-        </div>
-      )
-
-    case 'two-column':
-      return (
-        <div className={`w-full h-full p-16 flex flex-col ${bgClass}`}>
-          <h2 className={`text-4xl font-black mb-16 border-b-4 inline-block pb-4 tracking-tight ${titleClass}`} style={!isDark ? { borderBottomColor: brandColor } : { borderColor: 'currentColor' }}>
-            {safeData.title || 'Título de Sección'}
-          </h2>
-          <div className="flex-1 grid grid-cols-2 gap-16 items-center">
-            <div className={`text-xl leading-relaxed font-light ${textNormalClass}`}>
-              {safeData.left_content || 'Contenido columna izquierda...'}
-            </div>
-            <div className={`p-12 rounded-[2rem] text-xl font-medium shadow-2xl ${cardClass}`}>
-              {safeData.right_content || 'Contenido destacado derecha...'}
-            </div>
-          </div>
-        </div>
-      )
-
-    case 'metrics':
-      return (
-        <div className={`w-full h-full p-16 flex flex-col justify-center ${bgClass}`}>
-          <h2 className={`text-4xl font-black mb-16 text-center tracking-tight ${titleClass}`}>{data.title || 'KPIs Principales'}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {(Array.isArray(data.items) ? data.items : [{label:'Ejemplo', value:'100'}]).map((item: any, i: number) => (
-              <div key={i} className={`p-8 rounded-[2rem] text-center shadow-2xl transition-transform hover:-translate-y-2 ${cardClass}`}>
-                <p className={`text-sm font-bold tracking-widest uppercase mb-6 ${textMutedClass}`}>{item?.label || 'Dato'}</p>
-                <p className={`text-6xl font-black ${isEvolution ? 'text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-500' : isMundial ? 'text-emerald-400' : isLotbet ? 'text-white' : ''}`} style={!isDark ? { color: brandColor } : {}}>{item?.value || '0'}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-
-    case 'chart':
-      return (
-        <div className={`w-full h-full p-16 flex flex-col items-center justify-center text-center ${bgClass}`}>
-          <h2 className={`text-4xl font-black mb-16 tracking-tight ${titleClass}`}>{data.title || 'Gráfico de Datos'}</h2>
-          <div className={`w-full max-w-3xl h-80 border-b-2 border-l-2 flex items-end justify-between px-12 pt-8 ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
-            {(Array.isArray(data.items) ? data.items : [{name:'A', value:30}, {name:'B', value:80}, {name:'C', value:50}]).map((item:any, i:number) => (
-              <div key={i} className="flex flex-col items-center gap-6 w-24 group">
-                <div 
-                  className={`w-full rounded-t-xl transition-all duration-700 shadow-lg group-hover:opacity-100 ${isDark ? 'opacity-90' : 'opacity-80'}`} 
-                  style={{ height: `${Math.min(Number(item?.value || 0), 100)}%`, backgroundColor: brandColor, backgroundImage: isLotbet ? 'linear-gradient(to top, #3b82f6, #6366f1)' : isMundial ? 'linear-gradient(to top, #10b981, #34d399)' : isEvolution ? 'linear-gradient(to top, #ec4899, #a855f7)' : 'none' }}
-                ></div>
-                <span className={`text-base font-bold truncate w-full uppercase tracking-wider ${textMutedClass}`}>{item?.name || 'Item'}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-
-    case 'pricing':
-      return (
-        <div className={`w-full h-full p-16 flex flex-col items-center justify-center ${bgClass}`}>
-           <h2 className={`text-5xl font-black mb-16 tracking-tight ${titleClass}`}>{data.title || 'Inversión'}</h2>
-           <div className="flex gap-8 w-full max-w-6xl justify-center items-stretch">
-             {(Array.isArray(data.items) ? data.items : [{name:'Opción A', price:1000, features:'Feature 1'}, {name:'Opción B', price:2000, features:'Feature 1, 2'}]).map((item:any, i:number) => (
-               <div key={i} className={`flex-1 rounded-[2rem] p-12 hover:shadow-2xl transition-all hover:-translate-y-4 relative overflow-hidden flex flex-col ${cardClass} ${i === 1 ? 'scale-105 z-10 ring-4 ring-indigo-500/30' : ''}`}>
-                 {i === 1 && <div className="absolute top-0 inset-x-0 h-3 bg-gradient-to-r from-amber-400 to-orange-500"></div>}
-                 {i === 1 && <div className="absolute top-4 right-4 bg-amber-500 text-white text-[10px] font-black uppercase px-2 py-1 rounded-full">Recomendado</div>}
-                 
-                 <h3 className={`text-3xl font-black mb-6 ${isDark ? 'text-white' : 'text-slate-900'}`}>{item?.name || 'Plan'}</h3>
-                 <p className={`text-6xl font-black mb-10 tracking-tighter ${isMundial ? 'text-emerald-400' : isLotbet ? 'text-indigo-400' : isEvolution ? 'text-pink-400' : ''}`} style={(!isDark) ? { color: brandColor } : {}}>
-                   ${Number(item?.price || 0).toLocaleString()}
-                 </p>
-                 <div className={`h-px w-full mb-10 ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
-                 <div className="flex-1">
-                    <p className={`text-xl whitespace-pre-wrap leading-relaxed font-light ${textNormalClass}`}>{item?.features || 'Sin detalles'}</p>
-                 </div>
-                 <button className={`mt-10 w-full py-5 rounded-2xl font-black text-white text-lg transition-all hover:scale-105 shadow-xl ${isLotbet ? 'bg-indigo-600 shadow-indigo-600/30' : isMundial ? 'bg-emerald-600 shadow-emerald-600/30' : isEvolution ? 'bg-pink-600 shadow-pink-600/30' : ''}`} style={(!isDark) ? { backgroundColor: brandColor } : {}}>
-                   Seleccionar Plan
-                 </button>
-               </div>
-             ))}
-           </div>
-        </div>
-      )
-
-    case 'profiles':
-      return (
-        <div className={`w-full h-full p-16 flex flex-col justify-center ${bgClass}`}>
-          <h2 className={`text-5xl font-black mb-16 tracking-tight text-center ${titleClass}`}>{data.title || 'Equipo / Influenciadores'}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {(Array.isArray(data.items) ? data.items : [{name:'Juan P.', role:'Macro Influencer', metric:'1.2M'}, {name:'Maria C.', role:'Content Creator', metric:'850K'}]).map((item:any, i:number) => (
-              <div key={i} className={`p-8 rounded-[2rem] flex flex-col items-center text-center group hover:scale-105 transition-all duration-300 shadow-xl ${cardClass}`}>
-                <div className={`w-32 h-32 rounded-full mb-6 flex items-center justify-center p-1 border-2 ${isEvolution ? 'border-pink-500' : isMundial ? 'border-emerald-500' : 'border-indigo-500'}`}>
-                  <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${(item?.name || 'User').replace(' ', '')}`} alt={item?.name || 'User'} className="w-full h-full rounded-full bg-slate-100" />
-                </div>
-                <h3 className={`text-2xl font-black mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>{item?.name || 'User'}</h3>
-                <p className={`text-sm font-bold uppercase tracking-widest mb-4 ${textMutedClass}`}>{item?.role || 'Role'}</p>
-                <div className={`mt-auto py-2 px-6 rounded-full font-black text-lg ${isEvolution ? 'bg-pink-500/20 text-pink-400' : isMundial ? 'bg-emerald-500/20 text-emerald-400' : isLotbet ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-100 text-slate-700'}`}>
-                  {item?.metric || '0'}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-
-    case 'data-table':
-      return (
-        <div className={`w-full h-full p-16 flex flex-col ${bgClass}`}>
-          <h2 className={`text-4xl font-black mb-12 tracking-tight ${titleClass}`}>{data.title || 'Plan de Acción y Entregables'}</h2>
-          <div className={`flex-1 rounded-[2rem] overflow-hidden shadow-2xl flex flex-col ${cardClass}`}>
-            <div className={`grid grid-cols-4 gap-4 px-10 py-6 border-b text-sm font-bold uppercase tracking-widest ${isDark ? 'border-slate-700/50 bg-slate-900/50 text-slate-400' : 'border-slate-200 bg-slate-50 text-slate-500'}`}>
-              <div className="col-span-2">Acción / Entregable</div>
-              <div>Responsable</div>
-              <div className="text-right">Estado / Presupuesto</div>
-            </div>
-            <div className="overflow-y-auto flex-1 p-4 space-y-2">
-              {(Array.isArray(data.items) ? data.items : [
-                { action: '1x Reel Instagram (Q3)', person: 'Juan P.', status: 'En Proceso' },
-                { action: 'Campaña Expectativa', person: 'Maria C.', status: 'Completado' },
-                { action: 'Evento Lanzamiento', person: 'Agencia', status: 'Pendiente' }
-              ]).map((item:any, i:number) => (
-                <div key={i} className={`grid grid-cols-4 gap-4 px-6 py-4 rounded-xl items-center ${isDark ? 'bg-slate-800/30 hover:bg-slate-800/50' : 'bg-white hover:bg-slate-50'} transition-colors`}>
-                  <div className={`col-span-2 font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{item?.action || 'Acción'}</div>
-                  <div className={`text-sm font-medium ${textNormalClass}`}>{item?.person || 'Responsable'}</div>
-                  <div className="text-right">
-                    <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider ${
-                      item.status?.toLowerCase().includes('completado') || item.status?.toLowerCase().includes('aprobado')
-                        ? 'bg-emerald-500/20 text-emerald-500'
-                        : item.status?.toLowerCase().includes('proceso')
-                        ? 'bg-amber-500/20 text-amber-500'
-                        : isEvolution ? 'bg-pink-500/20 text-pink-400' : 'bg-blue-500/20 text-blue-500'
-                    }`}>
-                      {item?.status || 'Pendiente'}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )
-
-    case 'timeline':
-      return (
-        <div className={`w-full h-full p-16 flex flex-col justify-center ${bgClass}`}>
-          <h2 className={`text-5xl font-black mb-20 tracking-tight text-center ${titleClass}`}>{data.title || 'Cronograma del Proyecto'}</h2>
-          <div className="relative flex justify-between items-start max-w-5xl mx-auto w-full">
-            {/* Connecting Line */}
-            <div className={`absolute top-8 left-0 w-full h-1 -z-10 ${isDark ? 'bg-slate-700/50' : 'bg-slate-200'}`}>
-              <div className={`h-full w-2/3 ${isEvolution ? 'bg-pink-500' : isMundial ? 'bg-emerald-500' : isLotbet ? 'bg-indigo-500' : 'bg-slate-400'}`}></div>
-            </div>
-            
-            {(Array.isArray(data.items) ? data.items : [
-              { phase: 'Fase 1', name: 'Kickoff', date: 'Semana 1' },
-              { phase: 'Fase 2', name: 'Producción', date: 'Semana 2-3' },
-              { phase: 'Fase 3', name: 'Lanzamiento', date: 'Semana 4' }
-            ]).map((item:any, i:number) => (
-              <div key={i} className="flex flex-col items-center text-center w-64 group relative">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center font-black text-xl mb-8 shadow-xl transition-transform group-hover:scale-110 ${
-                  i < 2 
-                    ? (isEvolution ? 'bg-pink-500 text-white shadow-pink-500/40' : isMundial ? 'bg-emerald-500 text-white shadow-emerald-500/40' : isLotbet ? 'bg-indigo-500 text-white shadow-indigo-500/40' : 'bg-slate-800 text-white')
-                    : (isDark ? 'bg-slate-800 text-slate-400 border-2 border-slate-600' : 'bg-white text-slate-400 border-2 border-slate-300')
-                }`}>
-                  {i + 1}
-                </div>
-                <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${isEvolution ? 'text-pink-400' : isMundial ? 'text-emerald-400' : isLotbet ? 'text-indigo-400' : 'text-slate-500'}`}>{item?.phase || 'Fase'}</p>
-                <h3 className={`text-2xl font-black mb-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>{item?.name || 'Hito'}</h3>
-                <p className={`text-base ${textMutedClass}`}>{item?.date || 'Fecha'}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-
+    // --- FALLBACK GENÉRICO (Por si la IA o el caché devuelven uno viejo) ---
     default:
       return (
-        <div className={`w-full h-full p-12 flex flex-col items-center justify-center text-center ${bgClass}`}>
-           <p className={textMutedClass}>Layout "{layoutType}" no soportado aún.</p>
+        <div className={`w-full h-full p-16 flex flex-col justify-center ${bgClass} relative overflow-hidden`}>
+          <h2 className={`text-5xl font-black mb-10 tracking-tight ${titleClass}`}>{safeData.title || 'Sección Desconocida'}</h2>
+          <div className={`text-2xl leading-relaxed max-w-5xl relative z-10 font-light ${textNormalClass}`}>
+            Este layout antiguo ({layoutType}) ya no está disponible en la versión Premium.
+            Por favor, selecciona uno de los 5 diseños principales desde el panel izquierdo.
+          </div>
         </div>
       )
+    }
   }
-}
-
   return (
     <AnimatePresence mode="wait">
       <motion.div

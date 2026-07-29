@@ -1,61 +1,47 @@
 import React from 'react';
-import { FileCheck2, Calendar, CalendarCheck, CircleDollarSign, Wallet } from 'lucide-react';
-
-interface Metric {
-  id: string;
-  label: string;
-  value: string;
-}
+import { motion } from 'framer-motion';
 
 export interface LevelCoverData {
-  title: React.ReactNode;
-  subtitle: string;
-  metrics: Metric[];
+  title?: string;
+  subtitle?: string;
+  description?: string;
 }
 
 export const LevelCover: React.FC<{ data: LevelCoverData }> = ({ data }) => {
-  const getIcon = (id: string) => {
-    switch (id) {
-      case 'start': return <Calendar className="w-6 h-6 text-slate-400 mb-3" />;
-      case 'end': return <CalendarCheck className="w-6 h-6 text-slate-400 mb-3" />;
-      case 'contract': return <CircleDollarSign className="w-6 h-6 text-emerald-400 mb-3" />;
-      case 'advance': return <Wallet className="w-6 h-6 text-cyan-400 mb-3" />;
-      default: return null;
-    }
-  };
-
-  const getColorClass = (id: string) => {
-    switch(id) {
-        case 'contract': return "text-emerald-400";
-        case 'advance': return "text-cyan-400";
-        default: return "text-white";
-    }
-  }
-
   return (
-    <div className="h-[80vh] flex flex-col justify-center items-center text-center p-12 bg-slate-900 rounded-[3rem] text-white shadow-2xl relative overflow-hidden">
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl"></div>
+    <div className="w-full h-full flex flex-col justify-center items-center text-center p-12 bg-[#0B1120] text-white relative overflow-hidden group">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 mix-blend-overlay"></div>
+      <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-indigo-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 transition-all duration-1000 group-hover:bg-indigo-500/20"></div>
+      <div className="absolute bottom-0 left-0 w-[40rem] h-[40rem] bg-fuchsia-500/10 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/3 transition-all duration-1000 group-hover:bg-fuchsia-500/20"></div>
       
-      <div className="w-24 h-24 bg-white/10 backdrop-blur-md rounded-3xl flex items-center justify-center text-cyan-400 shadow-xl mb-8 border border-white/20 z-10">
-        <FileCheck2 className="w-12 h-12" />
-      </div>
-      <h1 className="text-4xl md:text-6xl font-black tracking-tighter leading-tight mb-4 z-10">
-        {data.title}
-      </h1>
-      <h2 className="text-2xl text-cyan-400 font-medium tracking-wide mb-12 z-10">
-        {data.subtitle}
-      </h2>
-      
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-4xl z-10 mt-8">
-        {data.metrics.map((metric, idx) => (
-          <div key={idx} className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl text-left">
-            {getIcon(metric.id)}
-            <p className="text-xs text-slate-400 uppercase tracking-widest font-bold mb-1">{metric.label}</p>
-            <p className={`text-lg font-black ${getColorClass(metric.id)}`}>{metric.value}</p>
-          </div>
-        ))}
-      </div>
+      {/* Content Container */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="relative z-10 flex flex-col items-center max-w-5xl"
+      >
+        {/* Top Accent */}
+        <div className="w-24 h-1.5 mb-12 rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 shadow-[0_0_20px_rgba(99,102,241,0.5)]"></div>
+        
+        {/* Title */}
+        <h1 className="text-6xl md:text-8xl font-black mb-8 leading-tight tracking-tighter bg-gradient-to-br from-white via-indigo-50 to-slate-400 bg-clip-text text-transparent drop-shadow-sm">
+          {data.title || 'Título Principal'}
+        </h1>
+        
+        {/* Subtitle */}
+        <h2 className="text-2xl md:text-4xl font-light tracking-wide text-indigo-300 mb-10 max-w-4xl">
+          {data.subtitle || 'Subtítulo o línea de impacto para cautivar a tu cliente'}
+        </h2>
+        
+        {/* Description */}
+        {data.description && (
+          <p className="text-xl md:text-2xl font-light leading-relaxed text-slate-400 max-w-3xl backdrop-blur-sm bg-white/5 p-8 rounded-3xl border border-white/10 shadow-2xl">
+            {data.description}
+          </p>
+        )}
+      </motion.div>
     </div>
   );
 };

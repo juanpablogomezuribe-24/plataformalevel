@@ -1,42 +1,82 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
-interface TimelineEvent {
-  text: React.ReactNode;
-  type: 'default' | 'warning' | 'danger' | 'info';
+export interface Milestone {
+  name?: string;
+  date?: string;
+  description?: string;
 }
 
 export interface LevelTimelineData {
-  title: string;
-  events: TimelineEvent[];
+  title?: string;
+  milestones?: Milestone[];
 }
 
 export const LevelTimeline: React.FC<{ data: LevelTimelineData }> = ({ data }) => {
-  const getStyles = (type: string) => {
-    switch (type) {
-      case 'warning': return { dot: "bg-amber-500", box: "bg-amber-50 border-amber-100 text-amber-900" };
-      case 'danger': return { dot: "bg-red-500", box: "bg-red-50 border-red-100 text-red-900" };
-      case 'info': return { dot: "bg-indigo-500", box: "bg-indigo-50 border-indigo-100 text-indigo-900" };
-      default: return { dot: "bg-cyan-500", box: "bg-slate-50 border-slate-100" };
-    }
-  };
+  const milestones = data.milestones && data.milestones.length > 0 ? data.milestones : [];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 mt-12">
-      <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight">{data.title}</h2>
-      <div className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-xl overflow-hidden relative">
-        <div className="absolute left-8 md:left-1/2 top-8 bottom-8 w-1 bg-slate-100 -translate-x-1/2 rounded-full"></div>
-        
-        <div className="space-y-4 relative">
-          {data.events.map((event, idx) => {
-            const isLeft = idx % 2 === 0;
-            const styles = getStyles(event.type);
+    <div className="w-full min-h-full flex flex-col p-12 lg:p-24 bg-white relative overflow-hidden">
+      {/* Background Subtle Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-white -z-10"></div>
+      
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="mb-20 text-center max-w-4xl mx-auto z-10"
+      >
+        <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+          {data.title || 'Línea de Tiempo'}
+        </h2>
+        <div className="w-24 h-1.5 bg-indigo-500 mx-auto mt-8 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.3)]"></div>
+      </motion.div>
+
+      <div className="relative max-w-5xl mx-auto w-full z-10">
+        {/* Central Vertical Line (Desktop) */}
+        <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500/20 via-indigo-500/50 to-transparent -translate-x-1/2 rounded-full"></div>
+        {/* Left Vertical Line (Mobile) */}
+        <div className="md:hidden absolute left-6 top-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500/20 via-indigo-500/50 to-transparent rounded-full"></div>
+
+        <div className="space-y-12 md:space-y-24 relative">
+          {milestones.map((milestone, idx) => {
+            const isEven = idx % 2 === 0;
             return (
-              <div key={idx} className={`flex items-center relative left-12 md:left-0 mb-4 ${isLeft ? 'md:justify-end md:w-1/2 md:pr-8' : 'md:w-1/2 md:pl-8 md:ml-auto'}`}>
-                <div className={`absolute w-4 h-4 rounded-full border-4 border-white shadow-sm z-10 ${styles.dot} ${isLeft ? '-left-[45px] md:-right-[37px] md:left-auto' : '-left-[45px] md:-left-[21px]'}`}></div>
-                <div className={`p-3 rounded-xl shadow-sm text-sm w-full border ${styles.box}`}>
-                  {event.text}
+              <motion.div 
+                key={idx}
+                initial={{ opacity: 0, x: isEven ? -50 : 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                className={`flex flex-col md:flex-row items-center w-full relative ${
+                  isEven ? 'md:justify-start' : 'md:justify-end'
+                }`}
+              >
+                {/* Node Point */}
+                <div className={`absolute left-6 md:left-1/2 w-8 h-8 -translate-x-1/2 rounded-full bg-white border-4 border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.5)] z-20 flex items-center justify-center`}>
+                   <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
                 </div>
-              </div>
+
+                {/* Content Card */}
+                <div className={`w-full md:w-[45%] pl-20 md:pl-0 ${
+                  isEven ? 'md:pr-16 text-left md:text-right' : 'md:pl-16 text-left'
+                }`}>
+                  <div className="group bg-white p-8 rounded-[2rem] border border-slate-100 shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(99,102,241,0.1)] transition-all duration-500 hover:-translate-y-2 relative overflow-hidden">
+                    {/* Hover Decoration */}
+                    <div className={`absolute top-0 w-2 h-full bg-indigo-500 transition-all duration-500 ${isEven ? 'right-0 group-hover:w-full group-hover:opacity-5' : 'left-0 group-hover:w-full group-hover:opacity-5'}`}></div>
+
+                    <span className="inline-block px-4 py-1 rounded-full bg-indigo-50 text-indigo-600 font-bold text-xs uppercase tracking-widest mb-4">
+                      {milestone.date || `Hito ${idx + 1}`}
+                    </span>
+                    <h3 className="text-2xl font-black text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors">
+                      {milestone.name || 'Nombre del evento'}
+                    </h3>
+                    <p className="text-slate-500 leading-relaxed font-light">
+                      {milestone.description || 'Describe los entregables, acciones clave o eventos que sucederán en este punto del cronograma.'}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
             );
           })}
         </div>

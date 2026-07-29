@@ -1,132 +1,75 @@
-import React, { useState } from 'react';
-import { ToggleRight, ToggleLeft, Star, ExternalLink, Camera } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
 
-export const LevelMethodology: React.FC<{ data?: any }> = ({ data }) => {
-  const [im, setIm] = useState(false);
+export interface Phase {
+  title?: string;
+  description?: string;
+}
 
-  const toggleInfluencerMode = () => setIm(!im);
+export interface LevelMethodologyData {
+  title?: string;
+  phases?: Phase[];
+}
+
+export const LevelMethodology: React.FC<{ data: LevelMethodologyData }> = ({ data }) => {
+  const phases = data.phases && data.phases.length > 0 ? data.phases : [];
 
   return (
-    <div className="animate-slide-right p-4 md:p-10 max-w-7xl mx-auto h-full flex flex-col justify-center text-slate-200">
-      <div className="text-center mb-12">
-        <h2 className="text-4xl font-extrabold mb-4 uppercase text-white">Los 3 Momentos</h2>
-        <p className="text-slate-400 max-w-2xl mx-auto mb-6">Nuestra estrategia de contenido cubre todo el ciclo de vida del evento.</p>
-        
-        <div className="flex flex-col items-center gap-3">
-            <div onClick={toggleInfluencerMode} className={`inline-flex items-center gap-3 px-6 py-2 rounded-full cursor-pointer transition-all duration-300 border-2 ${im ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-900 border-slate-700 text-slate-400'}`}>
-              <div className="font-bold text-sm uppercase tracking-wider">Modo Influencer</div>
-              {im ? <ToggleRight className="w-8 h-8 text-cyan-400" /> : <ToggleLeft className="w-8 h-8 text-slate-600" />}
-            </div>
-            {im && <div className="flex items-center gap-2 text-xs text-cyan-400 animate-fade-in"><Star className="w-3 h-3 fill-cyan-400" /> Indica formato potenciado con Influencer</div>}
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-        <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-slate-800 -z-10 transform -translate-y-1/2"></div>
+    <div className="w-full min-h-full flex flex-col p-12 lg:p-24 bg-slate-50 relative overflow-hidden">
+      {/* Background Ornaments */}
+      <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-indigo-500/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-[40rem] h-[40rem] bg-fuchsia-500/5 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
 
-        {/* PREVIA */}
-        <div className={`p-8 rounded-xl border-2 transition-all group relative bg-slate-900 ${im ? 'border-indigo-500 shadow-lg shadow-indigo-500/10' : 'border-slate-800'}`}>
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl mb-6 mx-auto transition-all ${im ? 'bg-indigo-600 text-white scale-110' : 'bg-slate-800 text-slate-500'}`}>1</div>
-          <h3 className="text-xl font-black text-center mb-2 uppercase text-white">La Previa</h3>
-          <p className="text-xs text-center text-slate-400 uppercase tracking-widest mb-6">Expectativa & Educación</p>
-          
-          <div className="space-y-3">
-            <button className={`w-full text-left p-3 rounded-lg transition-all flex items-center justify-between group/item border ${im ? 'bg-indigo-900/40 text-white border-indigo-500/50' : 'bg-slate-800/50 text-slate-300 border-slate-700 hover:border-slate-600'}`}>
-              <div>
-                <strong className="block text-sm flex items-center gap-2">Street Content {im && <Star className="w-3 h-3 text-cyan-400 fill-cyan-400" />}</strong>
-                <span className={`text-[10px] ${im ? 'text-indigo-200' : 'text-slate-500'}`}>Retos en la calle, vox pop e interacción (Tablets)</span>
-              </div>
-              <ExternalLink className="w-4 h-4 opacity-0 group-hover/item:opacity-100 text-indigo-400" />
-            </button>
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="mb-16 text-center max-w-4xl mx-auto z-10"
+      >
+        <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+          {data.title || 'Metodología de Trabajo'}
+        </h2>
+        <div className="w-24 h-1.5 bg-gradient-to-r from-indigo-500 to-fuchsia-500 mx-auto mt-8 rounded-full"></div>
+      </motion.div>
 
-            <button className={`w-full text-left p-3 rounded-lg transition-all flex items-center justify-between group/item border ${im ? 'bg-indigo-900/40 text-white border-indigo-500/50' : 'bg-slate-800/50 text-slate-300 border-slate-700 hover:border-slate-600'}`}>
-              <div>
-                <strong className="block text-sm flex items-center gap-2">Interacción con el juego {im && <Star className="w-3 h-3 text-emerald-400 fill-emerald-400" />}</strong>
-                <span className={`text-[10px] ${im ? 'text-indigo-200' : 'text-slate-500'}`}>Usuarios ganando (Efecto Pantalla)</span>
+      <div className="flex-1 w-full max-w-7xl mx-auto flex flex-col md:flex-row gap-6 md:gap-8 justify-center items-stretch z-10">
+        {phases.map((phase, idx) => (
+          <motion.div 
+            key={idx}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: idx * 0.1, duration: 0.4 }}
+            className={`flex-1 flex flex-col relative group ${
+              idx % 2 !== 0 ? 'md:mt-16' : ''
+            }`}
+          >
+            {/* Connection Line (Hidden on Mobile) */}
+            {idx < phases.length - 1 && (
+              <div className="hidden md:block absolute top-12 left-1/2 w-full h-[2px] bg-slate-200 -z-10">
+                <div className="h-full bg-indigo-500 w-0 group-hover:w-full transition-all duration-700 ease-out"></div>
               </div>
-              <ExternalLink className="w-4 h-4 opacity-0 group-hover/item:opacity-100 text-indigo-400" />
-            </button>
-
-            <button className={`w-full text-left p-3 rounded-lg transition-all flex items-center justify-between group/item border ${im ? 'bg-indigo-900/40 text-white border-indigo-500/50' : 'bg-slate-800/50 text-slate-300 border-slate-700 hover:border-slate-600'}`}>
-              <div>
-                <strong className="block text-sm flex items-center gap-2">Cápsulas Educativas {im && <Star className="w-3 h-3 text-cyan-400 fill-cyan-400" />}</strong>
-                <span className={`text-[10px] ${im ? 'text-indigo-200' : 'text-slate-500'}`}>Explicar de forma entretenida</span>
-              </div>
-              <ExternalLink className="w-4 h-4 opacity-0 group-hover/item:opacity-100 text-indigo-400" />
-            </button>
-          </div>
-        </div>
-
-        {/* DURANTE */}
-        <div className={`p-8 rounded-xl shadow-2xl transform md:-translate-y-4 transition-all ${im ? 'bg-slate-950 border border-cyan-500/50 scale-105 shadow-cyan-500/20' : 'bg-slate-950 border border-slate-800'}`}>
-          <div className="w-12 h-12 bg-indigo-500 text-white rounded-full flex items-center justify-center font-bold text-xl mb-6 mx-auto animate-pulse shadow-lg shadow-indigo-500/30">2</div>
-          <h3 className="text-xl font-black text-center mb-2 uppercase text-white">El Durante</h3>
-          <p className="text-xs text-center text-indigo-300 uppercase tracking-widest mb-6">Cobertura en Vivo</p>
-          
-          <ul className="space-y-4 text-sm">
-            <li className="flex gap-3 items-start">
-              <div className="bg-slate-800 p-1.5 rounded-full"><Camera className="w-4 h-4 text-indigo-400" /></div>
-              <div>
-                <strong className="block font-bold text-slate-200">Historias Proveedor</strong>
-                <span className="text-xs text-slate-500">Cobertura básica en tiempo real.</span>
-              </div>
-            </li>
-            {im && (
-            <div className="animate-fade-in pt-4 border-t border-slate-800 space-y-4">
-                <li className="flex gap-3 items-start">
-                  <div className="bg-cyan-500/20 p-1.5 rounded-full text-cyan-400"><Star className="w-4 h-4 fill-cyan-400" /></div>
-                  <div>
-                    <strong className="block font-bold text-cyan-400">Talento en Vivo</strong>
-                    <span className="text-xs text-cyan-100/70">Influencer como animador.</span>
-                  </div>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <div className="bg-cyan-500/20 p-1.5 rounded-full text-cyan-400"><ExternalLink className="w-4 h-4" /></div>
-                  <div>
-                    <strong className="block font-bold text-cyan-400">Tráfico Web</strong>
-                    <span className="text-xs text-cyan-100/70">Stories con Link directo al juego.</span>
-                  </div>
-                </li>
-            </div>
             )}
-          </ul>
-        </div>
 
-        {/* POST */}
-        <div className={`p-8 rounded-xl border-2 transition-all group relative bg-slate-900 ${im ? 'border-indigo-500 shadow-lg shadow-indigo-500/10' : 'border-slate-800'}`}>
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl mb-6 mx-auto transition-all ${im ? 'bg-indigo-600 text-white scale-110' : 'bg-slate-800 text-slate-500'}`}>3</div>
-          <h3 className="text-xl font-black text-center mb-2 uppercase text-white">El Post</h3>
-          <p className="text-xs text-center text-slate-400 uppercase tracking-widest mb-6">Amplificación</p>
-          
-          <div className="space-y-3">
-            <button className={`w-full text-left p-3 rounded-lg transition-all flex items-center justify-between group/item border ${im ? 'bg-indigo-900/40 text-white border-indigo-500/50' : 'bg-slate-800/50 text-slate-300 border-slate-700 hover:border-slate-600'}`}>
-              <div>
-                <strong className="block text-sm flex items-center gap-2">Mejores Momentos {im && <Star className="w-3 h-3 text-cyan-400 fill-cyan-400" />}</strong>
-                <span className={`text-[10px] ${im ? 'text-indigo-200' : 'text-slate-500'}`}>Clips / Reacciones</span>
+            <div className="bg-white rounded-[2rem] p-8 md:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-slate-100 flex-1 hover:-translate-y-4 transition-transform duration-500 group-hover:shadow-[0_20px_50px_rgba(99,102,241,0.1)] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-50 to-transparent rounded-bl-full -mr-10 -mt-10 transition-all duration-500 group-hover:scale-150 group-hover:bg-indigo-500/5"></div>
+              
+              <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center mb-8 relative z-10 group-hover:bg-indigo-600 transition-colors duration-500 shadow-inner">
+                <span className="text-2xl font-black text-indigo-600 group-hover:text-white transition-colors duration-500">
+                  {idx + 1}
+                </span>
               </div>
-              <ExternalLink className="w-4 h-4 opacity-0 group-hover/item:opacity-100 text-indigo-400" />
-            </button>
-
-            <button className={`w-full text-left p-3 rounded-lg transition-all flex items-center justify-between group/item border ${im ? 'bg-indigo-900/40 text-white border-indigo-500/50' : 'bg-slate-800/50 text-slate-300 border-slate-700 hover:border-slate-600'}`}>
-              <div>
-                <strong className="block text-sm flex items-center gap-2">{im ? 'Behind The Scenes' : 'Teaser Resumen'} {im && <Star className="w-3 h-3 text-cyan-400 fill-cyan-400" />}</strong>
-                <span className={`text-[10px] ${im ? 'text-indigo-200' : 'text-slate-500'}`}>{im ? 'Haciendo el recap con el influencer' : 'Recap cinematográfico'}</span>
-              </div>
-              <ExternalLink className="w-4 h-4 opacity-0 group-hover/item:opacity-100 text-indigo-400" />
-            </button>
-
-            <div className={`w-full text-left p-3 rounded-lg border ${im ? 'bg-indigo-900/40 text-white border-indigo-500/50' : 'bg-slate-800/50 text-slate-300 border-slate-700'}`}>
-              <strong className="block text-sm flex items-center gap-2">Backstage Exclusivo {im && <Star className="w-3 h-3 text-cyan-400 fill-cyan-400" />}</strong>
-              <span className={`text-[10px] ${im ? 'text-indigo-200' : 'text-slate-500'}`}>Jugadores + Talento</span>
+              
+              <h3 className="text-2xl font-black text-slate-900 mb-4 relative z-10">
+                {phase.title || `Fase ${idx + 1}`}
+              </h3>
+              
+              <p className="text-slate-500 font-light leading-relaxed relative z-10">
+                {phase.description || 'Detalla las acciones, hitos o procesos que ocurren durante esta fase de la metodología.'}
+              </p>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-16 text-center">
-        <button className="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/20">
-          Ver Roster de Influenciadores
-        </button>
+          </motion.div>
+        ))}
       </div>
     </div>
   );

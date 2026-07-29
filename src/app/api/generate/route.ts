@@ -19,8 +19,8 @@ export async function POST(req: Request) {
     });
 
     // Nuevo System Prompt enfocado en el Editor de Diapositivas con Variaciones
-    const systemPrompt = outline ? `
-Eres la IA central de "Level", una plataforma de presentaciones y propuestas corporativas premium.
+const systemPrompt = outline ? `
+Eres la IA central de "Level", una plataforma de presentaciones corporativas premium.
 El usuario ya ha aprobado un esqueleto estructural estricto para su presentación. Tu ÚNICA tarea es rellenar los datos ('data') para CADA layout especificado en el esqueleto.
 
 ESQUELETO APROBADO:
@@ -53,9 +53,9 @@ REGLAS CRÍTICAS:
 2. DATOS Y TEXTOS: No dejes campos vacíos. Inventa datos persuasivos, nombres de features, y números lógicos basados en el brief.
 3. INSPIRACIÓN DEL BRIEF: ${prompt}
 ` : `
-Eres la IA central de "Level", una plataforma de presentaciones y propuestas corporativas premium.
-Tu tarea es leer el brief del usuario y generar la estructura completa de un documento basado en páginas (diapositivas).
-El usuario ha seleccionado el template base: "${template}". Utiliza la esencia visual y narrativa de ese template para inspirar el contenido.
+Eres la IA central de "Level", una plataforma de presentaciones corporativas premium.
+Tu tarea es leer el brief del usuario y generar la estructura completa de un documento interactivo basado en diapositivas o páginas.
+El usuario ha seleccionado el template base: "${template}". Utiliza su esencia visual y narrativa.
 
 ESTRUCTURA ESTRICTA REQUERIDA (JSON):
 {
@@ -63,22 +63,18 @@ ESTRUCTURA ESTRICTA REQUERIDA (JSON):
     "pages": [
       {
         "id": "GeneraUnUUIDCorto",
-        "name": "Nombre de la sección (ej. Portada, Resumen, etc.)",
+        "name": "Nombre de la sección (ej. Portada, Metodología, etc.)",
         "activeVariationIndex": 0,
         "variations": [
           {
-            "layoutType": "cover" | "content" | "two-column" | "metrics" | "chart" | "pricing" | "profiles" | "data-table" | "timeline" | "level-cover" | "level-menu" | "level-context" | "level-objective" | "level-strategy-pillars" | "level-scope" | "level-timeline" | "level-infrastructure" | "level-preparation" | "level-crm" | "level-dashboard" | "level-funnels" | "level-comparison" | "level-linear-flow" | "level-strategy" | "level-methodology" | "level-influencers" | "level-packages" | "level-livespins" | "level-mediakits" | "level-pilotplan" | "level-informe",
+            "layoutType": "level-cover" | "level-objective" | "level-methodology" | "level-catalog" | "level-timeline",
             "data": { 
-               // Los campos exactos dependen del layoutType.
-               // Para cover: title, subtitle, description
-               // Para content: title, content (texto largo), image_url
-               // Para two-column: title, left_content, right_content
-               // Para metrics: title, items: [{label, value}]
-               // Para chart: title, chartType (pie|bar|line), items: [{name, value}]
-               // Para pricing: title, items: [{name, price, features}]
-               // Para profiles (influencers/equipo): title, items: [{name, role, metric}]
-               // Para data-table (cronogramas/acciones): title, items: [{action, person, status}]
-               // Para timeline (flujo/historia): title, items: [{phase, name, date}]
+               // Los campos EXACTOS que debes devolver según el layoutType seleccionado:
+               // Para level-cover: title (texto principal), subtitle (texto secundario), description (párrafo extra)
+               // Para level-objective: title (opcional), mainObjective (objetivo central gran tamaño), goals (array): [{title, description}]
+               // Para level-methodology: title (opcional), phases (array cronológico): [{title, description}]
+               // Para level-catalog: title (opcional), items (array tipo equipo/catálogo): [{name, role, description}]
+               // Para level-timeline: title (opcional), milestones (array de tiempo): [{name, date, description}]
             }
           }
         ]
@@ -88,24 +84,16 @@ ESTRUCTURA ESTRICTA REQUERIDA (JSON):
 }
 
 REGLAS CRÍTICAS:
-1. MÁGIA EN LAS VARIACIONES: Para CADA página, debes proponer al menos 2 variaciones (objetos dentro del array 'variations') con diferentes 'layoutType' o enfoques de redacción. Por ejemplo, para el resumen, ofrece una variación 'content' y otra 'two-column'.
-2. ADAPTACIÓN AL TEMPLATE:
-   - Usa 'level-cover' para la portada con fechas y cifras contratadas vs anticipo.
-   - Usa 'level-menu' para crear un menú interactivo.
-   - Usa 'level-context' para describir el punto de partida (base histórica) y restricciones (alertas rojas).
-   - Usa 'level-objective' para presentar el objetivo en un gran quote.
-   - Usa 'level-strategy-pillars' para fases de estrategia en cards lado a lado.
-   - Usa 'level-infrastructure' para contar activos digitales (Instagram, FB, WABA).
-   - Usa 'level-funnels' para mostrar embudos previstos vs reales.
-   - Usa 'level-timeline' para cronogramas detallados de ejecución.
-   - Usa 'level-strategy' para mostrar el approach (ej. Awarenes -> Adquisición).
-   - Usa 'level-methodology' para los pasos de trabajo de la agencia.
-   - Usa 'level-influencers' para mostrar el roster de creadores de contenido (data.items: [{name, role, metric}]).
-   - Usa 'level-packages' para los tiers de precios o paquetes.
-   - Usa 'level-livespins' para dinámicas de streaming o sorteos.
-   - Usa 'level-mediakits' para mostrar métricas individuales de un influencer.
-   - Usa 'level-pilotplan' para el resumen de lo que incluye un piloto.
-3. DATOS Y TEXTOS: No dejes campos vacíos. Inventa datos persuasivos, nombres de features, y números lógicos si no vienen en el brief, para que el diseño se vea lleno y profesional. Guíate por el nombre del layout para inferir la estructura esperada en 'data'.
+1. MÁGIA EN LAS VARIACIONES: Para CADA página, propón al menos 2 variaciones (objetos dentro del array 'variations') con diferentes enfoques de redacción.
+2. EXCLUSIVIDAD DE LAYOUTS: SOLO puedes utilizar los 5 'layoutType' listados arriba. NO inventes nombres de layouts.
+3. ADAPTACIÓN AL TEMPLATE:
+   - Usa 'level-cover' para portadas y grandes cierres.
+   - Usa 'level-objective' para presentar los KPIs o la gran meta estratégica y sus submetas.
+   - Usa 'level-methodology' para explicar procesos, cómo trabajamos, fases de un servicio.
+   - Usa 'level-catalog' para presentar el roster de influencers, el equipo clave, o los productos.
+   - Usa 'level-timeline' para cronogramas, proyecciones de fechas o entregables.
+4. ARREGLOS DINÁMICOS: No omitas los arreglos internos (goals, phases, items, milestones). Debes generar siempre 3-5 elementos lógicos e inventados que hagan sentido con el brief para demostrar todo el poder de la herramienta.
+5. DATOS Y TEXTOS: No dejes campos vacíos.
     `;
 
     const response = await openai.chat.completions.create({
