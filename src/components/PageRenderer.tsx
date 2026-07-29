@@ -81,29 +81,29 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
   const renderLayout = () => {
     switch (layoutType) {
     // --- LEVEL LAYOUTS ---
-    case 'level-cover': return <LevelCover data={data} />
-    case 'level-menu': return <LevelMenu data={data} />
-    case 'level-context': return <LevelContext data={data} />
-    case 'level-objective': return <LevelObjective data={data} />
-    case 'level-strategy-pillars': return <LevelStrategyPillars data={data} />
-    case 'level-scope': return <LevelScope data={data} />
-    case 'level-timeline': return <LevelTimeline data={data} />
-    case 'level-infrastructure': return <LevelInfrastructure data={data} />
-    case 'level-preparation': return <LevelPreparation data={data} />
-    case 'level-crm': return <LevelCrm data={data} />
-    case 'level-dashboard': return <LevelDashboard data={data} />
-    case 'level-funnels': return <LevelFunnels data={data} />
-    case 'level-comparison': return <LevelComparison data={data} />
-    case 'level-linear-flow': return <LevelLinearFlow data={data} />
+    case 'level-cover': return <LevelCover data={safeData} />
+    case 'level-menu': return <LevelMenu data={safeData} />
+    case 'level-context': return <LevelContext data={safeData} />
+    case 'level-objective': return <LevelObjective data={safeData} />
+    case 'level-strategy-pillars': return <LevelStrategyPillars data={safeData} />
+    case 'level-scope': return <LevelScope data={safeData} />
+    case 'level-timeline': return <LevelTimeline data={safeData} />
+    case 'level-infrastructure': return <LevelInfrastructure data={safeData} />
+    case 'level-preparation': return <LevelPreparation data={safeData} />
+    case 'level-crm': return <LevelCrm data={safeData} />
+    case 'level-dashboard': return <LevelDashboard data={safeData} />
+    case 'level-funnels': return <LevelFunnels data={safeData} />
+    case 'level-comparison': return <LevelComparison data={safeData} />
+    case 'level-linear-flow': return <LevelLinearFlow data={safeData} />
 
-    case 'level-strategy': return <LevelStrategy data={data} />
-    case 'level-methodology': return <LevelMethodology data={data} />
-    case 'level-influencers': return <LevelInfluencers data={data} />
-    case 'level-packages': return <LevelPackages data={data} />
-    case 'level-livespins': return <LevelLiveSpins data={data} />
-    case 'level-mediakits': return <LevelMediaKits data={data} />
-    case 'level-pilotplan': return <LevelPilotPlan data={data} />
-    case 'level-informe': return <LevelInforme data={data} />
+    case 'level-strategy': return <LevelStrategy data={safeData} />
+    case 'level-methodology': return <LevelMethodology data={safeData} />
+    case 'level-influencers': return <LevelInfluencers data={safeData} />
+    case 'level-packages': return <LevelPackages data={safeData} />
+    case 'level-livespins': return <LevelLiveSpins data={safeData} />
+    case 'level-mediakits': return <LevelMediaKits data={safeData} />
+    case 'level-pilotplan': return <LevelPilotPlan data={safeData} />
+    case 'level-informe': return <LevelInforme data={safeData} />
 
     // --- GENERIC LAYOUTS ---
     case 'cover':
@@ -113,9 +113,9 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
           {isEvolution && <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/10 to-purple-500/10"></div>}
           <div className="relative z-10 flex flex-col items-center">
             <div className={`w-32 h-2 mb-10 ${isEvolution ? 'bg-gradient-to-r from-pink-500 to-purple-500 rounded-full' : ''}`} style={!isEvolution ? { backgroundColor: brandColor } : {}}></div>
-            <h1 className={`text-6xl font-black mb-8 leading-tight max-w-4xl tracking-tight ${titleClass}`}>{data.title || 'Título de Presentación'}</h1>
-            <p className={`text-2xl max-w-3xl font-light leading-relaxed ${textMutedClass}`}>{data.subtitle || 'Subtítulo o descripción breve'}</p>
-            {data.description && <p className={`mt-8 max-w-2xl mx-auto text-lg ${textNormalClass}`}>{data.description}</p>}
+            <h1 className={`text-6xl font-black mb-8 leading-tight max-w-4xl tracking-tight ${titleClass}`}>{safeData.title || 'Título de Presentación'}</h1>
+            <p className={`text-2xl max-w-3xl font-light leading-relaxed ${textMutedClass}`}>{safeData.subtitle || 'Subtítulo o descripción breve'}</p>
+            {safeData.description && <p className={`mt-8 max-w-2xl mx-auto text-lg ${textNormalClass}`}>{safeData.description}</p>}
           </div>
         </div>
       )
@@ -126,9 +126,9 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
           {isEvolution && <div className="absolute -top-32 -right-32 w-96 h-96 bg-pink-500/20 blur-3xl rounded-full"></div>}
           {isMundial && <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-emerald-500/10 to-transparent"></div>}
           
-          <h2 className={`text-5xl font-black mb-10 tracking-tight ${titleClass}`}>{data.title || 'Sección'}</h2>
+          <h2 className={`text-5xl font-black mb-10 tracking-tight ${titleClass}`}>{safeData.title || 'Sección'}</h2>
           <div className={`text-2xl leading-relaxed max-w-5xl relative z-10 font-light ${textNormalClass}`}>
-            {data.content || 'Contenido principal...'}
+            {safeData.content || 'Contenido principal...'}
           </div>
         </div>
       )
@@ -137,14 +137,14 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
       return (
         <div className={`w-full h-full p-16 flex flex-col ${bgClass}`}>
           <h2 className={`text-4xl font-black mb-16 border-b-4 inline-block pb-4 tracking-tight ${titleClass}`} style={!isDark ? { borderBottomColor: brandColor } : { borderColor: 'currentColor' }}>
-            {data.title || 'Título de Sección'}
+            {safeData.title || 'Título de Sección'}
           </h2>
           <div className="flex-1 grid grid-cols-2 gap-16 items-center">
             <div className={`text-xl leading-relaxed font-light ${textNormalClass}`}>
-              {data.left_content || 'Contenido columna izquierda...'}
+              {safeData.left_content || 'Contenido columna izquierda...'}
             </div>
             <div className={`p-12 rounded-[2rem] text-xl font-medium shadow-2xl ${cardClass}`}>
-              {data.right_content || 'Contenido destacado derecha...'}
+              {safeData.right_content || 'Contenido destacado derecha...'}
             </div>
           </div>
         </div>
