@@ -37,7 +37,7 @@ export default function PageRenderer({ page, brandColor = '#4f46e5', template = 
 
   // SANITIZACIÓN ROBUSTA: Prevenir crashes si la IA alucina objetos en vez de arrays o si faltan.
   const safeData = { ...data };
-  const knownArrayKeys = ['items', 'events', 'influencersData', 'pillars', 'packages', 'funnels', 'profiles', 'rows'];
+  const knownArrayKeys = ['items', 'events', 'influencersData', 'pillars', 'packages', 'funnels', 'profiles', 'rows', 'benefits', 'risks', 'summaryItems', 'steps', 'metrics', 'flowSteps', 'nodes', 'stats', 'summaries', 'checklist', 'boxes'];
   
   // 1. Si un campo conocido falta, inicializarlo como array vacío
   knownArrayKeys.forEach(key => {
